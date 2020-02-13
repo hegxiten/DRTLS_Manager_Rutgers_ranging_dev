@@ -612,6 +612,7 @@ public class GridView extends View {
             redraw = true;
         }
         if (redraw) {
+            // redraw the current view
             postInvalidate();
         }
     }
@@ -989,7 +990,7 @@ public class GridView extends View {
         if (DEBUG_DRAW_NODE) {
             log.d("drawing anchor: " + bleAddress + ", position: " + anchor.extractPositionDirect());
         }
-        // anchor is a triangle
+        // anchor is a triangle (symbol)
         NodeStateView.configureAnchorPath(networkElementPath, x, y - anchorTriangleSize / 2, anchorTriangleSize);
         if (!anchor.isInitiator()) {
             // if this is not initiator we will fill the triangle separately
