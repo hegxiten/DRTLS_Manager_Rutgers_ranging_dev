@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -346,6 +347,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         super.onCreate(savedInstanceState);
         // retrieve the original/to be modified node in each case
         Bundle args = getArguments();
+        Log.d("NodeDetailGetArgs", "onCreate: " + args.toString());
         if (Constants.DEBUG) {
             Preconditions.checkNotNull(args, "must specify node details to show!");
             Preconditions.checkState(args.getLong(BK_NODE_ID, 0) == 0, "must specify node ID in args!");

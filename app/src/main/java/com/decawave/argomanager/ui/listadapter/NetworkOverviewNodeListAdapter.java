@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -508,8 +509,11 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 Bundle args = GridFragment.getArgsForPosition(position);
                 mainActivity.showFragment(FragmentType.GRID, args);
             });
-            editIcon.setOnClickListener(view ->
-                    mainActivity.showFragment(FragmentType.NODE_DETAILS, NodeDetailFragment.getArgumentsForActiveNetworkNode(nodeId)));
+            editIcon.setOnClickListener(view -> {
+                Log.d("NodeIDDebug", "NetworkNodeListItemHolder: clicked node ID is: " + String.valueOf(nodeId));
+                // Debug: Long nodeId is wrong here causing crash
+                mainActivity.showFragment(FragmentType.NODE_DETAILS, NodeDetailFragment.getArgumentsForActiveNetworkNode(nodeId));
+            });
         }
 
         private void log(String msg) {

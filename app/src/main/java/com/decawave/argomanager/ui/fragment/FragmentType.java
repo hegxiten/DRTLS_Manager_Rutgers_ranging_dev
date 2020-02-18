@@ -16,7 +16,8 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 
 /**
- * Distinct fragment types.
+ * Distinct fragment types
+ * Used to new various fragments in MainActivity
  */
 public enum FragmentType {
     OVERVIEW(OverviewFragment::new),

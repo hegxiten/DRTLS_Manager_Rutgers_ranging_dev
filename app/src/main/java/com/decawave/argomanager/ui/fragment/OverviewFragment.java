@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +75,7 @@ import eu.kryl.android.common.hub.InterfaceHub;
 
 /**
  * Shows list of network nodes: anchors and tags, distinguishes between visible/invisible ones.
+ * Overview Fragment corresponds to the "Network Details" tab as opposite to "Grid"
  */
 public class OverviewFragment extends MainScreenFragment implements IhAppPreferenceListener,
         IhNodeDiscoveryListener, IhConnectionStateListener, IhErrorManagerListener, IhEnhancedNodePropertiesChangeListener {
@@ -365,6 +367,7 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.i("OverviewFragment", "Inflating nodelist");
         View v = inflater.inflate(R.layout.overview, container, false);
         nodeList = (RecyclerView) v.findViewById(R.id.nodeList);
         ((SimpleItemAnimator) nodeList.getItemAnimator()).setSupportsChangeAnimations(false);
