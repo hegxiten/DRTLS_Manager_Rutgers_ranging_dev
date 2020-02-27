@@ -117,6 +117,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     // members - views
     @BindView(R.id.node_detail_position_x)
     EditText etPosX;
+    //TODO: poll x y z data inputs and find usages
 
     @BindView(R.id.node_detail_position_y)
     EditText etPosY;
@@ -457,7 +458,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 origPosY = Util.formatLength(position.y, lengthUnit);
                 origPosZ = Util.formatLength(position.z, lengthUnit);
                 //
-                etPosX.setText(origPosX);
+                etPosX.setText(origPosX);   // origin pos found 
                 etPosY.setText(origPosY);
                 etPosZ.setText(origPosZ);
             }
