@@ -350,9 +350,11 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         Bundle args = getArguments();
         Log.d("NodeDetailGetArgs", "onCreate: " + args.toString());
         if (Constants.DEBUG) {
+            Log.d("Debug Mode", "onCreate: " + args.toString());
             Preconditions.checkNotNull(args, "must specify node details to show!");
             Preconditions.checkState(args.getLong(BK_NODE_ID, 0) == 0, "must specify node ID in args!");
         }
+
         nodeId = args.getLong(BK_NODE_ID);
         NetworkNodeEnhanced nne = networkNodeManager.getNode(nodeId);
         Preconditions.checkNotNull(nne, "must specify valid node ID in arguments!");
@@ -458,9 +460,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 origPosY = Util.formatLength(position.y, lengthUnit);
                 origPosZ = Util.formatLength(position.z, lengthUnit);
                 //
-                etPosX.setText(origPosX);   // origin pos found 
-                etPosY.setText(origPosY);
-                etPosZ.setText(origPosZ);
+                etPosX.setText(origPosX);   // origin pos input
+                etPosY.setText(origPosY);   // origin pos input
+                etPosZ.setText(origPosZ);   // origin pos input
             }
             // when we switch to TAG we want to have all the checkboxes checked
             chboxAccelerometer.setChecked(true);

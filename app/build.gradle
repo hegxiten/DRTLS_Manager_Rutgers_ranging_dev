@@ -65,13 +65,18 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // To turn on debuggable, we need to modify buildTypes{} for all the modules in order
+            //      to build.
+            // Once turn on debuggable for all modules, it behaves like debug build - crashes at
+            //      NodeDetailFragment.java
+            // minifyEnabled false
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             buildConfigField "String", "BUILD_TIME", "\"" + getTime() + "\""
+
         }
         debug {
-            minifyEnabled false
+            // minifyEnabled false
             buildConfigField "String", "BUILD_TIME", "\"" + getTime() + "\""
         }
     }
