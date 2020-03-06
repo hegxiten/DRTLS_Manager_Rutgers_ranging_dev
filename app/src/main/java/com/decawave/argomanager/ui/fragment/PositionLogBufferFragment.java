@@ -18,7 +18,7 @@ import com.decawave.argomanager.util.Util;
 import com.google.common.base.Preconditions;
 
 /**
- * Fragment showing debug logs.
+ * Fragment showing debug logs. Shown as "Position log" in the menu
  */
 public class PositionLogBufferFragment extends LogBufferFragment {
 

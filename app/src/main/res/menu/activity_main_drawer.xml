@@ -7,8 +7,8 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- other items here are generated programmatically -->
-
+    <!-- This is the content of the drawer (navigation bar) -->
+    <!-- other items here are generated programmatically in java -->
     <group android:id="@+id/networksSection">
         <item
             android:id="@+id/nav_do_discovery"

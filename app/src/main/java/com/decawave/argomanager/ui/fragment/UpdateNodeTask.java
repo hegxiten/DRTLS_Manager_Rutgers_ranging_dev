@@ -53,6 +53,8 @@ class UpdateNodeTask {
     private boolean running;
     private boolean cancelled;
     private NetworkNodeConnection connection;
+    // Question: NetworkNodeConnection is an interface, how is this private field (connection)
+    //      able to execute abstract method disconnect() without implementation?
 
     UpdateNodeTask(NetworkNodeManager networkNodeManager,
                    BleConnectionApi bleConnectionApi) {

@@ -66,7 +66,7 @@ import eu.kryl.android.common.hub.InterfaceHub;
 import static com.decawave.argomanager.ArgoApp.uiHandler;
 
 /**
- * Displays node details.
+ * Displays node details (enter from the edit button).
  */
 public class NodeDetailFragment extends AbstractArgoFragment implements NetworkPickerDialogFragment.IhCallback,
         NewNetworkNameDialogFragment.IhCallback,
@@ -116,14 +116,13 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // members - views
     @BindView(R.id.node_detail_position_x)
-    EditText etPosX;
-    //TODO: poll x y z data inputs and find usages
+    EditText etPosX;            // editable anchor X input/current value
 
     @BindView(R.id.node_detail_position_y)
-    EditText etPosY;
+    EditText etPosY;            // editable anchor Y input/current value
 
     @BindView(R.id.node_detail_position_z)
-    EditText etPosZ;
+    EditText etPosZ;            // editable anchor Z input/current value
 
     @BindView(R.id.etNodeLabel)
     EditText etNodeLabel;
@@ -171,10 +170,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     View networkViewGroup;
 
     @BindView(R.id.nodeTypeSelector)
-    View nodeTypeViewGroup;
+    View nodeTypeViewGroup;         // Anchor or Tag
 
     @BindView(R.id.uwbModeSelector)
-    View uwbModeViewGroup;
+    View uwbModeViewGroup;          // Shown as "UWB" as UI: off, active, passive
 
     @BindView(R.id.chboxInitiator)
     CheckBox chboxInitiator;
@@ -183,10 +182,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     CheckBox chboxFirmwareUpdate;
 
     @BindView(R.id.chboxAccelerometer)
-    CheckBox chboxAccelerometer;
+    CheckBox chboxAccelerometer;    // STATIONARY DETECTION
 
     @BindView(R.id.chboxLedIndication)
-    CheckBox chboxLedIndication;
+    CheckBox chboxLedIndication;    // LED
 
     @BindView(R.id.chboxResponsiveMode)
     CheckBox chboxResponsiveMode;
@@ -402,7 +401,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             fillUi = true;
             // reset the node task
             if (updateNodeTask != null) {
-                // let the existing task know, that we are not interested in results (IH) anymore
+                // let the existing task know, that we are not interested in results (of IH) anymore
                 updateNodeTask.cancel();
             }
             updateNodeTask = null;
@@ -460,9 +459,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 origPosY = Util.formatLength(position.y, lengthUnit);
                 origPosZ = Util.formatLength(position.z, lengthUnit);
                 //
-                etPosX.setText(origPosX);   // origin pos input
-                etPosY.setText(origPosY);   // origin pos input
-                etPosZ.setText(origPosZ);   // origin pos input
+                etPosX.setText(origPosX);   // anchor origin pos input
+                etPosY.setText(origPosY);   // anchor origin pos input
+                etPosZ.setText(origPosZ);   // anchor origin pos input
             }
             // when we switch to TAG we want to have all the checkboxes checked
             chboxAccelerometer.setChecked(true);
@@ -592,6 +591,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     }
 
     private boolean onSaveClick() {
+        // √ check sign on top right menu
         // for anchor, we have to consider selected position
         boolean positionInputOk = true;
         if (selectedNodeType == NodeType.ANCHOR) {
@@ -705,7 +705,8 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    // IH listening methods
+    // IH (interface hub) listening methods
+    // Implementation on abstract interfaces for various interfaces: e.g. update rate, node type, etc.
     //
 
     @Override

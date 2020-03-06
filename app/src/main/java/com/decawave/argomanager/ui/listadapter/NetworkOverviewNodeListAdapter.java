@@ -512,6 +512,9 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             editIcon.setOnClickListener(view -> {
                 Log.d("NodeIDDebug", "NetworkNodeListItemHolder: clicked node ID is: " + String.valueOf(nodeId));
                 // Debug: Long nodeId is wrong here causing crash
+                // 03052020: in release build, the node id is shown the same value and app doesn't crash.
+                //      To reproduce the crash, turn on debuggable release in gradle (or build in debug).
+                //      Example of clicked node ID: -2393025549702114255 (acceptable by the app)
                 mainActivity.showFragment(FragmentType.NODE_DETAILS, NodeDetailFragment.getArgumentsForActiveNetworkNode(nodeId));
             });
         }

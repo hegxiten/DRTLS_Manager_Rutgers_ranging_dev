@@ -267,6 +267,8 @@
     <string name="help_icon">help icon</string>
     <string name="menu_show_debug_info">Debug info</string>
     <string name="menu_show_grid">Show grid</string>
+    <string name="menu_show_average">Show average</string>
+    <string name="menu_setup_geofence">Setup geofence</string>
 
     <!-- settings -->
     <string name="pref_units_title">Units</string>
@@ -313,5 +315,6 @@
     <string name="floorplan_image_read_error">Unsupported image format!</string>
     <string name="floorplan_copy_failed">Failed to copy floor plan!</string>
     <string name="floorplan_file_exceeeds_size">Floorplan file size exceeds %1$s!</string>
+
 
 </resources>

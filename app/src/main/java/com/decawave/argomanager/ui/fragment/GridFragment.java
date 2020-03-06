@@ -196,6 +196,7 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
     };
 
     private MenuItem loadFloorplanMenuItem;
+    private MenuItem loadSetupGeofenceMenuItem;
 
     private IhPersistedNodeChangeListener nodeChangeListener = new IhPersistedNodeChangeListener() {
 
@@ -409,7 +410,7 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_grid, menu);
         configureBasicMenuItems(menu);
-        //
+        // add geofence feature here. Because connections are configured when Grid is available.
         configureInstructionsMenuItem(menu);
         // floor plan
         loadFloorplanMenuItem = menu.findItem(R.id.action_floorplan);
@@ -463,6 +464,13 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
             });
             showDebugInfoMenuItem.setChecked(appPreferenceAccessor.getShowGridDebugInfo());
         }
+        // setup geofence
+        loadSetupGeofenceMenuItem = menu.findItem(R.id.action_set_geofence);
+        loadSetupGeofenceMenuItem.setEnabled(networkNodeManager.getActiveNetwork() != null);
+        loadSetupGeofenceMenuItem.setOnMenuItemClickListener((m) -> {
+            ToastUtil.showToast("Geofence Stub: Not Yet Implemented. Only available with active network.");
+            return true;
+        });
     }
 
     private void startFloorPlanConfigurationMode() {

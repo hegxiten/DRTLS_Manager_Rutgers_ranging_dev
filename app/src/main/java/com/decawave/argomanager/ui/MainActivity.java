@@ -143,11 +143,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // enable ActionBar app icon to behave as action to toggle nav drawer
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // AB main spinner
+        // 03062020 - What does AB mean?
         abMainSpinnerAdapter = new AbSpinnerAdapter<>(MainSpinnerItem.values(), this,
                 () -> appPreferenceAccessor.getLastSelectedMainSpinnerItemPos()
         );
