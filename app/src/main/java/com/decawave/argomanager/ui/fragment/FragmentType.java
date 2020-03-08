@@ -18,6 +18,7 @@ import rx.functions.Func0;
 /**
  * Distinct fragment types
  * Used to new various fragments in MainActivity
+ * Fragment are constructed using corresponding constructors with different initializing params
  */
 public enum FragmentType {
     OVERVIEW(OverviewFragment::new),
@@ -110,7 +111,10 @@ public enum FragmentType {
         this(screenTitleId, instanceFactory, false, null);
     }
 
-    FragmentType(int screenTitleId, Func0<AbstractArgoFragment> instanceFactory, boolean fullscreenDialog, Action1<FragmentType> onFragmentLeft) {
+    FragmentType(int screenTitleId,
+                 Func0<AbstractArgoFragment> instanceFactory,
+                 boolean fullscreenDialog,
+                 Action1<FragmentType> onFragmentLeft) {
         this(screenTitleId, instanceFactory, fullscreenDialog, onFragmentLeft, null);
     }
 

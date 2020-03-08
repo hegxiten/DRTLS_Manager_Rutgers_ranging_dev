@@ -11,6 +11,8 @@ import com.decawave.argomanager.ui.fragment.FragmentType;
 
 /**
  * Argo project.
+ * Spinner: https://developer.android.com/guide/topics/ui/controls/spinner
+ * Spinner: - A drop-down menu showing the currently selected item
  */
 public enum MainSpinnerItem implements SpinnerItem {
     LIST(R.string.ab_overview, FragmentType.OVERVIEW),

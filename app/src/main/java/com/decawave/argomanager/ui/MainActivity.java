@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // AB main spinner
-        // 03062020 - What does AB mean?
+        // AB - Action Bar
         abMainSpinnerAdapter = new AbSpinnerAdapter<>(MainSpinnerItem.values(), this,
                 () -> appPreferenceAccessor.getLastSelectedMainSpinnerItemPos()
         );
