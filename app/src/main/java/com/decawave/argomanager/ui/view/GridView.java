@@ -18,6 +18,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -294,7 +295,7 @@ public class GridView extends View {
     private Matrix drawFloorPlanMatrix = new Matrix();
     private Matrix drawFloorPlanVirtualMatrix = new Matrix();
 
-    // matrix
+    // matrix -> the Matrix class holds a 3x3 matrix for transforming coordinates.
     private Matrix drawMatrix;
     private Matrix flingStartMatrix = new Matrix();
     private Matrix zoomStartMatrix = new Matrix();
@@ -387,7 +388,7 @@ public class GridView extends View {
 
             idx++;
             if(idx >= 10) {
-                ready = true;
+                ready = true; // ready when 10+ positions reported (called through Tagavg.updatexyz())
                 idx = 0;
             }
 
@@ -499,6 +500,7 @@ public class GridView extends View {
             nodesById.put(networkNode.getId(), networkNode);
         });
         // clear helper datastructures
+        // 03092020 what are they? why they need to be cleared?
         nodesByXCoordinate.clear();
         visibleNodes.clear();
     }
@@ -771,7 +773,9 @@ public class GridView extends View {
 
         fIn[0] = realX;
         fIn[1] = realY;
-        // transform the x,y coordinates
+
+        // transform the x,y coordinates, apply drawMatrix to fIn and write in fOut
+        // https://developer.android.com/reference/android/graphics/Matrix#mapPoints(float%5B%5D,%20float%5B%5D)
         drawMatrix.mapPoints(fOut, fIn);
         float pxPosX = fOut[0];
         float pxPosY = fOut[1];
@@ -781,7 +785,7 @@ public class GridView extends View {
         float y;
         do {
             y = pxPosY + (i++ * gridLineStepInPx);
-            canvas.drawLine(0, y, pxWidth, y, paint);
+            canvas.drawLine(0, y, pxWidth, y, paint); // startX, startY, stopX, stopY, paint
         } while (y <= pxHeight);
 
         // draw vertical lines
@@ -789,14 +793,14 @@ public class GridView extends View {
         float x;
         do {
             x = pxPosX + (i++ * gridLineStepInPx);
-            canvas.drawLine(x, 0, x, pxHeight, paint);
+            canvas.drawLine(x, 0, x, pxHeight, paint); // startX, startY, stopX, stopY, paint
         } while (x <= pxWidth);
 
+        // draw labels
         float labelStepInPx = gridLineStepInPx;
         float labelRealStep = gridLineStepInCm;
 
         if (drawLabels != DrawLabels.NO) {
-            // draw labels
             pxPosY = fOut[1];
             float pxStartX = fOut[0];
             if (drawLabels == DrawLabels.EVERY_OTHER) {
@@ -1249,9 +1253,9 @@ public class GridView extends View {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             float scaleFactor = detector.getScaleFactor();
-            //
             float focusX = detector.getFocusX();
             float focusY = detector.getFocusY();
+            // Check if the floorplan lock is on (bounded for the floorplan image)
             if (floorPlanBound) {
                 drawMatrix.getValues(matrixAsFloat);
                 float finalScale = matrixAsFloat[0] * scaleFactor;
@@ -1267,7 +1271,7 @@ public class GridView extends View {
                     return true;
                 }
             } else {
-                // we are just mapping this to floorplan properties
+                // action only applies to the floorplan image
                 currTenMetersInPixels = currTenMetersInPixels / scaleFactor;
                 // we must have at least 20 pixels and at most 1000 pixels in one meter
                 if (currTenMetersInPixels >= FLOORPLAN_MIN_PIXELS_IN_TEN_METERS && currTenMetersInPixels <= FLOORPLAN_MAX_PIXELS_IN_TEN_METERS) {
@@ -1349,6 +1353,7 @@ public class GridView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float dx, float dy) {
+            // Check if the floorplan lock is on (bounded for the floorplan image)
             if (floorPlanBound) {
                 drawMatrix.postTranslate(-dx, -dy);
                 if (DEBUG_MATRIX) {
@@ -1356,6 +1361,7 @@ public class GridView extends View {
                 }
                 onDrawMatrixTranslationChanged();
             } else {
+                // action only applies to the floorplan image
                 drawFloorPlanVirtualMatrix.postTranslate(-dx, -dy);
                 // recompute the shift to floorplan properties
                 if (virtualFloorPlanMatrixToFloorPlanProperties(false)) {
@@ -1537,11 +1543,12 @@ public class GridView extends View {
         // remember the size
         pxWidth = w;
         pxHeight = h;
-        // fixing bug #52
-        if (!fullyConfigured()) {
-            // nothing to recompute
-            return;
-        }
+//        // fixing bug #52
+//        if (floorPlanProvider == null) {
+//            // nothing to recompute
+//            return;
+//        }
+
 //        // determine display width in cms
 //        float cmWidth = INCH_TO_CM * pxWidth / DisplayMetrics.LCD_DENSITY_DPI;
 //        float cmHeight = INCH_TO_CM * pxHeight / DisplayMetrics.LCD_DENSITY_DPI;
@@ -1550,7 +1557,7 @@ public class GridView extends View {
 //        float virtualHeightCm = cmHeight * INITIAL_ZOOM_RATIO;
         // fixing problem with keyboard resizing the drawn content
         if (drawMatrix == null) {
-            // we do not have the drawmatrix yet
+            // we do not have the drawMatrix yet (null)
             if (injectedScale != null) {
                 computeInjectedMatrix();
                 if (extraAnimatedZoom != 1) {
@@ -1563,9 +1570,7 @@ public class GridView extends View {
             }
             firstShowSysTime = SystemClock.uptimeMillis();
         }
-        if (DEBUG_MATRIX) {
-            log.d("drawMatrix = " + drawMatrix);
-        }
+        Log.d("drawMatrix = ", drawMatrix.toString());
         // compute what is the minimal step in px from which we draw grid marks/labels
         int showGridMarksFrom;
         if (h > w) {
@@ -1615,10 +1620,6 @@ public class GridView extends View {
         this.extraAnimatedZoom = extraAnimatedZoom;
     }
 
-    private boolean fullyConfigured() {
-        return floorPlanProvider != null;
-    }
-
     public void onNodeChanged(NetworkNode newNode) {
         if (Constants.DEBUG) log.d("onNodeChanged() called with: " + "newNode = [" + newNode + "]");
         NetworkNode myNode = nodesById.get(newNode.getId());
@@ -1652,8 +1653,9 @@ public class GridView extends View {
         }
         // update the new position
         if(newNode.getType() == NodeType.TAG) {
+            // parse the map for any Tag with the same ID as the newNode (03092020 assuming nonnull?)
             TagAvg avgNode = avgNodesById.get(newNode.getId());
-            // update the average based on current position
+            // update the average based on current position saved in the Map
             avgNode.updatexyz(newNode.extractPositionDirect());
         }
         if (getNodePosition(newNode) != null) {
@@ -1727,6 +1729,26 @@ public class GridView extends View {
     }
 
     float matrixAsFloat[] = new float[9];
+    //    public static final int MPERSP_0
+    //      Constant Value: 6 (0x00000006)
+    //    public static final int MPERSP_1
+    //      Constant Value: 7 (0x00000007)
+    //    public static final int MPERSP_2
+    //      Constant Value: 8 (0x00000008)
+    //    public static final int MSCALE_X
+    //      Constant Value: 0 (0x00000000)
+    //    public static final int MSCALE_Y
+    //      Constant Value: 4 (0x00000004)
+    //    public static final int MSKEW_X
+    //      Constant Value: 1 (0x00000001)
+    //    public static final int MSKEW_Y
+    //      Constant Value: 3 (0x00000003)
+    //    public static final int MTRANS_X
+    //      Constant Value: 2 (0x00000002)
+    //    public static final int MTRANS_Y
+    //      Constant Value: 5 (0x00000005)
+    //
+    // Matrix.getValues(float[] values): copy the 9 values From the matrix Into the array
 
     private void onDrawMatrixChanged() {
         drawMatrix.getValues(matrixAsFloat);

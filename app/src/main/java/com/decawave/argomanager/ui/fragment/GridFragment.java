@@ -411,6 +411,9 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
         inflater.inflate(R.menu.menu_grid, menu);
         configureBasicMenuItems(menu);
         // add geofence feature here. Because connections are configured when Grid is available.
+        // TODO: build the geofence view following the floorplan
+        // TODO: follow the callbacks of the floorplan for the geofence
+        // TODO: Draw demo geofence on (Geofence View) or (GridView), depending on implementations of the floorplan view
         configureInstructionsMenuItem(menu);
         // floor plan
         loadFloorplanMenuItem = menu.findItem(R.id.action_floorplan);
