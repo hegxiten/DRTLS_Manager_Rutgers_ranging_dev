@@ -7,6 +7,7 @@
 package com.decawave.argomanager.components.ih;
 
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 
 /**
  * Argo project.
@@ -35,6 +36,11 @@ public class IhNetworkChangeListenerAdapter implements IhNetworkChangeListener {
 
     @Override
     public void onFloorPlanChanged(short networkId, FloorPlan floorPlan) {
+
+    }
+
+    @Override
+    public void onGeofenceChanged(short networkId, Geofence geofence) {
 
     }
 }

@@ -17,6 +17,7 @@ import android.support.design.widget.TextInputLayout;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -55,6 +56,7 @@ import com.decawave.argomanager.prefs.IhAppPreferenceListener;
 import com.decawave.argomanager.prefs.LengthUnit;
 import com.decawave.argomanager.ui.MainActivity;
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 import com.decawave.argomanager.ui.view.GridView;
 import com.decawave.argomanager.util.AndroidPermissionHelper;
 import com.decawave.argomanager.util.Fixme;
@@ -136,6 +138,8 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
     @BindView(R.id.floorplan_control_rotate_left)
     ImageView rotateLeftControl;
 
+//    @BindView(R.id.)
+
     ///////////////////////////////////////////////////////////////////////////
     // dependencies
     ///////////////////////////////////////////////////////////////////////////
@@ -160,6 +164,7 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
 
     // members/state
     private FloorPlanConfiguration floorPlanConfiguration;
+    private GeofenceConfiguration geofenceConfiguration;
 
     private static class FloorPlanConfiguration {
         //
@@ -178,6 +183,18 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
 
         boolean toggleLock() {
             return (floorPlanLocked = !floorPlanLocked);
+        }
+    }
+
+    private static class GeofenceConfiguration {
+        Geofence geofence;
+
+        GeofenceConfiguration(Geofence geofence) {
+            this.geofence = geofence;
+        }
+
+        boolean anyGeofence () {
+            return geofence != null;
         }
     }
 
@@ -233,7 +250,7 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
         return floorPlanLocked ? R.drawable.ic_lock_closed : R.drawable.ic_lock_open;
     }
 
-    //
+    // actions and results returning from floorplan image picker
     private IhOnActivityResultListener onActivityResultListener = new IhOnActivityResultListener() {
         @Override
         public void onActivityResult(MainActivity mainActivity, int requestCode, int resultCode, Intent data) {
@@ -410,10 +427,6 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_grid, menu);
         configureBasicMenuItems(menu);
-        // add geofence feature here. Because connections are configured when Grid is available.
-        // TODO: build the geofence view following the floorplan
-        // TODO: follow the callbacks of the floorplan for the geofence
-        // TODO: Draw demo geofence on (Geofence View) or (GridView), depending on implementations of the floorplan view
         configureInstructionsMenuItem(menu);
         // floor plan
         loadFloorplanMenuItem = menu.findItem(R.id.action_floorplan);
@@ -467,15 +480,53 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
             });
             showDebugInfoMenuItem.setChecked(appPreferenceAccessor.getShowGridDebugInfo());
         }
-        // setup geofence
+        // add geofence feature here. Because connections are configured when Grid is available.
+        // TODO: build the geofence view following the floorplan
+        // TODO: follow the callbacks of the floorplan for the geofence
+        // TODO: Draw demo geofence on (Geofence View) or (GridView), depending on implementations of the floorplan view
         loadSetupGeofenceMenuItem = menu.findItem(R.id.action_set_geofence);
+        // Menu item of geofence Only available with an active network
         loadSetupGeofenceMenuItem.setEnabled(networkNodeManager.getActiveNetwork() != null);
         loadSetupGeofenceMenuItem.setOnMenuItemClickListener((m) -> {
-            ToastUtil.showToast("Geofence Stub: Not Yet Implemented. Only available with active network.");
+            Geofence currGeofence = networkNodeManager.getActiveNetworkNullSafe().getGeofence();
+            geofenceConfiguration = new GeofenceConfiguration(Geofence.copyNullSafe(currGeofence));
+            if (geofenceConfiguration.anyGeofence()) {
+                // Not yet implemented
+                Log.d("Geofence:", "Geofence Object Existing");
+            }
+            else {
+                // there is no previous geofence, launch geofence setter
+//                startGeofenceConfigurationMode();
+            }
             return true;
         });
     }
+    private void startGeofenceConfigurationMode() {
+        mActionMode = getMainActivity().startActionMode(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                ToastUtil.showToast("onCreateActionModeGeofence");
+                actionMode.getMenuInflater().inflate(R.menu.menu_geofence, menu);
+                return false;
+            }
 
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                ToastUtil.showToast("onPrepareActionModeGeofence");
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+                ToastUtil.showToast("onDestroyActionModeGeofence");
+            }
+        });
+    }
     private void startFloorPlanConfigurationMode() {
         mActionMode = getMainActivity().startActionMode(new ActionMode.Callback() {
 

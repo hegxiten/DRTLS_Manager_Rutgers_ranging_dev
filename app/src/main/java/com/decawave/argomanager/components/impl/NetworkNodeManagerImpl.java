@@ -38,6 +38,8 @@ import com.decawave.argomanager.components.struct.NodeWarning;
 import com.decawave.argomanager.components.struct.TrackMode;
 import com.decawave.argomanager.prefs.AppPreferenceAccessor;
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
+import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Preconditions;
 
@@ -140,6 +142,15 @@ public class NetworkNodeManagerImpl implements NetworkNodeManager {
                 log.d("onFloorPlanChanged() called with: " + "floorPlan = [" + floorPlan + "]");
             schedulePersist();
             InterfaceHub.getHandlerHub(IhNetworkChangeListener.class).onFloorPlanChanged(networkId, floorPlan);
+        }
+
+        @Override
+        public void onGeofenceChanged(short networkId, Geofence geofence) {
+            // a copy of onFloorPlanChanged() above
+            if (Constants.DEBUG)
+                log.d("onGeofenceChanged() called with: " + "geofence = [" + geofence + "]");
+            schedulePersist();
+            InterfaceHub.getHandlerHub(IhNetworkChangeListener.class).onGeofenceChanged(networkId, geofence);
         }
 
     };

@@ -41,6 +41,7 @@ import com.decawave.argomanager.ui.dialog.NewNetworkNameDialogFragment;
 import com.decawave.argomanager.ui.layout.NpaLinearLayoutManager;
 import com.decawave.argomanager.ui.listadapter.discovery.DiscoveryListAdapter;
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 import com.decawave.argomanager.util.AndroidPermissionHelper;
 import com.decawave.argomanager.util.NetworkIdGenerator;
 import com.decawave.argomanager.util.ToastUtil;
@@ -447,6 +448,11 @@ public class DiscoveryFragment extends DiscoveryProgressAwareFragment
     @Override
     public void onFloorPlanChanged(short networkId, FloorPlan floorPlan) {
         // ignore (floor plan is not visualized)
+    }
+
+    @Override
+    public void onGeofenceChanged(short networkId, Geofence geofence) {
+        ToastUtil.showToast("Implementation of onGeofenceChanged() at DiscoveryFragment not available!");
     }
 
     ///////////////////////////////////////////////////////////////////////////

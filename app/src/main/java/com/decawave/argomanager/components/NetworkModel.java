@@ -7,6 +7,7 @@
 package com.decawave.argomanager.components;
 
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 import com.google.common.base.Objects;
 
 /**
@@ -21,6 +22,7 @@ public class NetworkModel {
     private String networkName;
     // nodes
     private FloorPlan floorPlan;
+    private Geofence geofence;
     //
     private NetworkPropertyChangeListener changeListener;
 
@@ -53,12 +55,25 @@ public class NetworkModel {
         this.floorPlan = floorPlan;
         if (!Objects.equal(floorPlan, oldFp)) {
             // notify
-            changeListener.onFloorPlanChanged(networkId, floorPlan);
+            changeListener.onGeofenceChanged(networkId, geofence);
         }
     }
 
     public FloorPlan getFloorPlan() {
         return floorPlan;
+    }
+
+    public void setGeofence(Geofence geofence) {
+        Geofence oldGf = this.geofence;
+        this.geofence = geofence;
+        if (!Objects.equal(geofence, oldGf)) {
+            // notify
+            changeListener.onGeofenceChanged(networkId, geofence);
+        }
+    }
+
+    public Geofence getGeofence() {
+        return geofence;
     }
 
     public String getNetworkName() {
@@ -120,6 +135,10 @@ public class NetworkModel {
 
         }
 
-    };
+        @Override
+        public void onGeofenceChanged(short networkId, Geofence geofence) {
+
+        }
+  };
 
 }

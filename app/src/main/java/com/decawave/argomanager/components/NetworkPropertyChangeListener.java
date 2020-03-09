@@ -7,6 +7,7 @@
 package com.decawave.argomanager.components;
 
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 
 /**
  * System network change listener.
@@ -25,5 +26,7 @@ public interface NetworkPropertyChangeListener {
     void onNetworkRenamed(short networkId, String newName);
 
     void onFloorPlanChanged(short networkId, FloorPlan floorPlan);
+
+    void onGeofenceChanged(short networkId, Geofence geofence);
 
 }

@@ -7,6 +7,7 @@
 package com.decawave.argomanager.components.ih;
 
 import com.decawave.argomanager.ui.view.FloorPlan;
+import com.decawave.argomanager.ui.view.Geofence;
 
 import eu.kryl.android.common.hub.InterfaceHubHandler;
 
@@ -24,5 +25,7 @@ public interface IhNetworkChangeListener extends InterfaceHubHandler {
     void onNetworkRenamed(short networkId, String newName);
 
     void onFloorPlanChanged(short networkId, FloorPlan floorPlan);
+
+    void onGeofenceChanged(short networkId, Geofence geofence);
 
 }
