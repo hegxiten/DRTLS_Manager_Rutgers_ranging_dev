@@ -25,6 +25,7 @@ import com.decawave.argomanager.ui.fragment.DeviceDebugConsoleFragment;
 import com.decawave.argomanager.ui.fragment.DeviceErrorFragment;
 import com.decawave.argomanager.ui.fragment.DiscoveryFragment;
 import com.decawave.argomanager.ui.fragment.FirmwareUpdateFragment;
+import com.decawave.argomanager.ui.fragment.GeofenceSetupFragment;
 import com.decawave.argomanager.ui.fragment.GridFragment;
 import com.decawave.argomanager.ui.fragment.InstructionsFragment;
 import com.decawave.argomanager.ui.fragment.LogBufferFragment;
@@ -86,6 +87,8 @@ public interface ArgoComponent {
     void inject(ApPreviewFragment apPreviewFragment);
 
     void inject(InstructionsFragment instructionsFragment);
+
+    void inject(GeofenceSetupFragment geofenceSetupFragment);
 
     UniqueReorderingStack<Short> getActiveNetworkIdStack();
 

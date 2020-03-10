@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- Top space -->
+    <View
+        android:id="@+id/geofenceCardTop"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/geofenceCardContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="?color_card_bg"
+        android:orientation="horizontal">
+
+
+        <FrameLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:duplicateParentState="true"
+            >
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/geofenceCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp"
+                />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/geifenceName"
+                android:text="Geofence name"
+                style="@style/NodeTitleInNodeList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- bottom spacing -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="5dp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

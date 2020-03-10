@@ -441,7 +441,7 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
                 startFloorPlanConfigurationMode();
                 fillFloorPlanEditProperties(floorPlanConfiguration.floorPlan);
             } else {
-                // there is no previous floor plan, launch directly image picker
+                // there is no previous floor plan, launch image picker directly
                 launchImagePicker();
             }
             return true;
@@ -481,52 +481,18 @@ public class GridFragment extends MainScreenFragment implements IhPresenceApiLis
             showDebugInfoMenuItem.setChecked(appPreferenceAccessor.getShowGridDebugInfo());
         }
         // add geofence feature here. Because connections are configured when Grid is available.
-        // TODO: build the geofence view following the floorplan
+        // TODO: create the geofence configuration fragment
         // TODO: follow the callbacks of the floorplan for the geofence
-        // TODO: Draw demo geofence on (Geofence View) or (GridView), depending on implementations of the floorplan view
         loadSetupGeofenceMenuItem = menu.findItem(R.id.action_set_geofence);
         // Menu item of geofence Only available with an active network
         loadSetupGeofenceMenuItem.setEnabled(networkNodeManager.getActiveNetwork() != null);
         loadSetupGeofenceMenuItem.setOnMenuItemClickListener((m) -> {
-            Geofence currGeofence = networkNodeManager.getActiveNetworkNullSafe().getGeofence();
-            geofenceConfiguration = new GeofenceConfiguration(Geofence.copyNullSafe(currGeofence));
-            if (geofenceConfiguration.anyGeofence()) {
-                // Not yet implemented
-                Log.d("Geofence:", "Geofence Object Existing");
-            }
-            else {
-                // there is no previous geofence, launch geofence setter
-//                startGeofenceConfigurationMode();
-            }
+            Log.d("Geofence", "Entering Geofence Fragment");
+            getMainActivity().showFragment(FragmentType.GEOFENCE_SETUP);
             return true;
         });
     }
-    private void startGeofenceConfigurationMode() {
-        mActionMode = getMainActivity().startActionMode(new ActionMode.Callback() {
-            @Override
-            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                ToastUtil.showToast("onCreateActionModeGeofence");
-                actionMode.getMenuInflater().inflate(R.menu.menu_geofence, menu);
-                return false;
-            }
 
-            @Override
-            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                ToastUtil.showToast("onPrepareActionModeGeofence");
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) {
-                ToastUtil.showToast("onDestroyActionModeGeofence");
-            }
-        });
-    }
     private void startFloorPlanConfigurationMode() {
         mActionMode = getMainActivity().startActionMode(new ActionMode.Callback() {
 

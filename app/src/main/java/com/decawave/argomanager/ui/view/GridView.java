@@ -479,7 +479,7 @@ public class GridView extends View {
             // in the map, there must be no nodes with null position
             Position dp1 = getNodePosition(o1);
             Position dp2 = getNodePosition(o2);
-            int zDiff = dp1.z - dp2.z;
+            int zDiff = dp1.z - dp2.z;  // null pointer crashes here occasionally when check "show average"
             if (zDiff != 0) {
                 return zDiff;
             } // else: by id (we need total ordering)

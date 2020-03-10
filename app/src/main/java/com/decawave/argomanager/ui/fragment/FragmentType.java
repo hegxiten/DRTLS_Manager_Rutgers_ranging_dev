@@ -11,6 +11,7 @@ import com.decawave.argomanager.components.AutoPositioningManager;
 import com.decawave.argomanager.components.DiscoveryManager;
 import com.decawave.argomanager.ioc.IocContext;
 import com.decawave.argomanager.util.AndroidPermissionHelper;
+import com.decawave.argomanager.util.ToastUtil;
 
 import rx.functions.Action1;
 import rx.functions.Func0;
@@ -78,6 +79,9 @@ public enum FragmentType {
                 FirmwareUpdateFragment.firmwareUpdateRunner = null;
             }
         }
+    }),
+    GEOFENCE_SETUP(R.string.screen_title_setup_geofence, GeofenceSetupFragment::new, false, (newFragmentType) -> {
+        ToastUtil.showToast("onFragmentLeft GeofenceSetupFragment");
     }),
     AP_PREVIEW(R.string.ap_preview, ApPreviewFragment::new),
     INSTRUCTIONS(R.string.screen_title_instructions, InstructionsFragment::new);
