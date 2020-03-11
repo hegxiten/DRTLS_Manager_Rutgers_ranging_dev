@@ -6,9 +6,12 @@
     tools:context=".ui.fragment.GeofenceSetupFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/geofenceDetailContentFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical">
+        <include layout="@layout/geofence_details"/>
+    </LinearLayout>
 
 </FrameLayout>

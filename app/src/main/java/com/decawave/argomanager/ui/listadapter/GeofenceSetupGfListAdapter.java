@@ -25,21 +25,15 @@ import butterknife.ButterKnife;
 public class GeofenceSetupGfListAdapter extends RecyclerView.Adapter<GeofenceSetupGfListAdapter.ViewHolder> {
 
     private final MainActivity mainActivity;
-    private final Consumer<Set<Long>> checkedChangedListener;
-    private List<GeofenceItem> geofences = new ArrayList<>();
-    private Set<Long> checkGeofenceIds;
+    private final Consumer<Set<Short>> checkedChangedListener;
+    private List<GeofenceItem> geofences;
+    private Set<Short> checkGeofenceIds;
 
     public GeofenceSetupGfListAdapter(@NotNull Collection<GeofenceItem> geofenceItems,
                                       @NotNull MainActivity mainActivity,
-                                      @NotNull Consumer<Set<Long>> checkedChangedListener) {
+                                      @NotNull Consumer<Set<Short>> checkedChangedListener) {
         this.mainActivity = mainActivity;
         this.checkedChangedListener = checkedChangedListener;
-    }
-
-    abstract class ViewHolder extends RecyclerView.ViewHolder {
-        ViewHolder(View itemView) {
-            super(itemView);
-        }
     }
 
     @Override
@@ -48,12 +42,16 @@ public class GeofenceSetupGfListAdapter extends RecyclerView.Adapter<GeofenceSet
         View view = inflater.inflate(R.layout.li_geofence_item, parent, false);
         // wrap with view holder
         return new GeofenceListItemHolder(view);
+    }
 
+    abstract class ViewHolder extends RecyclerView.ViewHolder {
+        ViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 
     class GeofenceListItemHolder extends ViewHolder {
-
-
+        // references to views
         @BindView(R.id.geofenceCardTop)
         View geofenceCardTop;
         @BindView(R.id.geofenceCardContent)
@@ -61,7 +59,8 @@ public class GeofenceSetupGfListAdapter extends RecyclerView.Adapter<GeofenceSet
         @BindView(R.id.geofenceCheckbox)
         CheckBox geofenceCheckBox;
 
-        long geofenceId;
+        short geofenceItemId;
+        String geofenceItemName;
 
         GeofenceListItemHolder(View itemView) {
             super(itemView);
@@ -71,21 +70,29 @@ public class GeofenceSetupGfListAdapter extends RecyclerView.Adapter<GeofenceSet
             itemView.findViewById(R.id.cardContent).setOnClickListener(view -> {
                 ToastUtil.showToast("geofence item onclick!");
             });
-            geofenceCheckBox.setOnCheckedChangeListener((button, isChecked) -> onGeofenceItemChecked(geofenceId, isChecked));
+            geofenceCheckBox.setOnCheckedChangeListener((button, isChecked) -> onGeofenceItemChecked(geofenceItemId, isChecked));
+        }
+
+        void bind(short geofenceId) {
+            this.geofenceItemId = geofenceId;
+            geofenceCheckBox.setChecked(checkGeofenceIds.contains(geofenceItemId));
         }
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-
+    public void onBindViewHolder(ViewHolder holder, int pos) {
+        if (holder instanceof GeofenceListItemHolder) {
+            int p = pos - 1;
+            ((GeofenceListItemHolder) holder).bind(geofences.get(p).getId());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return geofences.size();
     }
 
-    private void onGeofenceItemChecked(Long geofenceId, boolean checked) {
+    private void onGeofenceItemChecked(short geofenceId, boolean checked) {
         if (checked) {
             checkGeofenceIds.add(geofenceId);
         } else {

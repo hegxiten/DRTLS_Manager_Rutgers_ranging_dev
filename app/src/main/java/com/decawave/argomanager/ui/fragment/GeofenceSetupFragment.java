@@ -4,13 +4,28 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.decawave.argomanager.R;
+import com.decawave.argomanager.components.GeofenceManager;
+import com.decawave.argomanager.components.NetworkNodeManager;
+import com.decawave.argomanager.components.struct.GeofenceItem;
 import com.decawave.argomanager.ioc.ArgoComponent;
+import com.decawave.argomanager.ui.layout.NpaLinearLayoutManager;
 import com.decawave.argomanager.ui.listadapter.GeofenceSetupGfListAdapter;
+
+import java.util.Collection;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,12 +49,15 @@ public class GeofenceSetupFragment extends DiscoveryProgressAwareFragment {
     private GeofenceSetupGfListAdapter adapter;
     private Bundle savedAdapterState;
 
-
     public GeofenceSetupFragment() {
         // constructor
         super(FragmentType.GEOFENCE_SETUP);
     }
 
+    @BindView(R.id.geofenceList)
+    RecyclerView geofenceListRecyclerView;
+    @BindView(R.id.geofenceDetailContentFrame)
+    LinearLayout geofenceDetailContentFrame;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +68,12 @@ public class GeofenceSetupFragment extends DiscoveryProgressAwareFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_geofence_setup, container, false);
+        ButterKnife.bind(this, v);
+        // Test Geofence Display in RecyclerView
+        ((SimpleItemAnimator) geofenceListRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        geofenceListRecyclerView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
+        geofenceListRecyclerView.setAdapter(adapter);
         return inflater.inflate(R.layout.fragment_geofence_setup, container, false);
     }
 
