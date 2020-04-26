@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity
 
     private FragmentType mLastDisplayedFragment;
 
+    // Dagger: use Dagger to inject and get instances
     @Inject
     NetworkNodeManager networkNodeManager;
 
@@ -132,7 +133,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         // onCreate UI means that we might need display metrics
         DisplayMetrics.initDisplayMetrics();
-        // initialize injected fields
+        // Dagger: initialize injected fields, set up dependencies
+        // daCtx: Dagger context (created ArgoComponent)
         daCtx.inject(this);
         // create instance of network UI manager
         setContentView(R.layout.activity_main);
@@ -540,6 +542,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (!fragmentType.mainScreen) {
+            // when you press "back", pop up the previous fragments from the fragment back stack
             ft.addToBackStack(fragmentTag);
         }
 

@@ -42,7 +42,9 @@ import dagger.Component;
 /**
  * Argo project.
  *
- * Injection methods for application components.
+ * Injection methods for application components. We have only one component in this App.
+ *
+ * Dagger: if the dependency modules include singleton instances, the component must be singleton
  */
 @Component(modules = { ArgoDependencyBindingsModule.class, ArgoDependencyProvider.class } )
 @Singleton
@@ -51,7 +53,9 @@ public interface ArgoComponent {
     void inject(ArgoApp argoApp);
 
     void inject(MainActivity mainActivity);
-
+    /*  Since we have only one activity in this project, all our fragment references to this ArgoComponent
+    *   is the same ArgoComponent instance. (Because each activity holds a distinct singleton.)
+    * */
     void inject(DiscoveryFragment fragment);
 
     void inject(NodeDetailFragment fragment);
