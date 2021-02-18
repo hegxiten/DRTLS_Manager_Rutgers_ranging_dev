@@ -44,6 +44,7 @@ import com.decawave.argomanager.components.ErrorManager;
 import com.decawave.argomanager.components.LocationDataObserver;
 import com.decawave.argomanager.components.NetworkModel;
 import com.decawave.argomanager.components.NetworkNodeManager;
+import com.decawave.argomanager.components.NetworkOperationModeListener.OperationModeEnum;
 import com.decawave.argomanager.components.ih.IhEnhancedNodePropertiesChangeListener;
 import com.decawave.argomanager.components.ih.IhNetworkChangeListener;
 import com.decawave.argomanager.components.ih.IhNetworkChangeListenerAdapter;
@@ -64,6 +65,7 @@ import com.decawave.argomanager.ui.listadapter.NetworkOverviewNodeListAdapter;
 import com.decawave.argomanager.util.AndroidPermissionHelper;
 import com.decawave.argomanager.util.ConnectionUtil;
 import com.decawave.argomanager.util.NetworkNodePropertyDecorator;
+import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 
 import java.util.HashSet;
@@ -118,6 +120,7 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
     // menu items (to be able do adjust visibility dynamically)
     private MenuItem forgetNetworkMenuItem;
     private MenuItem renameNetworkMenuItem;
+    private MenuItem switchNetworkOperationModeMenuItem;
     private MenuItem firmwareStatusMenuItem;
     private MenuItem autoPositioningMenuItem;
     private Set<String> ignoredNodeChanges = new HashSet<>();
@@ -334,6 +337,24 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             }
             return true;
         });
+        switchNetworkOperationModeMenuItem = menu.findItem(R.id.action_switch_operation_mode);
+        switchNetworkOperationModeMenuItem.setOnMenuItemClickListener((v) -> {
+            NetworkModel network = networkNodeManager.getActiveNetwork();
+            if (network.getOperationMode() == OperationModeEnum.POSITIONING) {
+                network.setNetworkOperationMode(OperationModeEnum.RANGING);
+                if (Constants.DEBUG) {
+                    ToastUtil.showToast("Switched to ranging mode! Mode: "+network.getOperationMode().toString());
+                }
+            }
+            else {
+                network.setNetworkOperationMode(OperationModeEnum.POSITIONING);
+                if (Constants.DEBUG) {
+                    ToastUtil.showToast("Switched to positioning mode! Mode: "+network.getOperationMode().toString());
+                }
+            }
+            return true;
+        });
+
         firmwareStatusMenuItem = menu.findItem(R.id.action_firmware_status);
         firmwareStatusMenuItem.setOnMenuItemClickListener((v) -> {
             //
@@ -430,6 +451,7 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             adapter = null;
         } else {
             short networkId = network.getNetworkId();
+            OperationModeEnum networkOperationmode = network.getOperationMode();
             // selected active network
             noNetworkView.setVisibility(View.GONE);
             nodeList.setVisibility(View.VISIBLE);
@@ -620,11 +642,13 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             if (!anyActiveNetwork) {
                 renameNetworkMenuItem.setVisible(false);
                 forgetNetworkMenuItem.setVisible(false);
+                switchNetworkOperationModeMenuItem.setVisible(false);
                 firmwareStatusMenuItem.setVisible(false);
                 autoPositioningMenuItem.setVisible(false);
             } else {
                 renameNetworkMenuItem.setVisible(true);
                 forgetNetworkMenuItem.setVisible(true);
+                switchNetworkOperationModeMenuItem.setVisible(true);
                 firmwareStatusMenuItem.setVisible(true);
                 autoPositioningMenuItem.setVisible(true);
                 boolean nodeOperationEnabled;

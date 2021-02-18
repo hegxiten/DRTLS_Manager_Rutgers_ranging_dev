@@ -8,6 +8,7 @@ package com.decawave.argomanager.components;
 
 import com.decawave.argomanager.ui.view.FloorPlan;
 import com.decawave.argomanager.ui.view.Geofence;
+import com.decawave.argomanager.components.NetworkOperationModeListener.OperationModeEnum;
 import com.google.common.base.Objects;
 
 /**
@@ -18,6 +19,7 @@ import com.google.common.base.Objects;
 public class NetworkModel {
     // id of the network - as it is advertised
     public final short networkId;
+    private OperationModeEnum operationMode;
     // modifiable members
     private String networkName;
     // nodes
@@ -25,6 +27,7 @@ public class NetworkModel {
     private Geofence geofence;
     //
     private NetworkPropertyChangeListener changeListener;
+    private NetworkOperationModeListener operationModeChangeListener;
 
     public NetworkModel(short networkId) {
         this(networkId, null);
@@ -34,11 +37,17 @@ public class NetworkModel {
     public NetworkModel(short networkId, String networkName) {
         this.networkId = networkId;
         this.networkName = networkName;
+        this.operationMode = OperationModeEnum.POSITIONING;
         this.changeListener = VOID_LISTENER;
+        this.operationModeChangeListener = VOID_OPERATION_MODE_LISTENER;
     }
 
     public void setChangeListener(NetworkPropertyChangeListener changeListener) {
         this.changeListener = changeListener == null ? VOID_LISTENER : changeListener;
+    }
+
+    public void setOperationModeChangeListener(NetworkOperationModeListener operationModeChangeListener) {
+        this.operationModeChangeListener = operationModeChangeListener == null ? VOID_OPERATION_MODE_LISTENER : operationModeChangeListener;
     }
 
     public short getNetworkId() {
@@ -50,12 +59,23 @@ public class NetworkModel {
         this.changeListener.onNetworkRenamed(networkId, networkName);
     }
 
+    public void setNetworkOperationMode(OperationModeEnum operationMode) {
+        this.operationMode = operationMode;
+        this.operationModeChangeListener.onNetworkModeChanged(networkId, operationMode);
+    }
+
+    public OperationModeEnum getOperationMode() {
+        return this.operationMode;
+    }
+
     public void setFloorPlan(FloorPlan floorPlan) {
-        FloorPlan oldFp = this.floorPlan;
-        this.floorPlan = floorPlan;
-        if (!Objects.equal(floorPlan, oldFp)) {
-            // notify
-            changeListener.onGeofenceChanged(networkId, geofence);
+        if (this.operationMode == operationMode.POSITIONING){
+            FloorPlan oldFp = this.floorPlan;
+            this.floorPlan = floorPlan;
+            if (!Objects.equal(floorPlan, oldFp)) {
+                // notify
+                changeListener.onGeofenceChanged(networkId, geofence);
+            }
         }
     }
 
@@ -64,11 +84,13 @@ public class NetworkModel {
     }
 
     public void setGeofence(Geofence geofence) {
-        Geofence oldGf = this.geofence;
-        this.geofence = geofence;
-        if (!Objects.equal(geofence, oldGf)) {
-            // notify
-            changeListener.onGeofenceChanged(networkId, geofence);
+        if(this.operationMode == operationMode.POSITIONING){
+            Geofence oldGf = this.geofence;
+            this.geofence = geofence;
+            if (!Objects.equal(geofence, oldGf)) {
+                // notify
+                changeListener.onGeofenceChanged(networkId, geofence);
+            }
         }
     }
 
@@ -104,6 +126,7 @@ public class NetworkModel {
     public String toString() {
         return "NetworkModel{" +
                 "networkId='" + networkId + '\'' +
+                ", networkOperationMode='" + (this.operationMode == OperationModeEnum.POSITIONING ? "Positioning" : "Ranging") + '\'' +
                 ", networkName='" + networkName + '\'' +
                 '}';
     }
@@ -140,5 +163,13 @@ public class NetworkModel {
 
         }
   };
+
+    private static NetworkOperationModeListener VOID_OPERATION_MODE_LISTENER = new NetworkOperationModeListener() {
+
+        @Override
+        public void onNetworkModeChanged(short networkId, OperationModeEnum operationMode) {
+
+        }
+    };
 
 }

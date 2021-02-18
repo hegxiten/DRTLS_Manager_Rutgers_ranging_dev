@@ -351,7 +351,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         if (Constants.DEBUG) {
             Log.d("Debug Mode", "onCreate: " + args.toString());
             Preconditions.checkNotNull(args, "must specify node details to show!");
-            Preconditions.checkState(args.getLong(BK_NODE_ID, 0) == 0, "must specify node ID in args!");
+            Preconditions.checkState(args.getLong(BK_NODE_ID, 0) != 0, "must specify node ID in args!");
         }
 
         nodeId = args.getLong(BK_NODE_ID);

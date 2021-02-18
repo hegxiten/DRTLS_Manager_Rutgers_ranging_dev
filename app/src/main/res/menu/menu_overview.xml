@@ -37,21 +37,27 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/action_switch_operation_mode"
+        android:title="@string/menu_switch_operation_mode"
+        android:orderInCategory="120"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_forget"
         android:title="@string/menu_forget"
-        android:orderInCategory="120"
+        android:orderInCategory="140"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_firmware_status"
         android:title="@string/menu_firmware_status"
-        android:orderInCategory="140"
+        android:orderInCategory="160"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_autopositioning"
         android:title="@string/menu_autopositioning"
-        android:orderInCategory="160"
+        android:orderInCategory="180"
         app:showAsAction="never"/>
 
 </menu>
