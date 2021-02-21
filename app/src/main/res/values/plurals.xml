@@ -16,6 +16,16 @@
         <item quantity="other">tags: %1$d</item>
     </plurals>
 
+    <plurals name="number_of_slaves">
+        <item quantity="zero">no slaves</item>
+        <item quantity="other">slaves: %1$d</item>
+    </plurals>
+
+    <plurals name="number_of_masters">
+        <item quantity="zero">no masters</item>
+        <item quantity="other">masters: %1$d</item>
+    </plurals>
+
     <plurals name="devices_found_so_far">
         <item quantity="zero">no unassigned devices found so far</item>
         <item quantity="one">1 unassigned device found so far</item>

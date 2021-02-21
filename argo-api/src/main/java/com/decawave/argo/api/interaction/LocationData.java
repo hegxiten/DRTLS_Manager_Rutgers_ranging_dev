@@ -8,6 +8,7 @@ package com.decawave.argo.api.interaction;
 
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 
 import java.util.List;
 

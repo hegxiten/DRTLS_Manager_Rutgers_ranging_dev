@@ -6,11 +6,16 @@
 
 package com.decawave.argomanager.argoapi.ext;
 
+import android.util.Log;
+
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argomanager.Constants;
+import com.decawave.argomanager.util.ToastUtil;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -75,6 +80,11 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
         setProperty(NetworkNodeProperty.ANCHOR_POSITION, position);
     }
 
+    @Override
+    public void setSlaveInfoPosition(SlaveInformativePosition infoPosition) {
+        setProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION, infoPosition);
+    }
+
     public List<RangingAnchor> getDistances() {
         return getProperty(NetworkNodeProperty.ANCHOR_DISTANCES, true);
     }
@@ -83,6 +93,12 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
     public boolean anyDistance() {
         List<RangingAnchor> distances = getProperty(NetworkNodeProperty.ANCHOR_DISTANCES);
         return distances != null && distances.size() > 0;
+    }
+
+    @Override
+    public SlaveInformativePosition getSlaveInfoPosition() {
+        SlaveInformativePosition slaveInfoPos = getProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
+        return slaveInfoPos == null ? null : new SlaveInformativePosition(slaveInfoPos);
     }
 
     public void setDistances(List<RangingAnchor> distances) {
@@ -131,6 +147,7 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
             case ANCHOR_AN_LIST:
             case ANCHOR_POSITION:
             case ANCHOR_DISTANCES:
+            case ANCHOR_SLAVE_INFO_POSITION:
                 return true;
             default:
                 return super.isPropertyRecognized(property);
@@ -140,6 +157,12 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
     @Override
     public Position extractPositionDirect() {
         return getProperty(NetworkNodeProperty.ANCHOR_POSITION);
+    }
+
+    @Nullable
+    @Override
+    public SlaveInformativePosition extractSlaveInfoPositionDirect () {
+        return getProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
     }
 
     @Nullable

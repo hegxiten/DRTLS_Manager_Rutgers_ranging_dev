@@ -11,6 +11,7 @@ import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 
 import org.jetbrains.annotations.Nullable;
@@ -119,7 +120,7 @@ class TagNodeImpl extends NetworkNodeImpl implements TagNode {
         } // else:
         return null;
     }
-
+    
     @Nullable
     @Override
     public List<RangingAnchor> extractDistancesDirect() {

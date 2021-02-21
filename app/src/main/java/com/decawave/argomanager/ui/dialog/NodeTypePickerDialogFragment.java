@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argomanager.R;
+import com.decawave.argomanager.components.NetworkModel;
 import com.decawave.argomanager.ui.layout.NpaLinearLayoutManager;
 import com.decawave.argomanager.util.Util;
 
@@ -60,6 +61,7 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
 
     private AlertDialog dlg;
     private Adapter adapter;
+    private NetworkModel activeNetwork;
 
     // ***************************
     // * CONSTRUCTOR
@@ -100,7 +102,7 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        adapter = new Adapter();
+        adapter = new Adapter(activeNetwork);
         @SuppressLint("InflateParams")
         final View content = LayoutInflater.from(getActivity()).inflate(R.layout.dlg_item_picker, null);
         final RecyclerView recyclerView = (RecyclerView) content.findViewById(R.id.recyclerView);
@@ -122,8 +124,9 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
         super.onResume();
     }
 
-    public static void showDialog(FragmentManager fm, @Nullable NodeType selectedNodeType) {
+    public static void showDialog(FragmentManager fm, @Nullable NodeType selectedNodeType, NetworkModel activeNetwork) {
         final NodeTypePickerDialogFragment f = new NodeTypePickerDialogFragment();
+        f.activeNetwork = activeNetwork;
         if (selectedNodeType != null) {
             f.setArguments(getArgsForNodeType(selectedNodeType));
         }
@@ -138,6 +141,11 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
      * Adapter
      */
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+        private NetworkModel activeNetwork;
+
+        public Adapter(NetworkModel activeNetwork) {
+            this.activeNetwork = activeNetwork;
+        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -148,7 +156,7 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.bind(nodeTypes[position]);
+            holder.bind(nodeTypes[position], this.activeNetwork);
         }
 
         @Override
@@ -197,11 +205,11 @@ public class NodeTypePickerDialogFragment extends DialogFragment {
             }
         }
 
-        void bind(NodeType nodeType) {
+        void bind(NodeType nodeType, NetworkModel activeNetwork) {
             // assign data bean
             this.nodeType = nodeType;
             // set up visual elements content
-            this.tvNodeType.setText(Util.nodeTypeString(this.nodeType));
+            this.tvNodeType.setText(Util.nodeTypeString(this.nodeType, activeNetwork));
             // toggle radio button
             rb.setChecked(selectedNodeType == this.nodeType);
             //

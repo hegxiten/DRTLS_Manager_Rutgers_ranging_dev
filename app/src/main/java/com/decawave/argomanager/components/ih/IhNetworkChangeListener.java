@@ -6,6 +6,7 @@
 
 package com.decawave.argomanager.components.ih;
 
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argomanager.ui.view.FloorPlan;
 import com.decawave.argomanager.ui.view.Geofence;
 
@@ -28,4 +29,5 @@ public interface IhNetworkChangeListener extends InterfaceHubHandler {
 
     void onGeofenceChanged(short networkId, Geofence geofence);
 
+    void onNetworkOperationModeChanged(short networkId, NetworkOperationMode newOperationMode);
 }

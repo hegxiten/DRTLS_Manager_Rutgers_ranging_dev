@@ -7,9 +7,11 @@
 package com.decawave.argomanager.components.impl;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
@@ -166,12 +168,14 @@ public class NetworksNodesStorageImpl implements NetworksNodesStorage {
     private static class PersistedNetwork {
         short networkId;
         String networkName;
+        NetworkOperationMode networkOperationMode;
         PersistedFloorPlan floorPlan;
 
         static PersistedNetwork fromNetworkModel(NetworkModel network) {
             PersistedNetwork n = new PersistedNetwork();
             n.networkId = network.getNetworkId();
             n.networkName = network.getNetworkName();
+            n.networkOperationMode = network.getNetworkOperationMode();
             if (network.getFloorPlan() != null) {
                 n.floorPlan = PersistedFloorPlan.fromFloorPlan(network.getFloorPlan());
             }
@@ -179,7 +183,7 @@ public class NetworksNodesStorageImpl implements NetworksNodesStorage {
         }
 
         NetworkModel toNetworkModel() {
-            NetworkModel r = new NetworkModel(networkId, networkName);
+            NetworkModel r = new NetworkModel(networkId, networkName, networkOperationMode);
             if (floorPlan != null) {
                 r.setFloorPlan(floorPlan.toFloorPlan());
             }

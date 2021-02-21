@@ -22,6 +22,7 @@ import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.LocationDataMode;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
@@ -129,15 +130,37 @@ public class Util {
                 throw new IllegalStateException("unsupported operating firmware: " + operatingFirmware);
         }
     }
-    public static String nodeTypeString(NodeType nodeType) {
-        switch (nodeType) {
-            case ANCHOR:
-                return daApp.getString(R.string.node_type_anchor);
-            case TAG:
-                return daApp.getString(R.string.node_type_tag);
-            default:
-                throw new IllegalStateException("unsupported node type: " + nodeType);
+
+    public static String nodeTypeString(NodeType nodeType, NetworkModel activeNetwork) {
+        NetworkModel network = activeNetwork;
+        if (network == null) {
+            switch (nodeType) {
+                case ANCHOR:
+                    return daApp.getString(R.string.node_type_anchor);
+                case TAG:
+                    return daApp.getString(R.string.node_type_tag);
+                default:
+                    throw new IllegalStateException("unsupported node type: " + nodeType);
+            }
         }
+        else{
+            switch (nodeType) {
+                case ANCHOR:
+                    return (network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING) ?
+                            daApp.getString(R.string.node_type_anchor) :
+                            daApp.getString(R.string.node_type_slave);
+                case TAG:
+                    return (network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING) ?
+                            daApp.getString(R.string.node_type_tag) :
+                            daApp.getString(R.string.node_type_master);
+                default:
+                    throw new IllegalStateException("unsupported node type: " + nodeType);
+            }
+        }
+    }
+
+    public static String nodeTypeString(NodeType nodeType) {
+        return nodeTypeString(nodeType, null);
     }
 
     public static ByteBuffer newByteBuffer(byte[] bytes) {

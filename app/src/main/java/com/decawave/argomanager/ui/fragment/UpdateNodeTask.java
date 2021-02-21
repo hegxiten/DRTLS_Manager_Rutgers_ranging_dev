@@ -6,14 +6,18 @@
 
 package com.decawave.argomanager.ui.fragment;
 
+import android.util.Log;
+
 import com.annimon.stream.function.Function;
 import com.decawave.argo.api.interaction.ErrorCode;
 import com.decawave.argo.api.interaction.NetworkNodeConnection;
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.argoapi.ble.BleConnectionApi;
@@ -27,6 +31,7 @@ import com.decawave.argomanager.debuglog.LogEntryTagFactory;
 import com.decawave.argomanager.prefs.LengthUnit;
 import com.decawave.argomanager.util.ConnectionUtil;
 import com.decawave.argomanager.util.NetworkIdGenerator;
+import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -76,7 +81,6 @@ class UpdateNodeTask {
         }
     }
 
-
     void doUpdate(@NotNull NetworkNode originalInput,
                   @NotNull NodeType operationMode,
                   @Nullable UwbMode uwbMode,
@@ -98,7 +102,15 @@ class UpdateNodeTask {
                   @Nullable String posX,
                   @Nullable String posY,
                   @Nullable String posZ,
-                  LengthUnit lengthUnit) {
+                  LengthUnit lengthUnit,
+                  @Nullable String origSlavePosX,
+                  @Nullable String origSlavePosY,
+                  @Nullable String origSlavePosZ,
+                  @Nullable String origSlaveAssocId,
+                  @Nullable String posSlaveX,
+                  @Nullable String posSlaveY,
+                  @Nullable String posSlaveZ,
+                  @Nullable String slaveAssocId) {
 
         LogEntryTag tag = LogEntryTagFactory.getDeviceLogEntryTag(originalInput.getBleAddress());
 
@@ -115,6 +127,18 @@ class UpdateNodeTask {
         }
         if (posZ != null && posZ.length() == 0) {
             posZ = null;
+        }
+        if (posSlaveX != null && posSlaveX.length() == 0) {
+            posSlaveX = null;
+        }
+        if (posSlaveY != null && posSlaveY.length() == 0) {
+            posSlaveY = null;
+        }
+        if (posSlaveZ != null && posSlaveZ.length() == 0) {
+            posSlaveZ = null;
+        }
+        if (slaveAssocId != null && slaveAssocId.length() == 0) {
+            slaveAssocId = null;
         }
         // first process the network
         boolean networkActionPerformed = false;
@@ -146,7 +170,7 @@ class UpdateNodeTask {
         // create the target node where we will set only changed characteristics
         NetworkNode targetEntity = uiContentToNetworkNode(originalInput, operationMode, selectedNetworkId, nodeLabel, updateRate, stationaryUpdateRate,
                 uwbMode, isInitiator, isFirmwareUpdateEnable, isLedIndicationEnable, isBleEnable, isAccelerometerEnable, isLocationEngineEnable, isLowPowerModeEnable,
-                origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit);
+                origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit, origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId, posSlaveX, posSlaveY, posSlaveZ, slaveAssocId);
         if (targetEntity == null) {
             // no change detected
             running = false;
@@ -167,12 +191,15 @@ class UpdateNodeTask {
         connectAndUpdate(targetEntity, tag);
     }
 
-    private void connectAndUpdate(final NetworkNode targetEntity, LogEntryTag tag) {
+    private void connectAndUpdate(@NotNull final NetworkNode targetEntity, LogEntryTag tag) {
         boolean[] cleanDisconnectRequired = {false};
         ConnectionUtil.connectAndUpdate(bleConnectionApi, targetEntity.getBleAddress(), 3,
                 () -> targetEntity,
                 networkNodeConnection -> {},
                 (writeEffect,networkNode) -> {
+                    //TODO: investigate the connection behaviors (currently the slave info position is being propagated, but
+                    // gets directed to WRITE_SKIPPED. Not yet sure why.
+
                     // now we MUST check if the changes got propagated (sometimes a device restart is necessary)
                     if (!cancelled) {
                         switch (writeEffect) {
@@ -261,7 +288,15 @@ class UpdateNodeTask {
                                                @Nullable String posY,
                                                @Nullable String posZ,
                                                LogEntryTag logTag,
-                                               LengthUnit lengthUnit) {
+                                               LengthUnit lengthUnit,
+                                               @Nullable String origSlavePosX,
+                                               @Nullable String origSlavePosY,
+                                               @Nullable String origSlavePosZ,
+                                               @Nullable String origSlaveAssoc,
+                                               @Nullable String posSlaveX,
+                                               @Nullable String posSlaveY,
+                                               @Nullable String posSlaveZ,
+                                               @Nullable String slaveAssocId) {
         if (Constants.DEBUG) {
             Preconditions.checkState(posX == null && posY == null && posZ == null ||
                     posX != null && posY != null && posZ != null);
@@ -321,51 +356,105 @@ class UpdateNodeTask {
                 anchorBuilder.setInitiator(isInitiator);
                 b = true;
             }
-            // position
-            Position position = null;
-            if (posX != null && posY != null && posZ != null) {
-                Integer uiPosX;
-                Integer uiPosY;
-                Integer uiPosZ;
-                try {
-                    uiPosX = Util.parseLength(posX, lengthUnit);
-                    uiPosY = Util.parseLength(posY, lengthUnit);
-                    uiPosZ = Util.parseLength(posZ, lengthUnit);
-                } catch (NumberFormatException e) {
-                    throw new RuntimeException("wrong number format", e);
-                }
-                if (nodeTypeSwitch || origPosX == null || !posX.equals(origPosX)) {
-                    position = new Position();
-                    position.x = uiPosX;
-                }
-                if (position != null || !posY.equals(origPosY)) {
-                    if (position == null) {
+            if (targetNodeType == NodeType.ANCHOR) {
+                // position and slave informative position
+                Position position = null;
+                SlaveInformativePosition slaveInfoPosition = null;
+                if (posX != null && posY != null && posZ != null) {
+                    Integer uiPosX;
+                    Integer uiPosY;
+                    Integer uiPosZ;
+                    try {
+                        uiPosX = Util.parseLength(posX, lengthUnit);
+                        uiPosY = Util.parseLength(posY, lengthUnit);
+                        uiPosZ = Util.parseLength(posZ, lengthUnit);
+                    } catch (NumberFormatException e) {
+                        throw new RuntimeException("wrong number format", e);
+                    }
+                    if (nodeTypeSwitch || origPosX == null || !posX.equals(origPosX)) {
                         position = new Position();
-                        // we will take the value from the UI (it makes sense as a whole)
                         position.x = uiPosX;
                     }
-                    position.y = uiPosY;
-                }
-                if (position != null || !posZ.equals(origPosZ)) {
-                    if (position == null) {
-                        position = new Position();
-                        // we will take the value from the UI (it makes sense as a whole)
-                        position.x = uiPosX;
+                    if (position != null || !posY.equals(origPosY)) {
+                        if (position == null) {
+                            position = new Position();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            position.x = uiPosX;
+                        }
                         position.y = uiPosY;
                     }
-                    position.z = uiPosZ;
+                    if (position != null || !posZ.equals(origPosZ)) {
+                        if (position == null) {
+                            position = new Position();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            position.x = uiPosX;
+                            position.y = uiPosY;
+                        }
+                        position.z = uiPosZ;
+                    }
                 }
-            } else if (nodeTypeSwitch) {
-                // let's avoid a situation when user switched from TAG to ANCHOR and did not set explicit position
-                // there might be stored position from previous anchor mode
-                position = new Position();
-                position.x = position.y = position.z = 0;
-            }
-            if (position != null) {
-                appLog.d("POSITION change detected", logTag);
-                position.qualityFactor = Position.MAX_QUALITY_FACTOR;
-                anchorBuilder.setPosition(position);
-                b = true;
+                else if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null) {
+                    //TODO Finishing implementing the encoding of slave infomative positions
+                    Integer uiSlavePosX;
+                    Integer uiSlavePosY;
+                    Integer uiSlavePosZ;
+                    try {
+                        //TODO determine if we need to parse the length by unit
+                        uiSlavePosX = Util.parseLength(posSlaveX, lengthUnit);
+                        uiSlavePosY = Util.parseLength(posSlaveY, lengthUnit);
+                        uiSlavePosZ = Util.parseLength(posSlaveZ, lengthUnit);
+                    } catch (NumberFormatException e) {
+                        throw new RuntimeException("wrong number format", e);
+                    }
+                    if (nodeTypeSwitch || origSlavePosX == null || !posSlaveX.equals(origSlavePosX)) {
+                        slaveInfoPosition = new SlaveInformativePosition();
+                        slaveInfoPosition.x = uiSlavePosX;
+                    }
+                    if (slaveInfoPosition != null || !posSlaveY.equals(origSlavePosY)) {
+                        if (slaveInfoPosition == null) {
+                            slaveInfoPosition = new SlaveInformativePosition();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            slaveInfoPosition.x = uiSlavePosX;
+                        }
+                        slaveInfoPosition.y = uiSlavePosY;
+                    }
+                    if (slaveInfoPosition != null || !posSlaveZ.equals(origSlavePosZ)) {
+                        if (slaveInfoPosition == null) {
+                            slaveInfoPosition = new SlaveInformativePosition();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            slaveInfoPosition.x = uiSlavePosX;
+                            slaveInfoPosition.y = uiSlavePosY;
+                        }
+                        slaveInfoPosition.z = uiSlavePosZ;
+                    }
+                    if (slaveInfoPosition != null || !slaveAssocId.equals(origSlaveAssoc)) {
+                        if (slaveInfoPosition == null) {
+                            slaveInfoPosition = new SlaveInformativePosition();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            slaveInfoPosition.x = uiSlavePosX;
+                            slaveInfoPosition.y = uiSlavePosY;
+                            slaveInfoPosition.z = uiSlavePosZ;
+                        }
+                        slaveInfoPosition.associationId = slaveAssocId;
+                    }
+                }
+                else if (nodeTypeSwitch) {
+                    // let's avoid a situation when user switched from TAG to ANCHOR and did not set explicit position
+                    // there might be stored position from previous anchor mode
+                    position = new Position();
+                    position.x = position.y = position.z = 0;
+                }
+                if (position != null) {
+                    appLog.d("POSITION change detected", logTag);
+                    position.qualityFactor = Position.MAX_QUALITY_FACTOR;
+                    anchorBuilder.setPosition(position);
+                    b = true;
+                }
+                if (slaveInfoPosition != null) {
+                    appLog.d("SLAVE INFORMATIVE POSITION change detected", logTag);
+                    anchorBuilder.setSlaveInfoPosition(slaveInfoPosition);
+                    b = true;
+                }
             }
         } else {
             // TAG

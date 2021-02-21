@@ -26,7 +26,7 @@
     <string name="ab_position_log">Grid</string>
 
     <string name="network_id">network id: %1$s</string>
-
+    <string name="network_opmode">operation mode: %1$s</string>
     <string name="log_title_network">LOG for network: %1$s (%2$s)</string>
     <string name="log_title_discovery">Discovery LOG</string>
     <string name="ble_not_supported">BLE not supported on this device!</string>
@@ -108,6 +108,14 @@
     <string name="on">ON</string>
     <string name="off">OFF</string>
 
+    <!-- slave detail -->
+    <string name="slave_detail_config">Slave Position (UNIT TBD)</string>
+    <string name="slave_assoc_config">Slave Association ID</string>
+    <string name="slave_assoc_input_hint">Enter the Association ID (e.g. Vehicle ID)</string>
+    <string name="slave_detail_pos_x_coupler">CPLR(+:inside)</string>
+    <string name="slave_detail_pos_y_centerline">CL(+:COND.)</string>
+    <string name="slave_detail_pos_z_top_of_rail">TOR(+:over)</string>
+
     <!-- discovery -->
     <string name="discovery_section_title_networks">networks</string>
     <string name="discovery_section_title_unassigned_networks">unassigned networks</string>
@@ -145,6 +153,9 @@
     <string name="node_type_anchor">anchor</string>
     <string name="node_type_tag">tag</string>
 
+    <string name="node_type_slave">slave</string>
+    <string name="node_type_master">master</string>
+
     <string name="node_ble_pattern">BLE: %1$s</string>
     <string name="node_id_pattern">ID: %1$s</string>
 
@@ -166,7 +177,7 @@
     <string name="menu_rename">Rename network</string>
     <string name="menu_forget">Forget network</string>
     <string name="menu_firmware_status">Firmware status</string>
-    <string name="menu_switch_operation_mode">Switch operation mode</string>
+    <string name="menu_switch_operation_mode">Switch operation mode to %1$s</string>
     <string name="menu_autopositioning">Auto positioning</string>
     <string name="menu_show_errors">Show errors</string>
 

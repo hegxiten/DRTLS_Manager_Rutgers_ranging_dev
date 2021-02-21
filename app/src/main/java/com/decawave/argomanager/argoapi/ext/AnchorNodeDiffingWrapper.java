@@ -10,7 +10,10 @@ import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.google.common.base.Objects;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -65,6 +68,11 @@ public class AnchorNodeDiffingWrapper extends NetworkNodeDiffingWrapper<AnchorNo
     }
 
     @Override
+    public SlaveInformativePosition getSlaveInfoPosition() {
+        return delegate.getSlaveInfoPosition();
+    }
+
+    @Override
     public Position getPosition() {
         return delegate.getPosition();
     }
@@ -83,6 +91,11 @@ public class AnchorNodeDiffingWrapper extends NetworkNodeDiffingWrapper<AnchorNo
         delegate.setPosition(position);
     }
 
+    @Override
+    public void setSlaveInfoPosition(SlaveInformativePosition infoPosition) {
+        delegate.setSlaveInfoPosition(infoPosition);
+    }
+
     public boolean isInitiatorChanged() {
         return !Objects.equal(delegate.isInitiator(), original.isInitiator());
     }
@@ -96,11 +109,18 @@ public class AnchorNodeDiffingWrapper extends NetworkNodeDiffingWrapper<AnchorNo
         super.copyWritablePropertiesFrom(node);
         // initiator
         setPosition(node.getPosition());
+        setSlaveInfoPosition(node.getSlaveInfoPosition());
         setInitiator(node.isInitiator());
     }
 
     @Override
     public <T> T getProperty(NetworkNodeProperty property, boolean deepCopy) {
         return delegate.getProperty(property, deepCopy);
+    }
+
+    @Nullable
+    @Override
+    public SlaveInformativePosition extractSlaveInfoPositionDirect() {
+        return delegate.getSlaveInfoPosition();
     }
 }

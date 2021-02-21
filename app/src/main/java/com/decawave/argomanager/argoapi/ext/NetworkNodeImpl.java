@@ -6,6 +6,8 @@
 
 package com.decawave.argomanager.argoapi.ext;
 
+ import android.util.Log;
+
  import com.decawave.argo.api.struct.LocationDataMode;
  import com.decawave.argo.api.struct.NetworkNode;
  import com.decawave.argo.api.struct.NetworkNodeProperty;

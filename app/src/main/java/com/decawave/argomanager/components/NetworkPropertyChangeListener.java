@@ -6,6 +6,7 @@
 
 package com.decawave.argomanager.components;
 
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argomanager.ui.view.FloorPlan;
 import com.decawave.argomanager.ui.view.Geofence;
 
@@ -28,5 +29,7 @@ public interface NetworkPropertyChangeListener {
     void onFloorPlanChanged(short networkId, FloorPlan floorPlan);
 
     void onGeofenceChanged(short networkId, Geofence geofence);
+
+    void onNetworkOperationModeChanged(short networkId, NetworkOperationMode operationMode);
 
 }

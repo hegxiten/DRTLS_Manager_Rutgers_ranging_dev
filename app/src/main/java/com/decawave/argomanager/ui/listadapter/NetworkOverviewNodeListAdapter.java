@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.annimon.stream.function.Supplier;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.TagNode;
@@ -768,6 +769,8 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
         TextView numberOfTags;
         @BindView(R.id.infoNetworkId)
         TextView networkId;
+        @BindView(R.id.infoNetworkOperatioMode)
+        TextView networkOperationMode;
         @BindView(R.id.tagPictogram)
         NodeStateView tagPictogram;
         @BindView(R.id.anchorPictogram)
@@ -791,9 +794,14 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             networkName.setText(network.getNetworkName());
             int anchors = networkNodeManager.getNumberOfAnchors(network.networkId);
             int tags = networkNodeManager.getNumberOfTags(network.networkId);
-            this.numberOfAnchors.setText(daApp.getResources().getQuantityString(R.plurals.number_of_anchors, anchors, anchors));
-            this.numberOfTags.setText(daApp.getResources().getQuantityString(R.plurals.number_of_tags, tags, tags));
+            this.numberOfAnchors.setText(daApp.getResources().getQuantityString(
+                    network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING ? R.plurals.number_of_anchors : R.plurals.number_of_slaves,
+                    anchors, anchors));
+            this.numberOfTags.setText(daApp.getResources().getQuantityString(
+                    network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING ? R.plurals.number_of_tags : R.plurals.number_of_masters,
+                    tags, tags));
             networkId.setText(daApp.getString(R.string.network_id, Util.formatNetworkId(network.getNetworkId())));
+            networkOperationMode.setText(daApp.getString(R.string.network_opmode, network.getNetworkOperationMode().name()));
         }
 
     }

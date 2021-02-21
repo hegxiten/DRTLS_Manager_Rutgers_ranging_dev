@@ -40,7 +40,8 @@
         android:paddingRight="@dimen/activity_horizontal_margin">
 
         <eu.kryl.android.common.ui.SbRotatingProgressView
-            style="@style/SbProgressNormal"/>
+            style="@style/SbProgressNormal"
+            android:layout_width="48dp" />
 
     </LinearLayout>
 

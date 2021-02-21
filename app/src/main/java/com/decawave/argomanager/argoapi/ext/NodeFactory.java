@@ -18,6 +18,7 @@ import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 
@@ -236,6 +237,11 @@ public class NodeFactory {
 
         public AnchorNodeBuilder setPosition(Position position) {
             networkNode.setPosition(position);
+            return this;
+        }
+
+        public AnchorNodeBuilder setSlaveInfoPosition(SlaveInformativePosition slaveInfoPosition) {
+            networkNode.setSlaveInfoPosition(slaveInfoPosition);
             return this;
         }
 

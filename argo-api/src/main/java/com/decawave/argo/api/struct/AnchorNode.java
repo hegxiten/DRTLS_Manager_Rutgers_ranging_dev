@@ -6,6 +6,8 @@
 
 package com.decawave.argo.api.struct;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 /**
@@ -36,6 +38,12 @@ public interface AnchorNode extends NetworkNode {
     void setPosition(Position position);
 
     /**
+     * Set the informative position for slave operation.
+     */
+
+    void setSlaveInfoPosition(SlaveInformativePosition infoPosition);
+
+    /**
      * @return a deep copy of position
      * @see #getProperty(NetworkNodeProperty)
      */
@@ -49,5 +57,13 @@ public interface AnchorNode extends NetworkNode {
 
     boolean anyDistance();
 
+    SlaveInformativePosition getSlaveInfoPosition();
+
+    /**
+     * For slave anchor this returns simply slave informative position
+     * @return slave informative position, direct reference
+     */
+    @Nullable
+    SlaveInformativePosition extractSlaveInfoPositionDirect();
 
 }

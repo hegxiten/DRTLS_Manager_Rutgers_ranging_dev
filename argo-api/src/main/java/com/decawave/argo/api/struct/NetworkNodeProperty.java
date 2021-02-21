@@ -45,6 +45,7 @@ public enum NetworkNodeProperty {
     ANCHOR_MAC_STATS(true, false),
     ANCHOR_AN_LIST(true, false),
     ANCHOR_POSITION,
+    ANCHOR_SLAVE_INFO_POSITION(true, false),
     ANCHOR_DISTANCES,
     // tag-specific
     TAG_ACCELEROMETER_ENABLE,
@@ -78,7 +79,9 @@ public enum NetworkNodeProperty {
             return (T) new ArrayList<>((List) value);
         } else if (this == NetworkNodeProperty.ANCHOR_POSITION) {
             return (T) new Position((Position) value);
-        } else if (this == NetworkNodeProperty.ANCHOR_DISTANCES) {
+        }else if (this == NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION) {
+            return (T) new SlaveInformativePosition((SlaveInformativePosition) value);
+        }else if (this == NetworkNodeProperty.ANCHOR_DISTANCES) {
             return (T) RangingAnchor.deepCopy((List<RangingAnchor>) value);
         } else if (this == NetworkNodeProperty.TAG_LOCATION_DATA) {
             // we need to do a deep copy

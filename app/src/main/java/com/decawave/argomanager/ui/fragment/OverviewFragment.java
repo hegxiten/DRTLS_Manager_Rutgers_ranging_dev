@@ -29,6 +29,7 @@ import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.Constants;
 import com.decawave.argomanager.R;
@@ -44,7 +45,6 @@ import com.decawave.argomanager.components.ErrorManager;
 import com.decawave.argomanager.components.LocationDataObserver;
 import com.decawave.argomanager.components.NetworkModel;
 import com.decawave.argomanager.components.NetworkNodeManager;
-import com.decawave.argomanager.components.NetworkOperationModeListener.OperationModeEnum;
 import com.decawave.argomanager.components.ih.IhEnhancedNodePropertiesChangeListener;
 import com.decawave.argomanager.components.ih.IhNetworkChangeListener;
 import com.decawave.argomanager.components.ih.IhNetworkChangeListenerAdapter;
@@ -65,7 +65,6 @@ import com.decawave.argomanager.ui.listadapter.NetworkOverviewNodeListAdapter;
 import com.decawave.argomanager.util.AndroidPermissionHelper;
 import com.decawave.argomanager.util.ConnectionUtil;
 import com.decawave.argomanager.util.NetworkNodePropertyDecorator;
-import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 
 import java.util.HashSet;
@@ -79,8 +78,12 @@ import eu.kryl.android.common.hub.InterfaceHub;
  * Shows list of network nodes: anchors and tags, distinguishes between visible/invisible ones.
  * Overview Fragment corresponds to the "Network Details" tab as opposite to "Grid"
  */
-public class OverviewFragment extends MainScreenFragment implements IhAppPreferenceListener,
-        IhNodeDiscoveryListener, IhConnectionStateListener, IhErrorManagerListener, IhEnhancedNodePropertiesChangeListener {
+public class OverviewFragment extends MainScreenFragment implements
+        IhAppPreferenceListener,
+        IhNodeDiscoveryListener,
+        IhConnectionStateListener,
+        IhErrorManagerListener,
+        IhEnhancedNodePropertiesChangeListener{
     public static final int DISTANCE_TO_TRIGGER_SYNC = 240;
     public static final String BK_ADAPTER_STATE = "ADAPTER_STATE";
     public static final String BK_EXPANDED_NODE = "EXPANDED_NODE";
@@ -188,6 +191,15 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             adapter.notifyItemChanged(0);
         }
 
+        @Override
+        public void onNetworkOperationModeChanged(short networkId, NetworkOperationMode newOperationMode) {
+            switchNetworkOperationModeMenuItem.setTitle(daApp.getString(
+                    R.string.menu_switch_operation_mode,
+                    (newOperationMode == NetworkOperationMode.POSITIONING) ?
+                            NetworkOperationMode.RANGING.name():
+                            NetworkOperationMode.POSITIONING.name()));
+            adapter.notifyDataSetChanged();
+        }
     };
 
     private IhPersistedNodeChangeListener persistedNodeChangeListener = new IhPersistedNodeChangeListener() {
@@ -280,7 +292,9 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
                 },
                 (nnc) -> {},
                 (writeEffect, aNode) -> {
-                    log.d("successfully cleared network ID");
+                    if (Constants.DEBUG) {
+                        log.d("successfully cleared network ID");
+                    }
                     // let the network node manager know that the network ID reset (if any) passed through
                     // the node is forgotten now, we may use the original instance
                     NetworkNodeEnhanced currNode = networkNodeManager.getNode(node.getId());
@@ -337,21 +351,16 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             }
             return true;
         });
+
         switchNetworkOperationModeMenuItem = menu.findItem(R.id.action_switch_operation_mode);
+        NetworkModel network = networkNodeManager.getActiveNetwork();
+        switchNetworkOperationModeMenuItem.setTitle(daApp.getString(
+                R.string.menu_switch_operation_mode,
+                network.getCurrentNetworkOppositeOperationMode().name()));
         switchNetworkOperationModeMenuItem.setOnMenuItemClickListener((v) -> {
-            NetworkModel network = networkNodeManager.getActiveNetwork();
-            if (network.getOperationMode() == OperationModeEnum.POSITIONING) {
-                network.setNetworkOperationMode(OperationModeEnum.RANGING);
-                if (Constants.DEBUG) {
-                    ToastUtil.showToast("Switched to ranging mode! Mode: "+network.getOperationMode().toString());
-                }
-            }
-            else {
-                network.setNetworkOperationMode(OperationModeEnum.POSITIONING);
-                if (Constants.DEBUG) {
-                    ToastUtil.showToast("Switched to positioning mode! Mode: "+network.getOperationMode().toString());
-                }
-            }
+            network.setNetworkOperationMode((network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING) ?
+                    NetworkOperationMode.RANGING : NetworkOperationMode.POSITIONING);
+            updateUi();
             return true;
         });
 
@@ -418,7 +427,8 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
         InterfaceHub.registerHandler(persistedNodeChangeListener);
         InterfaceHub.registerHandler(networkChangeListener);
         InterfaceHub.registerHandler(presenceApiListener);
-        if (networkNodeManager.getActiveNetwork() != null && permissionHelper.allSetUp() && !discoveryStarted) {
+        NetworkModel networkModel = networkNodeManager.getActiveNetwork();
+        if (networkModel != null && permissionHelper.allSetUp() && !discoveryStarted) {
             // start / prolong discovery
             discoveryManager.startTimeLimitedDiscovery(true);
             discoveryStarted = true;
@@ -451,7 +461,7 @@ public class OverviewFragment extends MainScreenFragment implements IhAppPrefere
             adapter = null;
         } else {
             short networkId = network.getNetworkId();
-            OperationModeEnum networkOperationmode = network.getOperationMode();
+            NetworkOperationMode networkOperationmode = network.getNetworkOperationMode();
             // selected active network
             noNetworkView.setVisibility(View.GONE);
             nodeList.setVisibility(View.VISIBLE);

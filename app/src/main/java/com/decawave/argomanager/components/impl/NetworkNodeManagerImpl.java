@@ -13,6 +13,7 @@ import com.decawave.argo.api.interaction.LocationData;
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
@@ -39,7 +40,6 @@ import com.decawave.argomanager.components.struct.TrackMode;
 import com.decawave.argomanager.prefs.AppPreferenceAccessor;
 import com.decawave.argomanager.ui.view.FloorPlan;
 import com.decawave.argomanager.ui.view.Geofence;
-import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Preconditions;
 
@@ -138,8 +138,9 @@ public class NetworkNodeManagerImpl implements NetworkNodeManager {
 
         @Override
         public void onFloorPlanChanged(short networkId, FloorPlan floorPlan) {
-            if (Constants.DEBUG)
+            if (Constants.DEBUG) {
                 log.d("onFloorPlanChanged() called with: " + "floorPlan = [" + floorPlan + "]");
+            }
             schedulePersist();
             InterfaceHub.getHandlerHub(IhNetworkChangeListener.class).onFloorPlanChanged(networkId, floorPlan);
         }
@@ -148,9 +149,18 @@ public class NetworkNodeManagerImpl implements NetworkNodeManager {
         public void onGeofenceChanged(short networkId, Geofence geofence) {
             // a copy of onFloorPlanChanged() above
             if (Constants.DEBUG)
-                log.d("onGeofenceChanged() called with: " + "geofence = [" + geofence + "]");
+                log.d("onGeofenceChanged() at NetowkrNodeManagerImpl called with: " + "geofence = [" + geofence + "]");
             schedulePersist();
             InterfaceHub.getHandlerHub(IhNetworkChangeListener.class).onGeofenceChanged(networkId, geofence);
+        }
+
+        @Override
+        public void onNetworkOperationModeChanged(short networkId, NetworkOperationMode newOperationMode){
+            if (Constants.DEBUG) {
+                log.d("onNetworkOperationModeChanged() at NetowkrNodeManagerImpl called with: " + "operationmode = [" + newOperationMode + "]");
+            }
+            schedulePersist();
+            InterfaceHub.getHandlerHub(IhNetworkChangeListener.class).onNetworkOperationModeChanged(networkId, newOperationMode);
         }
 
     };

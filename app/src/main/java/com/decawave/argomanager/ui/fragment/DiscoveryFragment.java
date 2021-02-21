@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.decawave.argo.api.struct.NetworkNode;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argomanager.Constants;
 import com.decawave.argomanager.R;
 import com.decawave.argomanager.argoapi.ble.BleConnectionApi;
@@ -378,7 +379,7 @@ public class DiscoveryFragment extends DiscoveryProgressAwareFragment
 
     private void declareNewNetwork(Short networkId, String networkName) {
         // set the name
-        NetworkModel networkModel = new NetworkModel(networkId, networkName);
+        NetworkModel networkModel = new NetworkModel(networkId, networkName, NetworkOperationMode.POSITIONING);
         // declare the network
         networkNodeManager.declareNetwork(networkModel);
         // make it active
@@ -452,7 +453,12 @@ public class DiscoveryFragment extends DiscoveryProgressAwareFragment
 
     @Override
     public void onGeofenceChanged(short networkId, Geofence geofence) {
-        ToastUtil.showToast("Implementation of onGeofenceChanged() at DiscoveryFragment not available!");
+        ToastUtil.showToast("Implementation of onGeofenceChanged() at DiscoveryFragment not yet ready!");
+    }
+
+    @Override
+    public void onNetworkOperationModeChanged(short networkId, NetworkOperationMode newOperationMode){
+        ToastUtil.showToast("Implementation of onNetworkOperationModeChanged() at DiscoveryFragment not yet ready!");
     }
 
     ///////////////////////////////////////////////////////////////////////////
