@@ -7,7 +7,6 @@
 package com.decawave.argomanager.ui.fragment;
 
 import android.content.Context;
-import android.net.Network;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -525,7 +524,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     origSlavePosX = Util.formatLength(slaveInfoPosition.x, lengthUnit);
                     origSlavePosY = Util.formatLength(slaveInfoPosition.y, lengthUnit);
                     origSlavePosZ = Util.formatLength(slaveInfoPosition.z, lengthUnit);
-                    origSlaveAssocId = slaveInfoPosition.associationId.toString();
+                    origSlaveAssocId = slaveInfoPosition.assocIdByteArray.toString();
                     //
                     etPosX.setText(origSlavePosX);   // slave origin pos input
                     etPosY.setText(origSlavePosY);   // slave origin pos input

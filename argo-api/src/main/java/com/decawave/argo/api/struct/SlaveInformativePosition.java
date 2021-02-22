@@ -2,7 +2,6 @@ package com.decawave.argo.api.struct;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SlaveInformativePosition {
@@ -12,20 +11,27 @@ public class SlaveInformativePosition {
     // reserved 6 Bytes for future use
     public byte[] reserved = new byte[6];
     // association id: 0 - 255
-    public byte[] associationId = new byte[1];
+    public byte[] assocIdByteArray = new byte[1];
 
     public SlaveInformativePosition(int x, int y, int z) {
-        this.pos[0] = (byte) x;
-        this.pos[1] = (byte) (x >>> 8);
-        this.pos[2] = (byte) y;
-        this.pos[3] = (byte) (y >>> 8);
-        this.pos[4] = (byte) z;
-        this.pos[5] = (byte) (z >>> 8);
+        if ((x < -32768) || (x > 32767) || (y < -32768) || (y > 32767) || (z < -32768) || (z > 32767)) {
+            throw new IllegalArgumentException("relative position range has to be limited from -32,768 to 32,767 cm!");
+        }
+        this.pos[1] = (byte) x;
+        this.pos[0] = (byte) (x >> 8);
+        this.pos[3] = (byte) y;
+        this.pos[2] = (byte) (y >> 8);
+        this.pos[5] = (byte) z;
+        this.pos[4] = (byte) (z >> 8);
+        this.assocIdByteArray[0] = (byte) 0x00; // if not set, set to 0
     }
 
-    public SlaveInformativePosition(int x, int y, int z, byte associationId) {
+    public SlaveInformativePosition(int x, int y, int z, int associationId) {
         this(x, y, z);
-        this.associationId[0] = associationId;
+        if ((associationId < 0) || (associationId > 255)) {
+            throw new IllegalArgumentException("association id range has to be limited from 0 to 255!");
+        }
+        this.assocIdByteArray[0] = (byte) associationId;
     }
 
     public SlaveInformativePosition() {
@@ -44,23 +50,23 @@ public class SlaveInformativePosition {
         SlaveInformativePosition otherSlaveInfoPosition = (SlaveInformativePosition) o;
 
         if (this.pos != otherSlaveInfoPosition.pos) return false;
-        return associationId != null ? Arrays.equals(associationId, otherSlaveInfoPosition.associationId) : otherSlaveInfoPosition.associationId == null;
+        return assocIdByteArray != null ? Arrays.equals(assocIdByteArray, otherSlaveInfoPosition.assocIdByteArray) : otherSlaveInfoPosition.assocIdByteArray == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        result = 31 * result + z;
-        result = 31 * result + (qualityFactor != null ? qualityFactor.hashCode() : 0);
+        int result = this.getX();
+        result = 31 * result + this.getY();
+        result = 31 * result + this.getZ();
+        result = 31 * result + (this.getAssociation() != null ? this.getAssociation().hashCode() : 0);
         return result;
     }
 
     public void copyFrom(@NotNull SlaveInformativePosition source) {
         this.pos = source.pos;
         this.reserved = source.reserved;
-        this.associationId = source.associationId;
+        this.assocIdByteArray = source.assocIdByteArray;
     }
 
     @Override
@@ -79,14 +85,14 @@ public class SlaveInformativePosition {
                 && this.getY() == slaveInfoPos.getY()
                 && this.getZ() == slaveInfoPos.getZ();
     }
-    //TODO: The following part has not yet been developed
-    private int getAssociation() {
-        Byte associationIdByte = this.associationId[0];
-        return associationIdByte.intValue();
+
+    private Integer getAssociation() {
+        Byte associationIdByte = this.assocIdByteArray[0];
+        return Integer.valueOf(associationIdByte.intValue());
     }
 
     private int getX() {
-        byte[] xFieldBytes = this.pos[]
+        byte[] byteArraySliceX = Arrays.copyOfRange(this.pos, 0, 2);
         return 0;
     }
 

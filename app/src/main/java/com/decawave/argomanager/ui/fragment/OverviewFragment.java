@@ -351,7 +351,7 @@ public class OverviewFragment extends MainScreenFragment implements
             }
             return true;
         });
-
+        //TODO: check if we need to put the menu item assignment into the if clause.
         switchNetworkOperationModeMenuItem = menu.findItem(R.id.action_switch_operation_mode);
         if (networkNodeManager.getActiveNetwork() != null) {
             NetworkModel network = networkNodeManager.getActiveNetwork();

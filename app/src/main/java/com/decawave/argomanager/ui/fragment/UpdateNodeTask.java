@@ -6,15 +6,12 @@
 
 package com.decawave.argomanager.ui.fragment;
 
-import android.util.Log;
-
 import com.annimon.stream.function.Function;
 import com.decawave.argo.api.interaction.ErrorCode;
 import com.decawave.argo.api.interaction.NetworkNodeConnection;
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
-import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
@@ -31,7 +28,6 @@ import com.decawave.argomanager.debuglog.LogEntryTagFactory;
 import com.decawave.argomanager.prefs.LengthUnit;
 import com.decawave.argomanager.util.ConnectionUtil;
 import com.decawave.argomanager.util.NetworkIdGenerator;
-import com.decawave.argomanager.util.ToastUtil;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -432,7 +428,7 @@ class UpdateNodeTask {
                             slaveInfoPosition.y = uiSlavePosY;
                             slaveInfoPosition.z = uiSlavePosZ;
                         }
-                        slaveInfoPosition.associationId = slaveAssocId;
+                        slaveInfoPosition.assocIdByteArray = slaveAssocId;
                     }
                 }
                 else if (nodeTypeSwitch) {

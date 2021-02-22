@@ -222,7 +222,7 @@ public class GattEncoder {
         buff.putInt(slaveInfoPosition.x);
         buff.putInt(slaveInfoPosition.y);
         buff.putInt(slaveInfoPosition.z);
-        buff.put(slaveInfoPosition.associationId);
+        buff.put(slaveInfoPosition.assocIdByteArray);
         return buff.array();
     }
 
