@@ -353,16 +353,18 @@ public class OverviewFragment extends MainScreenFragment implements
         });
 
         switchNetworkOperationModeMenuItem = menu.findItem(R.id.action_switch_operation_mode);
-        NetworkModel network = networkNodeManager.getActiveNetwork();
-        switchNetworkOperationModeMenuItem.setTitle(daApp.getString(
-                R.string.menu_switch_operation_mode,
-                network.getCurrentNetworkOppositeOperationMode().name()));
-        switchNetworkOperationModeMenuItem.setOnMenuItemClickListener((v) -> {
-            network.setNetworkOperationMode((network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING) ?
-                    NetworkOperationMode.RANGING : NetworkOperationMode.POSITIONING);
-            updateUi();
-            return true;
-        });
+        if (networkNodeManager.getActiveNetwork() != null) {
+            NetworkModel network = networkNodeManager.getActiveNetwork();
+            switchNetworkOperationModeMenuItem.setTitle(daApp.getString(
+                    R.string.menu_switch_operation_mode,
+                    network.getCurrentNetworkOppositeOperationMode().name()));
+            switchNetworkOperationModeMenuItem.setOnMenuItemClickListener((v) -> {
+                network.setNetworkOperationMode((network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING) ?
+                        NetworkOperationMode.RANGING : NetworkOperationMode.POSITIONING);
+                updateUi();
+                return true;
+            });
+        }
 
         firmwareStatusMenuItem = menu.findItem(R.id.action_firmware_status);
         firmwareStatusMenuItem.setOnMenuItemClickListener((v) -> {
