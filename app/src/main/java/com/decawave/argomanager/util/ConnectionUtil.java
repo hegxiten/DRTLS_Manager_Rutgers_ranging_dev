@@ -66,7 +66,7 @@ public class ConnectionUtil {
             // on fail
             handleFail(fail, counter, attemptCount, onFail, failure);
             // we will get disconnected automatically
-        }, (networkNodeConnection,errCode) -> {
+        }, (networkNodeConnection, errCode) -> {
             // on disconnected
             if (failure[0] && counter < attemptCount) {
                 // try again

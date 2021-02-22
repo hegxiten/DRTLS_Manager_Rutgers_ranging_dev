@@ -6,6 +6,8 @@
 
 package com.decawave.argomanager.argoapi.ext;
 
+import android.util.Log;
+
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.Position;
@@ -102,6 +104,10 @@ public class AnchorNodeDiffingWrapper extends NetworkNodeDiffingWrapper<AnchorNo
 
     public boolean isPositionChanged() {
         return isPropertyChanged(NetworkNodeProperty.ANCHOR_POSITION);
+    }
+
+    public boolean isSlaveInfoPosChanged() {
+        return isPropertyChanged(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
     }
 
     @Override

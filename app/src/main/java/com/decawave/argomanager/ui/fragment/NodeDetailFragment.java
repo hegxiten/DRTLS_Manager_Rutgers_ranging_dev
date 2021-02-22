@@ -521,11 +521,11 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 SlaveInformativePosition slaveInfoPosition = anchor.getSlaveInfoPosition();
                 if (slaveInfoPosition != null) {
                     LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
-                    //TODO check decoding needs here
+                    //TODO: The following part has not yet been developed, transferring from field to getter of XYZ
                     origSlavePosX = Util.formatLength(slaveInfoPosition.x, lengthUnit);
                     origSlavePosY = Util.formatLength(slaveInfoPosition.y, lengthUnit);
                     origSlavePosZ = Util.formatLength(slaveInfoPosition.z, lengthUnit);
-                    origSlaveAssocId = slaveInfoPosition.associationId;
+                    origSlaveAssocId = slaveInfoPosition.associationId.toString();
                     //
                     etPosX.setText(origSlavePosX);   // slave origin pos input
                     etPosY.setText(origSlavePosY);   // slave origin pos input
@@ -713,7 +713,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     origPosX, origPosY, origPosZ,
                     etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
                     origPosX, origPosY, origPosZ, origSlaveAssocId,
-                    etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString());
+                    etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), Integer.valueOf(etSlaveAssoc.getText().toString()).byteValue());
             return true;
         }
     }

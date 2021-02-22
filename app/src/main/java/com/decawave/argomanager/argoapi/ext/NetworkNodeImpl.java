@@ -393,6 +393,7 @@ abstract class NetworkNodeImpl implements NetworkNode, NetworkNodePropertySetter
             List<NetworkNodeProperty> keys = new ArrayList<>(valueMap.keySet());
             Collections.sort(keys, (nnp1,nnp2) -> nnp1.name().compareTo(nnp2.name()));
             for (NetworkNodeProperty property : keys) {
+                Log.d("propertycheck", "toString: "+property);
                 Object value = valueMap.get(property);
                 sb.append(property)
                         .append("=");

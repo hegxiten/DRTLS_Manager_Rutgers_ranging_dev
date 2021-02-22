@@ -7,6 +7,7 @@
 package com.decawave.argomanager.argoapi.ble;
 
 import com.annimon.stream.function.Supplier;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argomanager.ble.WriteType;
 
 import java.util.UUID;
@@ -141,7 +142,6 @@ public abstract class WriteCharacteristicRequest<V> {
     }
 
     static class Position extends WriteCharacteristicRequest<com.decawave.argo.api.struct.Position> {
-
         public Position(UUID serviceUuid, UUID characteristicUuid, com.decawave.argo.api.struct.Position value) {
             super(serviceUuid, characteristicUuid, WriteType.WITH_RESPONSE, value);
         }
@@ -152,6 +152,16 @@ public abstract class WriteCharacteristicRequest<V> {
         }
     }
 
+    static class SlaveInformativePosition extends WriteCharacteristicRequest<com.decawave.argo.api.struct.SlaveInformativePosition> {
+        public SlaveInformativePosition(UUID serviceUuid, UUID characteristicUuid, com.decawave.argo.api.struct.SlaveInformativePosition value) {
+            super(serviceUuid, characteristicUuid, WriteType.WITH_RESPONSE, value);
+        }
+
+        @Override
+        void accept(WriteCharacteristicRequestVisitor visitor) {
+            visitor.visitSlaveInfoPosition(this);
+        }
+    }
 
 
 }

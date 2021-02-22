@@ -8,6 +8,7 @@ package com.decawave.argomanager.argoapi.ble.connection;
 
 import android.bluetooth.BluetoothGattDescriptor;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
@@ -21,7 +22,9 @@ import com.decawave.argo.api.struct.FirmwareMeta;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
+import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argomanager.Constants;
 import com.decawave.argomanager.argoapi.ble.BleConstants;
 import com.decawave.argomanager.argoapi.ble.BleGattServiceRdonly;
@@ -1236,8 +1239,13 @@ class NetworkNodeBleConnectionImpl implements NetworkNodeBleConnection {
             if (anchor.isPositionChanged()) {
                 appLog.d("different POSITION injected");
                 // now we will encode position (specific write-only characteristic)
-                builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, anchor.getPosition());
+                builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, (Position) anchor.getPosition());
             }
+            if (anchor.isSlaveInfoPosChanged()){
+                appLog.d("different SLAVE INFO POSITION injected");
+                builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, (SlaveInformativePosition) anchor.getSlaveInfoPosition());
+            }
+            //TODO: add appropriate diffing actions to accommodate slave informative positions
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // tag-specific modifiable properties

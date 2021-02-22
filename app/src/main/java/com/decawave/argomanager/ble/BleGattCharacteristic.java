@@ -7,6 +7,7 @@
 package com.decawave.argomanager.ble;
 
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 
 import java.util.UUID;
 
@@ -38,6 +39,8 @@ public interface BleGattCharacteristic {
     boolean setUuidValue(UUID uuid);
 
     boolean setPositionValue(Position value);
+
+    boolean setSlaveInfoPositionValue(SlaveInformativePosition value);
 
     boolean valueLoaded();
 

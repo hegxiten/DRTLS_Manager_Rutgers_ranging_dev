@@ -8,6 +8,7 @@ package com.decawave.argomanager.argoapi.ble;
 
 import com.annimon.stream.function.Supplier;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +53,11 @@ public class WriteCharacteristicRequestsBuilder {
         return this;
     }
 
+    public WriteCharacteristicRequestsBuilder addValue(UUID characteristicId, SlaveInformativePosition value) {
+        requests.add(new WriteCharacteristicRequest.SlaveInformativePosition(currentServiceId, characteristicId, value));
+        return this;
+    }
+
     public WriteCharacteristicRequestsBuilder addValue(UUID characteristicId, UUID value) {
         requests.add(new WriteCharacteristicRequest.Uuid(currentServiceId, characteristicId, value));
         return this;
@@ -77,5 +83,7 @@ public class WriteCharacteristicRequestsBuilder {
         requests = new LinkedList<>();
         return r;
     }
+
+    //TODO: add appropriate request to accommodate slave requests
 
 }

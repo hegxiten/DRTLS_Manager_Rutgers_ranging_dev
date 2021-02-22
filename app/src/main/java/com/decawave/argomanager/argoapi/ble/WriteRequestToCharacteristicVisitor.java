@@ -50,6 +50,11 @@ class WriteRequestToCharacteristicVisitor implements WriteCharacteristicRequestV
     }
 
     @Override
+    public void visitSlaveInfoPosition(WriteCharacteristicRequest.SlaveInformativePosition request) {
+        doVisit(() -> characteristic.setSlaveInfoPositionValue(request.getValue()), "setSlaveInfoPositionValue()");
+    }
+
+    @Override
     public void visitInteger(WriteCharacteristicRequest<Integer> request) {
         doVisit(() -> characteristic.setIntValue(request.getValue()), "setIntValue()");
     }

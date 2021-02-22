@@ -110,7 +110,7 @@ class UpdateNodeTask {
                   @Nullable String posSlaveX,
                   @Nullable String posSlaveY,
                   @Nullable String posSlaveZ,
-                  @Nullable String slaveAssocId) {
+                  @Nullable Byte slaveAssocId) {
 
         LogEntryTag tag = LogEntryTagFactory.getDeviceLogEntryTag(originalInput.getBleAddress());
 
@@ -136,9 +136,6 @@ class UpdateNodeTask {
         }
         if (posSlaveZ != null && posSlaveZ.length() == 0) {
             posSlaveZ = null;
-        }
-        if (slaveAssocId != null && slaveAssocId.length() == 0) {
-            slaveAssocId = null;
         }
         // first process the network
         boolean networkActionPerformed = false;
@@ -196,7 +193,7 @@ class UpdateNodeTask {
         ConnectionUtil.connectAndUpdate(bleConnectionApi, targetEntity.getBleAddress(), 3,
                 () -> targetEntity,
                 networkNodeConnection -> {},
-                (writeEffect,networkNode) -> {
+                (writeEffect, networkNode) -> {
                     //TODO: investigate the connection behaviors (currently the slave info position is being propagated, but
                     // gets directed to WRITE_SKIPPED. Not yet sure why.
 
@@ -296,7 +293,7 @@ class UpdateNodeTask {
                                                @Nullable String posSlaveX,
                                                @Nullable String posSlaveY,
                                                @Nullable String posSlaveZ,
-                                               @Nullable String slaveAssocId) {
+                                               @Nullable Byte slaveAssocId) {
         if (Constants.DEBUG) {
             Preconditions.checkState(posX == null && posY == null && posZ == null ||
                     posX != null && posY != null && posZ != null);

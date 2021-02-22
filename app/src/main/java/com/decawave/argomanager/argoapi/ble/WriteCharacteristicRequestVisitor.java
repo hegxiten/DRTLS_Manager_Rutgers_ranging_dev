@@ -21,6 +21,8 @@ interface WriteCharacteristicRequestVisitor {
 
     void visitPosition(WriteCharacteristicRequest<Position> request);
 
+    void visitSlaveInfoPosition(WriteCharacteristicRequest.SlaveInformativePosition request);
+
     void visitInteger(WriteCharacteristicRequest<Integer> request);
 
     void visitByte(WriteCharacteristicRequest<byte[]> request);

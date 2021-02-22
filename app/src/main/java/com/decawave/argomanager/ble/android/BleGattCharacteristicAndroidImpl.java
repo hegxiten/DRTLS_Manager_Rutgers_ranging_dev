@@ -9,6 +9,7 @@ package com.decawave.argomanager.ble.android;
 import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argomanager.ble.BleGatt;
 import com.decawave.argomanager.ble.BleGattCharacteristic;
 import com.decawave.argomanager.ble.BleGattDescriptor;
@@ -76,6 +77,12 @@ class BleGattCharacteristicAndroidImpl implements BleGattCharacteristic {
     @Override
     public boolean setPositionValue(Position value) {
         return delegate.setValue(GattEncoder.encodePosition(value));
+    }
+
+    @Override
+    public boolean setSlaveInfoPositionValue(SlaveInformativePosition value) {
+        //TODO: test if quality-factor field can be used to represent association id (1-byte)
+        return delegate.setValue(GattEncoder.encodeSlaveInfoPosition(value));
     }
 
     @Override

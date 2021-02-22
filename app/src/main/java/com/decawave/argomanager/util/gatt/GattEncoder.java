@@ -13,6 +13,7 @@ import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.Constants;
@@ -203,6 +204,25 @@ public class GattEncoder {
         buff.putInt(position.y);
         buff.putInt(position.z);
         buff.put(position.qualityFactor);
+        return buff.array();
+    }
+
+    /**
+     * We never encode anything else than position (ranging anchors are always provided by the device only).
+     */
+    public static byte[] encodeSlaveInfoPosition(SlaveInformativePosition slaveInfoPosition) {
+        if (slaveInfoPosition == null) {
+            return EMPTY_BYTE_ARRAY;
+        } // else:
+        if (Constants.DEBUG) {
+            Preconditions.checkNotNull(slaveInfoPosition);
+        }
+        ByteBuffer buff = Util.newByteBuffer(new byte[13]);
+        // slave info position follows
+        buff.putInt(slaveInfoPosition.x);
+        buff.putInt(slaveInfoPosition.y);
+        buff.putInt(slaveInfoPosition.z);
+        buff.put(slaveInfoPosition.associationId);
         return buff.array();
     }
 
