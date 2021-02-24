@@ -7,31 +7,22 @@ import java.util.Arrays;
 public class SlaveInformativePosition {
 
     // relative X, Y, Z coordinate, each 2 Bytes
-    public byte[] pos = new byte[6];
+    private byte[] pos = new byte[6];
     // reserved 6 Bytes for future use
-    public byte[] reserved = new byte[6];
+    private byte[] reserved = new byte[6];
     // association id: 0 - 255
-    public byte[] assocIdByteArray = new byte[1];
+    private byte[] assocIdByteArray = new byte[1];
 
     public SlaveInformativePosition(int x, int y, int z) {
-        if ((x < -32768) || (x > 32767) || (y < -32768) || (y > 32767) || (z < -32768) || (z > 32767)) {
-            throw new IllegalArgumentException("relative position range has to be limited from -32,768 to 32,767 cm!");
-        }
-        this.pos[1] = (byte) x;
-        this.pos[0] = (byte) (x >> 8);
-        this.pos[3] = (byte) y;
-        this.pos[2] = (byte) (y >> 8);
-        this.pos[5] = (byte) z;
-        this.pos[4] = (byte) (z >> 8);
-        this.assocIdByteArray[0] = (byte) 0x00; // if not set, set to 0
+        this.setX(x);
+        this.setY(y);
+        this.setZ(z);
+        this.setAssocId(0); // if not set, set to 0
     }
 
     public SlaveInformativePosition(int x, int y, int z, int associationId) {
         this(x, y, z);
-        if ((associationId < 0) || (associationId > 255)) {
-            throw new IllegalArgumentException("association id range has to be limited from 0 to 255!");
-        }
-        this.assocIdByteArray[0] = (byte) associationId;
+        this.setAssocId(associationId);
     }
 
     public SlaveInformativePosition() {
@@ -59,7 +50,7 @@ public class SlaveInformativePosition {
         int result = this.getX();
         result = 31 * result + this.getY();
         result = 31 * result + this.getZ();
-        result = 31 * result + (this.getAssociation() != null ? this.getAssociation().hashCode() : 0);
+        result = 31 * result + (this.getAssocId() != null ? this.getAssocId().hashCode() : 0);
         return result;
     }
 
@@ -75,7 +66,7 @@ public class SlaveInformativePosition {
                 "x=" + this.getX() +
                 ", y=" + this.getY() +
                 ", z=" + this.getZ() +
-                ", association=" + this.getAssociation() +
+                ", association=" + this.getAssocId() +
                 '}';
     }
 
@@ -86,45 +77,81 @@ public class SlaveInformativePosition {
                 && this.getZ() == slaveInfoPos.getZ();
     }
 
-    private Integer getAssociation() {
-        Byte associationIdByte = this.assocIdByteArray[0];
-        return Integer.valueOf(associationIdByte.intValue());
+    private void setX(int x) {
+        if (x < -32768 || x > 32767) {
+            throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
+        }
+        this.pos[1] = (byte) x;
+        this.pos[0] = (byte) (x >> 8);
+    }
+
+    private void setY(int y) {
+        if (y < -32768 || y > 32767) {
+            throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
+        }
+        this.pos[3] = (byte) y;
+        this.pos[2] = (byte) (y >> 8);
+    }
+
+    private void setZ(int z) {
+        if (z < -32768 || z > 32767) {
+            throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
+        }
+        this.pos[5] = (byte) z;
+        this.pos[4] = (byte) (z >> 8);
+    }
+
+    private void setAssocId(int assocId) {
+        if (assocId < 0 || assocId > 255) {
+            throw new IllegalArgumentException("association id range has to be limited from 0 to 255!");
+        }
+        this.assocIdByteArray[0] = (byte) assocId;
     }
 
     private int getX() {
-        byte[] byteArraySliceX = Arrays.copyOfRange(this.pos, 0, 2);
-        return 0;
+        return signedIntFromTwoBytes(pos[0], pos[1]);
     }
 
     private int getY() {
-        return 0;
+        return signedIntFromTwoBytes(pos[2], pos[3]);
     }
 
     private int getZ() {
-        return 0;
-    }
-    //TODO: The following part has not yet been developed
-    public static byte[] intToTwoBytes(int x) {
-        if (x < 0 || x > 65535) {
-            throw new IllegalArgumentException("input position value out of range! (min 0 max 65535)");
-        }
-
-        byte[] bytes = new byte[2];
-        bytes[0] = (byte) x;
-        bytes[1] = (byte)(x >>> 8);
-        return bytes;
+        return signedIntFromTwoBytes(pos[4], pos[5]);
     }
 
-    public static int TwoBytesToInt(byte[] bytes) {
-        if (bytes.length != 2) {
-            throw new IllegalArgumentException("invalid input byte array! length is fixed to 2");
+    private Integer getAssocId() {
+        return unsignedIntFromByte(assocIdByteArray[0]);
+    }
+
+    private static int signedIntFromTwoBytes(byte highByte, byte lowByte) {
+        boolean isNegative;
+        if (firstBitZero(highByte)) {
+            isNegative = false;
         }
+        else {
+            isNegative = true;
+        }
+        if (isNegative) {
+            int ret = ((highByte & 0xFF) << 8 | (lowByte & 0xFF)) | 0xFFFF0000; // sign ext.
+            return ret;
+        }
+        else {
+            int ret = ((highByte & 0xFF) << 8 | (lowByte & 0xFF)) | 0x00000000; // no sign ext.
+            return ret;
+        }
+    }
 
-        int ret;
-        byte[] bytes = new byte[2];
+    private static int unsignedIntFromByte(byte b) {
+        int ret = 0;
+        for (int idx=0; idx<=7; idx++) {
+            ret = (int) (ret + ((b >> idx) & 1) * Math.pow(2, idx));
+        }
+        return ret;
+    }
 
-
-        return bytes;
+    private static boolean firstBitZero(byte input) {
+        return (input >> (7) & 1) == 0;
     }
 
 }
