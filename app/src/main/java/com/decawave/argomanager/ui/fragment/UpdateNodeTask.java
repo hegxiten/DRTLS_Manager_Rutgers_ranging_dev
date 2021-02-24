@@ -106,7 +106,7 @@ class UpdateNodeTask {
                   @Nullable String posSlaveX,
                   @Nullable String posSlaveY,
                   @Nullable String posSlaveZ,
-                  @Nullable Byte slaveAssocId) {
+                  @Nullable String slaveAssocId) {
 
         LogEntryTag tag = LogEntryTagFactory.getDeviceLogEntryTag(originalInput.getBleAddress());
 
@@ -258,6 +258,7 @@ class UpdateNodeTask {
      * If there is no change performed (comparing to the original), null is returned.
      * @param originalInput original
      * @param targetNodeType target node type
+     * @param slaveAssocId
      * @return built network node or null if no change is detected
      */
     private NetworkNode uiContentToNetworkNode(NetworkNode originalInput,
@@ -289,7 +290,7 @@ class UpdateNodeTask {
                                                @Nullable String posSlaveX,
                                                @Nullable String posSlaveY,
                                                @Nullable String posSlaveZ,
-                                               @Nullable Byte slaveAssocId) {
+                                               @Nullable String slaveAssocId) {
         if (Constants.DEBUG) {
             Preconditions.checkState(posX == null && posY == null && posZ == null ||
                     posX != null && posY != null && posZ != null);
@@ -391,44 +392,46 @@ class UpdateNodeTask {
                     Integer uiSlavePosX;
                     Integer uiSlavePosY;
                     Integer uiSlavePosZ;
+                    Integer uiSlaveAssocId;
                     try {
                         //TODO determine if we need to parse the length by unit
                         uiSlavePosX = Util.parseLength(posSlaveX, lengthUnit);
                         uiSlavePosY = Util.parseLength(posSlaveY, lengthUnit);
                         uiSlavePosZ = Util.parseLength(posSlaveZ, lengthUnit);
+                        uiSlaveAssocId = Integer.parseInt(slaveAssocId);
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("wrong number format", e);
                     }
                     if (nodeTypeSwitch || origSlavePosX == null || !posSlaveX.equals(origSlavePosX)) {
                         slaveInfoPosition = new SlaveInformativePosition();
-                        slaveInfoPosition.x = uiSlavePosX;
+                        slaveInfoPosition.setX(uiSlavePosX);
                     }
                     if (slaveInfoPosition != null || !posSlaveY.equals(origSlavePosY)) {
                         if (slaveInfoPosition == null) {
                             slaveInfoPosition = new SlaveInformativePosition();
                             // we will take the value from the UI (it makes sense as a whole)
-                            slaveInfoPosition.x = uiSlavePosX;
+                            slaveInfoPosition.setX(uiSlavePosX);
                         }
-                        slaveInfoPosition.y = uiSlavePosY;
+                        slaveInfoPosition.setY(uiSlavePosY);
                     }
                     if (slaveInfoPosition != null || !posSlaveZ.equals(origSlavePosZ)) {
                         if (slaveInfoPosition == null) {
                             slaveInfoPosition = new SlaveInformativePosition();
                             // we will take the value from the UI (it makes sense as a whole)
-                            slaveInfoPosition.x = uiSlavePosX;
-                            slaveInfoPosition.y = uiSlavePosY;
+                            slaveInfoPosition.setX(uiSlavePosX);
+                            slaveInfoPosition.setY(uiSlavePosY);
                         }
-                        slaveInfoPosition.z = uiSlavePosZ;
+                        slaveInfoPosition.setZ(uiSlavePosZ);
                     }
                     if (slaveInfoPosition != null || !slaveAssocId.equals(origSlaveAssoc)) {
                         if (slaveInfoPosition == null) {
                             slaveInfoPosition = new SlaveInformativePosition();
                             // we will take the value from the UI (it makes sense as a whole)
-                            slaveInfoPosition.x = uiSlavePosX;
-                            slaveInfoPosition.y = uiSlavePosY;
-                            slaveInfoPosition.z = uiSlavePosZ;
+                            slaveInfoPosition.setX(uiSlavePosX);
+                            slaveInfoPosition.setY(uiSlavePosY);
+                            slaveInfoPosition.setZ(uiSlavePosZ);
                         }
-                        slaveInfoPosition.assocIdByteArray = slaveAssocId;
+                        slaveInfoPosition.setAssocId(uiSlaveAssocId);
                     }
                 }
                 else if (nodeTypeSwitch) {

@@ -520,11 +520,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 SlaveInformativePosition slaveInfoPosition = anchor.getSlaveInfoPosition();
                 if (slaveInfoPosition != null) {
                     LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
-                    //TODO: The following part has not yet been developed, transferring from field to getter of XYZ
-                    origSlavePosX = Util.formatLength(slaveInfoPosition.x, lengthUnit);
-                    origSlavePosY = Util.formatLength(slaveInfoPosition.y, lengthUnit);
-                    origSlavePosZ = Util.formatLength(slaveInfoPosition.z, lengthUnit);
-                    origSlaveAssocId = slaveInfoPosition.assocIdByteArray.toString();
+                    origSlavePosX = Util.formatLength(slaveInfoPosition.getX(), lengthUnit);
+                    origSlavePosY = Util.formatLength(slaveInfoPosition.getY(), lengthUnit);
+                    origSlavePosZ = Util.formatLength(slaveInfoPosition.getZ(), lengthUnit);
+                    origSlaveAssocId = slaveInfoPosition.getAssocId().toString();
                     //
                     etPosX.setText(origSlavePosX);   // slave origin pos input
                     etPosY.setText(origSlavePosY);   // slave origin pos input
@@ -712,7 +711,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     origPosX, origPosY, origPosZ,
                     etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
                     origPosX, origPosY, origPosZ, origSlaveAssocId,
-                    etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), Integer.valueOf(etSlaveAssoc.getText().toString()).byteValue());
+                    etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString());
             return true;
         }
     }
