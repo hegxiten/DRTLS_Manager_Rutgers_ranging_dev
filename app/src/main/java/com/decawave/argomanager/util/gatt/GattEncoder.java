@@ -208,7 +208,8 @@ public class GattEncoder {
     }
 
     /**
-     * We never encode anything else than position (ranging anchors are always provided by the device only).
+     * encode the 13-byte SlaveInformativePosition (with the last byte unusable due to fw drawback)
+     * 6-byte of X, Y, Z, followed by 1 byte of association id. See SlaveInformativePosition.java
      */
     public static byte[] encodeSlaveInfoPosition(SlaveInformativePosition slaveInfoPosition) {
         if (slaveInfoPosition == null) {

@@ -77,11 +77,13 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
 
     @Override
     public void setPosition(Position position) {
+        //TODO: once the decoding method is sorted out, interlock setPosition() and setSlaveInfoPosition()
         setProperty(NetworkNodeProperty.ANCHOR_POSITION, position);
     }
 
     @Override
     public void setSlaveInfoPosition(SlaveInformativePosition infoPosition) {
+        //TODO: once the decoding method is sorted out, interlock setPosition() and setSlaveInfoPosition()
         setProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION, infoPosition);
     }
 
@@ -98,7 +100,6 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
     @Override
     public SlaveInformativePosition getSlaveInfoPosition() {
         SlaveInformativePosition slaveInfoPos = getProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
-        Log.d("getpropertyslaveinfopos", "getSlaveInfoPosition: " + slaveInfoPos);
         return slaveInfoPos == null ? null : new SlaveInformativePosition(slaveInfoPos);
     }
 

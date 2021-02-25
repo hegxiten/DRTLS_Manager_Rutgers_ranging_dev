@@ -4,16 +4,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class SlaveInformativePosition {
 
     // relative X, Y, Z coordinate, each 2 Bytes
     private byte[] pos = new byte[6];
-    // reserved 6 Bytes for future use
-    private byte[] reserved = new byte[6];
     // association id: 0 - 255
     private byte[] assocIdByteArray = new byte[1];
+    // reserved 5 Bytes for future use
+    // storing association ID cannot use the byte of qualityfactor. The fw of DWM1001-Dev anchor/slave
+    // doesn't report individual qualityfactor per each UWB ranging request from tag. Therefore the
+    // tag/master side cannot recover association id if stored in the last byte of 13-element array.
+    private byte[] reserved = new byte[5];
+    private byte[] qualityFactorByteArray = new byte[1];
 
     public SlaveInformativePosition(int x, int y, int z) {
         this.setX(x);
@@ -35,13 +40,31 @@ public class SlaveInformativePosition {
         copyFrom(slaveInfoPosition);
     }
 
+    /**
+     * Decode regular Position objects into SlaveInformativePosition objects
+     */
+    public SlaveInformativePosition(Position regularPosition) {
+        // regularPosition units in MM, each dimention takes 4 bytes, signed int
+        ByteBuffer bbX = ByteBuffer.allocate(4);
+        bbX.putInt(regularPosition.x);
+        ByteBuffer bbY = ByteBuffer.allocate(4);
+        bbY.putInt(regularPosition.y);
+        ByteBuffer bbZ = ByteBuffer.allocate(4);
+        bbZ.putInt(regularPosition.z);
+
+        byte[] byteArrayX = bbX.array();
+        byte[] byteArrayY = bbY.array();
+        byte[] byteArrayZ = bbZ.array();
+
+        //TODO: finish the decoding part of the SlaveInformativePosition from Position
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         SlaveInformativePosition otherSlaveInfoPosition = (SlaveInformativePosition) o;
-
         if (this.pos != otherSlaveInfoPosition.pos) return false;
         return assocIdByteArray != null ? Arrays.equals(assocIdByteArray, otherSlaveInfoPosition.assocIdByteArray) : otherSlaveInfoPosition.assocIdByteArray == null;
 
@@ -130,13 +153,14 @@ public class SlaveInformativePosition {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             outputStream.write(this.pos);
-            outputStream.write(this.reserved);
             outputStream.write(this.assocIdByteArray);
+            outputStream.write(this.reserved);
+            outputStream.write(this.qualityFactorByteArray);
         } catch (IOException e) {
             e.printStackTrace();
             return new byte[13];
         }
-        return outputStream.toByteArray( );
+        return outputStream.toByteArray();
     }
 
     private static int signedIntFromTwoBytes(byte highByte, byte lowByte) {

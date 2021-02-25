@@ -81,7 +81,6 @@ class BleGattCharacteristicAndroidImpl implements BleGattCharacteristic {
 
     @Override
     public boolean setSlaveInfoPositionValue(SlaveInformativePosition value) {
-        //TODO: test if quality-factor field can be used to represent association id (1-byte)
         return delegate.setValue(GattEncoder.encodeSlaveInfoPosition(value));
     }
 

@@ -522,8 +522,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
                 // TODO: Debug here as it returns null
-                SlaveInformativePosition slaveInfoPosition = anchor.getSlaveInfoPosition();
-                Log.d("popnodedetailui", "fromNodeToUiElements: "+"anchor " + anchor.toString());
+                SlaveInformativePosition slaveInfoPosition = anchor.extractSlaveInfoPositionDirect();
                 if (slaveInfoPosition != null) {
                     // LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit(); // res. for future unit flexibility
                     origSlavePosX = String.valueOf(slaveInfoPosition.getX()); // slave units in cm
