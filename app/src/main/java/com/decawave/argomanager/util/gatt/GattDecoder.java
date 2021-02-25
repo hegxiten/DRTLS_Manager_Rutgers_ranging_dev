@@ -473,9 +473,11 @@ public class GattDecoder {
                                 ((NodeFactory.TagNodeBuilder) nodeBuilder).setLocationData(locationData);
                             } else {
                                 // this is anchor - separate properties in one characteristic
+                                // TODO: Do we need to include slaveinformative position here?
                                 NodeFactory.AnchorNodeBuilder anBuilder = (NodeFactory.AnchorNodeBuilder) nodeBuilder;
-                                if (locationData.position != null)
+                                if (locationData.position != null) {
                                     anBuilder.setPosition(locationData.position);
+                                }
                                 if (locationData.distances != null) {
                                     anBuilder.setDistances(locationData.distances);
                                 }

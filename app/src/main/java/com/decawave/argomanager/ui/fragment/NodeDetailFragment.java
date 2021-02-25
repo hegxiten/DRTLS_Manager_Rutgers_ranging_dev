@@ -66,6 +66,7 @@ import eu.kryl.android.common.Constants;
 import eu.kryl.android.common.hub.InterfaceHub;
 
 import static com.decawave.argomanager.ArgoApp.uiHandler;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 /**
  * Displays node details (enter from the edit button).
@@ -94,8 +95,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     public static final String BK_ORIG_SLAVE_ASSOC = "ORIG_SLAVE_ASSOC";
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_2 = new DecimalDigitsInputFilter(5, 2);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_0 = new DecimalDigitsInputFilter(5, 0);
+    public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_3_0 = new DecimalDigitsInputFilter(3, 0);
     public static final InputFilter[] POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_2};
     public static final InputFilter[] SLAVE_POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_0};
+    public static final InputFilter[] SLAVE_ASSOC_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_3_0};
     private static UpdateNodeTask updateNodeTask;
 
     private Runnable cancelUpdateRunnable = () -> {
@@ -301,6 +304,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         for (EditText etSlavePos : new EditText[] {etSlavePosX, etSlavePosY, etSlavePosZ}) {
             etSlavePos.setFilters(SLAVE_POSITION_INPUT_FILTERS);
         }
+        etSlaveAssoc.setFilters(SLAVE_ASSOC_INPUT_FILTERS);
     }
 
     @Override
@@ -513,22 +517,24 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 selectedStationaryUpdateRate = UpdateRate.DEFAULT;
             }
             if (networkNodeManager.getActiveNetwork().getNetworkOperationMode() == NetworkOperationMode.RANGING) {
-                // slave  specific
+                // slave specific
                 AnchorNode anchor = (AnchorNode) inputNode;
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
+                // TODO: Debug here as it returns null
                 SlaveInformativePosition slaveInfoPosition = anchor.getSlaveInfoPosition();
+                Log.d("popnodedetailui", "fromNodeToUiElements: "+"anchor " + anchor.toString());
                 if (slaveInfoPosition != null) {
-                    LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
-                    origSlavePosX = Util.formatLength(slaveInfoPosition.getX(), lengthUnit);
-                    origSlavePosY = Util.formatLength(slaveInfoPosition.getY(), lengthUnit);
-                    origSlavePosZ = Util.formatLength(slaveInfoPosition.getZ(), lengthUnit);
+                    // LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit(); // res. for future unit flexibility
+                    origSlavePosX = String.valueOf(slaveInfoPosition.getX()); // slave units in cm
+                    origSlavePosY = String.valueOf(slaveInfoPosition.getY()); // slave units in cm
+                    origSlavePosZ = String.valueOf(slaveInfoPosition.getZ()); // slave units in cm
                     origSlaveAssocId = slaveInfoPosition.getAssocId().toString();
-                    //
-                    etPosX.setText(origSlavePosX);   // slave origin pos input
-                    etPosY.setText(origSlavePosY);   // slave origin pos input
-                    etPosZ.setText(origSlavePosZ);   // slave origin pos input
-                    etSlavePosX.setText(origSlaveAssocId); // slave association id input
+
+                    etSlavePosX.setText(origSlavePosX);     // slave origin pos input
+                    etSlavePosY.setText(origSlavePosY);     // slave origin pos input
+                    etSlavePosZ.setText(origSlavePosZ);     // slave origin pos input
+                    etSlaveAssoc.setText(origSlaveAssocId); // slave association id input
                 }
                 // when we switch to Master we want to have all the checkboxes checked
                 chboxAccelerometer.setChecked(true);
@@ -662,58 +668,90 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     private boolean onSaveClick() {
         // √ check sign on top right menu
         // for anchor, we have to consider selected position
-        boolean positionAncInputOk = true;
-        boolean positionSlaveInputOk = true;
+        boolean positionAncInputOk;
+        boolean slaveConfigValuesNotEmpty;
+        boolean slaveConfigValuesInputOk;
+        boolean slaveConfigValuesRangeOk;
+
         NetworkOperationMode networkMode = networkNodeManager.getActiveNetwork().getNetworkOperationMode();
         if (selectedNodeType == NodeType.ANCHOR) {
-            Editable posX = etPosX.getText();
-            Editable posY = etPosY.getText();
-            Editable posZ = etPosZ.getText();
+            if (networkMode == NetworkOperationMode.POSITIONING) {
+                Editable posX = etPosX.getText();
+                Editable posY = etPosY.getText();
+                Editable posZ = etPosZ.getText();
 
-            int posXl = posX.length();
-            int posYl = posY.length();
-            int posZl = posZ.length();
-            positionAncInputOk = posXl == 0 && posYl == 0 && posZl == 0
-                    || (posXl > 0 && posYl > 0 && posZl > 0
-                    && !posX.toString().equals("-.") && !posY.toString().equals("-.") && !posZ.toString().equals("-.")
-                    && !posX.toString().equals("-") && !posY.toString().equals("-") && !posZ.toString().equals("-")
-                    && !posX.toString().equals(".") && !posY.toString().equals(".") && !posZ.toString().equals("."));
+                int posXl = posX.length();
+                int posYl = posY.length();
+                int posZl = posZ.length();
+                positionAncInputOk = posXl == 0 && posYl == 0 && posZl == 0
+                        || (posXl > 0 && posYl > 0 && posZl > 0
+                        && !posX.toString().equals("-.") && !posY.toString().equals("-.") && !posZ.toString().equals("-.")
+                        && !posX.toString().equals("-") && !posY.toString().equals("-") && !posZ.toString().equals("-")
+                        && !posX.toString().equals(".") && !posY.toString().equals(".") && !posZ.toString().equals("."));
 
-            Editable slavePosX = etSlavePosX.getText();
-            Editable slavePosY = etSlavePosY.getText();
-            Editable slavePosZ = etSlavePosZ.getText();
 
-            int posSlaveXl = slavePosX.length();
-            int posSlaveYl = slavePosY.length();
-            int posSlaveZl = slavePosZ.length();
-            positionSlaveInputOk = posSlaveXl == 0 && posSlaveYl == 0 && posSlaveZl == 0
-                    || (posSlaveXl > 0 && posSlaveYl > 0 && posSlaveZl > 0);
+                if (!positionAncInputOk) {
+                    ToastUtil.showToast(R.string.node_detail_position_input_invalid, Toast.LENGTH_LONG);
+                    return false;
+                }
+            }
+            else if (networkMode == NetworkOperationMode.RANGING) {
+                Editable slavePosX = etSlavePosX.getText();
+                Editable slavePosY = etSlavePosY.getText();
+                Editable slavePosZ = etSlavePosZ.getText();
+                Editable slaveAssoc = etSlaveAssoc.getText();
+
+                int posSlaveXl = slavePosX.length();
+                int posSlaveYl = slavePosY.length();
+                int posSlaveZl = slavePosZ.length();
+                int assocSlaveL = slaveAssoc.length();
+                slaveConfigValuesNotEmpty = (posSlaveXl > 0 && posSlaveYl > 0 && posSlaveZl > 0 && assocSlaveL > 0);
+                slaveConfigValuesInputOk = posSlaveXl == 0 && posSlaveYl == 0 && posSlaveZl == 0 && assocSlaveL == 0
+                        || (slaveConfigValuesNotEmpty);
+
+                if (!slaveConfigValuesInputOk) {
+                    ToastUtil.showToast(R.string.slave_input_invalid, Toast.LENGTH_LONG);
+                    return false;
+                }
+                else if (slaveConfigValuesNotEmpty) {
+                    int inputSlaveX = Integer.valueOf(slavePosX.toString());
+                    int inputSlaveY = Integer.valueOf(slavePosY.toString());
+                    int inputSlaveZ = Integer.valueOf(slavePosZ.toString());
+                    int inputSlaveAssoc = Integer.valueOf(slaveAssoc.toString());
+
+                    slaveConfigValuesRangeOk = (inputSlaveX >= -32768 && inputSlaveX <= 32767)
+                            && (inputSlaveY >= -32768 && inputSlaveY <= 32767)
+                            && (inputSlaveZ >= -32768 && inputSlaveZ <= 32767)
+                            && (inputSlaveAssoc >= 0 && inputSlaveAssoc <= 255);
+                    if (!slaveConfigValuesRangeOk) {
+                        ToastUtil.showToast(R.string.slave_input_exceeds_range, Toast.LENGTH_LONG);
+                        return false;
+                    }
+                }
+            }
+            else if (selectedNetworkId == null && selectedNewNetworkName == null) {
+                ToastUtil.showToast(R.string.node_detail_must_selected_network, Toast.LENGTH_LONG);
+                return false;
+            } else if (etNodeLabel.getText().length() == 0) {
+                ToastUtil.showToast(R.string.node_detail_empty_node_label, Toast.LENGTH_LONG);
+                return false;
+            }
         }
-        if (!positionAncInputOk || !positionSlaveInputOk) {
-            ToastUtil.showToast(R.string.node_detail_position_input_invalid, Toast.LENGTH_LONG);
-            return false;
-        } else if (selectedNetworkId == null && selectedNewNetworkName == null) {
-            ToastUtil.showToast(R.string.node_detail_must_selected_network, Toast.LENGTH_LONG);
-            return false;
-        } else if (etNodeLabel.getText().length() == 0) {
-            ToastUtil.showToast(R.string.node_detail_empty_node_label, Toast.LENGTH_LONG);
-            return false;
-        } else {
-            // do the save
-            hideKeyboard();
-            updateNodeTask = new UpdateNodeTask(networkNodeManager, bleConnectionApi);
-            updateNodeTask.doUpdate(inputNode, selectedNodeType,
-                    selectedUwbMode, chboxInitiator.isChecked(),
-                    chboxFirmwareUpdate.isChecked(), chboxAccelerometer.isChecked(), chboxLedIndication.isChecked(),
-                    chboxBleEnabled.isChecked(), chboxLocationEngine.isChecked(), !chboxResponsiveMode.isChecked(),
-                    selectedNewNetworkName, selectedNetworkId,
-                    etNodeLabel.getText().toString(), selectedUpdateRate, selectedStationaryUpdateRate,
-                    origPosX, origPosY, origPosZ,
-                    etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
-                    origPosX, origPosY, origPosZ, origSlaveAssocId,
-                    etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString());
-            return true;
-        }
+        // do the save if reaches here
+        hideKeyboard();
+        updateNodeTask = new UpdateNodeTask(networkNodeManager, bleConnectionApi);
+        updateNodeTask.doUpdate(inputNode, selectedNodeType,
+                selectedUwbMode, chboxInitiator.isChecked(),
+                chboxFirmwareUpdate.isChecked(), chboxAccelerometer.isChecked(), chboxLedIndication.isChecked(),
+                chboxBleEnabled.isChecked(), chboxLocationEngine.isChecked(), !chboxResponsiveMode.isChecked(),
+                selectedNewNetworkName, selectedNetworkId,
+                etNodeLabel.getText().toString(), selectedUpdateRate, selectedStationaryUpdateRate,
+                origPosX, origPosY, origPosZ,
+                etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
+                origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
+                etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString());
+        return true;
+
     }
 
 

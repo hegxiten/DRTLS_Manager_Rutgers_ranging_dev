@@ -98,6 +98,7 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
     @Override
     public SlaveInformativePosition getSlaveInfoPosition() {
         SlaveInformativePosition slaveInfoPos = getProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
+        Log.d("getpropertyslaveinfopos", "getSlaveInfoPosition: " + slaveInfoPos);
         return slaveInfoPos == null ? null : new SlaveInformativePosition(slaveInfoPos);
     }
 

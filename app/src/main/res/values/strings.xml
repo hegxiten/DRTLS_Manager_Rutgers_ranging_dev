@@ -115,6 +115,8 @@
     <string name="slave_detail_pos_x_coupler">CPLR(+:inside)</string>
     <string name="slave_detail_pos_y_centerline">CL(+:COND.)</string>
     <string name="slave_detail_pos_z_top_of_rail">TOR(+:over)</string>
+    <string name="slave_input_invalid">Invalid slave values!</string>
+    <string name="slave_input_exceeds_range">Slave values out of range!</string>
 
     <!-- discovery -->
     <string name="discovery_section_title_networks">networks</string>

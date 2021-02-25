@@ -190,9 +190,6 @@ class UpdateNodeTask {
                 () -> targetEntity,
                 networkNodeConnection -> {},
                 (writeEffect, networkNode) -> {
-                    //TODO: investigate the connection behaviors (currently the slave info position is being propagated, but
-                    // gets directed to WRITE_SKIPPED. Not yet sure why.
-
                     // now we MUST check if the changes got propagated (sometimes a device restart is necessary)
                     if (!cancelled) {
                         switch (writeEffect) {
@@ -388,17 +385,15 @@ class UpdateNodeTask {
                     }
                 }
                 else if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null) {
-                    //TODO Finishing implementing the encoding of slave infomative positions
                     Integer uiSlavePosX;
                     Integer uiSlavePosY;
                     Integer uiSlavePosZ;
                     Integer uiSlaveAssocId;
                     try {
-                        //TODO determine if we need to parse the length by unit
-                        uiSlavePosX = Util.parseLength(posSlaveX, lengthUnit);
-                        uiSlavePosY = Util.parseLength(posSlaveY, lengthUnit);
-                        uiSlavePosZ = Util.parseLength(posSlaveZ, lengthUnit);
-                        uiSlaveAssocId = Integer.parseInt(slaveAssocId);
+                        uiSlavePosX = Util.parseSlavePosition(posSlaveX, lengthUnit);
+                        uiSlavePosY = Util.parseSlavePosition(posSlaveY, lengthUnit);
+                        uiSlavePosZ = Util.parseSlavePosition(posSlaveZ, lengthUnit);
+                        uiSlaveAssocId = Util.parseSlaveAssoc(slaveAssocId);
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("wrong number format", e);
                     }

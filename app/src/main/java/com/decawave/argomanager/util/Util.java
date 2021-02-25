@@ -258,6 +258,21 @@ public class Util {
         return (int) (Float.valueOf(strLength) * factor + 0.5);
     }
 
+    public static int parseSlavePosition(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
+        // TODO: Implement unit flexibility when needed. Currently only checking for integer centimeters
+        if(Integer.valueOf(strLength) < -32768 | Integer.valueOf(strLength) > 32767 ) {
+            throw new IllegalArgumentException("slave length must be within [-32767, +32768] cm");
+        }
+        return Integer.valueOf(strLength);
+    }
+
+    public static int parseSlaveAssoc(String strSlaveAssocId) throws NumberFormatException {
+        if(Integer.valueOf(strSlaveAssocId) < 0 | Integer.valueOf(strSlaveAssocId) > 255 ) {
+            throw new IllegalArgumentException("slave group id must be within [0, 255]");
+        }
+        return Integer.valueOf(strSlaveAssocId);
+    }
+
     private static short shortHash(short... args) {
         int r = 0;
         for (short a : args) {
@@ -421,6 +436,4 @@ public class Util {
             textView.setTextAppearance(mainActivity, extraStyle);
         }
     }
-
-
 }

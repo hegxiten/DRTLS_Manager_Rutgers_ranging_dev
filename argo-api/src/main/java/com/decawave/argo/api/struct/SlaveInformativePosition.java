@@ -2,6 +2,8 @@ package com.decawave.argo.api.struct;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class SlaveInformativePosition {
@@ -62,7 +64,7 @@ public class SlaveInformativePosition {
 
     @Override
     public String toString() {
-        return "Position{" +
+        return "SlaveInfoPosition{" +
                 "x=" + this.getX() +
                 ", y=" + this.getY() +
                 ", z=" + this.getZ() +
@@ -122,6 +124,19 @@ public class SlaveInformativePosition {
 
     public Integer getAssocId() {
         return unsignedIntFromByte(assocIdByteArray[0]);
+    }
+
+    public byte[] getEncodedByteArray() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            outputStream.write(this.pos);
+            outputStream.write(this.reserved);
+            outputStream.write(this.assocIdByteArray);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new byte[13];
+        }
+        return outputStream.toByteArray( );
     }
 
     private static int signedIntFromTwoBytes(byte highByte, byte lowByte) {

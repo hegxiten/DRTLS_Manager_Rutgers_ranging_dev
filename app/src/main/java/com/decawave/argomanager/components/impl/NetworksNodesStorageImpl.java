@@ -15,6 +15,7 @@ import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.ArgoApp;
@@ -214,6 +215,7 @@ public class NetworksNodesStorageImpl implements NetworksNodesStorage {
 
         // anchor-specific
         Position position;
+        SlaveInformativePosition slaveInfoPosition;
         UwbMode uwbMode;
         Boolean initiator;
         Boolean bridge;
@@ -256,10 +258,12 @@ public class NetworksNodesStorageImpl implements NetworksNodesStorage {
             r.bleEnable = node.isBleEnable();
             r.ledIndicationEnable = node.isLedIndicationEnable();
             r.operatingFirmware = node.getOperatingFirmware();
+            //TODO: check if we need to save slaveinfoposition here.
             if (node.isAnchor()) {
                 // anchor specific stuff
                 AnchorNode anchor = (AnchorNode) node;
                 r.position = anchor.getPosition();        // position of a tag changes too dynamically
+                r.slaveInfoPosition = anchor.getSlaveInfoPosition();
                 r.initiator = anchor.isInitiator();
                 r.bridge = anchor.isBridge();
                 r.seatNumber = anchor.getSeatNumber();
@@ -295,12 +299,14 @@ public class NetworksNodesStorageImpl implements NetworksNodesStorage {
                     .setBleEnable(bleEnable)
                     .setLedIndicationEnable(ledIndicationEnable)
                     .setOperatingFirmware(operatingFirmware);
+            //TODO: check if we need to save slaveinfoposition here.
             if (nodeType == NodeType.ANCHOR) {
                 NodeFactory.AnchorNodeBuilder anchorBuilder = (NodeFactory.AnchorNodeBuilder) nodeBuilder;
                 anchorBuilder.setInitiator(initiator)
                         .setBridge(bridge)
                         .setSeatNumber(seatNumber)
                         .setPosition(position)
+                        .setSlaveInfoPosition(slaveInfoPosition)
                         .setClusterMap(clusterMap)
                         .setClusterNeighbourMap(clusterNeighbourMap)
                         .setMacStats(macStats);

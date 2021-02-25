@@ -40,7 +40,6 @@ public interface AnchorNode extends NetworkNode {
     /**
      * Set the informative position for slave operation.
      */
-
     void setSlaveInfoPosition(SlaveInformativePosition infoPosition);
 
     /**

@@ -83,7 +83,4 @@ public class WriteCharacteristicRequestsBuilder {
         requests = new LinkedList<>();
         return r;
     }
-
-    //TODO: add appropriate request to accommodate slave requests
-
 }

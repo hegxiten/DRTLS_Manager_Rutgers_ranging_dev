@@ -219,14 +219,10 @@ public class GattEncoder {
         }
         ByteBuffer buff = Util.newByteBuffer(new byte[13]);
         // slave info position follows
-        //TODO: determine the data type to put. (our new 2-byte int might be considered),
-        // such as: replacing putInt() by put()
-        buff.putInt(slaveInfoPosition.getX());
-        buff.putInt(slaveInfoPosition.getY());
-        buff.putInt(slaveInfoPosition.getZ());
-        //TODO: here we have a BufferOverflowException because (doubtful) putting the AssocId as int
-        // towards the buffer.
-        buff.putInt(slaveInfoPosition.getAssocId());
+        byte[] slaveInfoPosBytes = slaveInfoPosition.getEncodedByteArray();
+        for(int i=0; i < slaveInfoPosBytes.length; i++) {
+            buff.put(slaveInfoPosBytes[i]);
+        }
         return buff.array();
     }
 

@@ -1245,7 +1245,6 @@ class NetworkNodeBleConnectionImpl implements NetworkNodeBleConnection {
                 appLog.d("different SLAVE INFO POSITION injected");
                 builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, (SlaveInformativePosition) anchor.getSlaveInfoPosition());
             }
-            //TODO: add appropriate diffing actions to accommodate slave informative positions
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // tag-specific modifiable properties
