@@ -106,24 +106,24 @@ public class SlaveInformativePosition {
         if (x < -32768 || x > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[1] = (byte) x;
-        this.pos[0] = (byte) (x >> 8);
+        this.pos[0] = (byte) x;
+        this.pos[1] = (byte) (x >> 8);
     }
 
     public void setY(int y) {
         if (y < -32768 || y > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[3] = (byte) y;
-        this.pos[2] = (byte) (y >> 8);
+        this.pos[2] = (byte) y;
+        this.pos[3] = (byte) (y >> 8);
     }
 
     public void setZ(int z) {
         if (z < -32768 || z > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[5] = (byte) z;
-        this.pos[4] = (byte) (z >> 8);
+        this.pos[4] = (byte) z;
+        this.pos[5] = (byte) (z >> 8);
     }
 
     public void setAssocId(int assocId) {
@@ -134,15 +134,15 @@ public class SlaveInformativePosition {
     }
 
     public int getX() {
-        return signedIntFromTwoBytes(pos[0], pos[1]);
+        return signedIntFromTwoBytes(pos[1], pos[0]);
     }
 
     public int getY() {
-        return signedIntFromTwoBytes(pos[2], pos[3]);
+        return signedIntFromTwoBytes(pos[3], pos[2]);
     }
 
     public int getZ() {
-        return signedIntFromTwoBytes(pos[4], pos[5]);
+        return signedIntFromTwoBytes(pos[5], pos[4]);
     }
 
     public Integer getAssocId() {
@@ -154,8 +154,8 @@ public class SlaveInformativePosition {
         try {
             outputStream.write(this.pos);
             outputStream.write(this.assocIdByteArray);
-            outputStream.write(this.reserved);
-            outputStream.write(this.qualityFactorByteArray);
+            outputStream.write(new byte[this.reserved.length]);                 // field for reserved
+            outputStream.write(new byte[this.qualityFactorByteArray.length]);   // field for quality factor
         } catch (IOException e) {
             e.printStackTrace();
             return new byte[13];
