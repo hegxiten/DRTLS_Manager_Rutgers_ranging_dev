@@ -92,10 +92,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     public static final String BK_ORIG_SLAVE_POS_Y = "ORIG_SLAVE_POS_Y";
     public static final String BK_ORIG_SLAVE_POS_Z = "ORIG_SLAVE_POS_Z";
     public static final String BK_ORIG_SLAVE_ASSOC = "ORIG_SLAVE_ASSOC";
-    public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_2 = new DecimalDigitsInputFilter(5, 2);
+    public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_3 = new DecimalDigitsInputFilter(5, 3);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_0 = new DecimalDigitsInputFilter(5, 0);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_3_0 = new DecimalDigitsInputFilter(3, 0);
-    public static final InputFilter[] POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_2};
+    public static final InputFilter[] POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_3};
     public static final InputFilter[] SLAVE_POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_0};
     public static final InputFilter[] SLAVE_ASSOC_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_3_0};
     private static UpdateNodeTask updateNodeTask;
@@ -497,13 +497,13 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
                 Position position = anchor.extractPositionDirect();
-                Log.d("bytearraydecodezw", "fromNodeToUiElements: " + position.toString());
+                Log.d("bytearrayencodedecode", "fromNodeToUiElements: " + position.toString());
                 if (position != null) {
                     LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
                     origPosX = Util.formatLength(position.x, lengthUnit);
                     origPosY = Util.formatLength(position.y, lengthUnit);
                     origPosZ = Util.formatLength(position.z, lengthUnit);
-                    Log.d("bytearraydecodezw", "fromNodeToUiElements: " +
+                    Log.d("bytearrayencodedecode", "fromNodeToUiElements: " +
                             origPosX + ";" +
                             origPosY + ";" +
                             origPosZ + ";");

@@ -207,10 +207,39 @@ public class GattEncoder {
         buff.putInt(position.y);
         buff.putInt(position.z);
         buff.put(position.qualityFactor);
-        Log.d("bytearraytowrite", "encodePosition: " + new String(Hex.encodeHex(buff.array())));
+        Log.d("bytearrayencodedecode", "encodePosition, anchor raw bytes: " + new String(Hex.encodeHex(buff.array())) + " length: " + buff.array().length);
         return buff.array();
     }
-
+    //    Positioning config test 1: (error)
+    //    1010 0100 1101 0111 1101 0101 0000 0011|(x)|0100 0001 0000 1011 1111 0011 0000 0001|(y)|0111 0000 1101 1100 0111 0010 1111 1111|(z)|
+    //    1010 1000 1101 0111 1101 0101 0000 0011|(x)|0100 0010 0000 1011 1111 0011 0000 0001|(y)|0110 1111 1101 1100 0111 0010 1111 1111|(z)|
+    //    in        |  |a4.d7d503(x)|41.0bf301(y)|70.dc72ff(z)|64(qf)|
+    //    out       |00|a8.d7d503(x)|42.0bf301(y)|6f.dc72ff(z)|64(qf)|
+    //    Positioning config test 2: (correct)
+    //    1100 1111 0010 1001 0000 0001 0000 0000|(x)|0100 0111 0111 0111 1001 1010 1111 1111|(y)|0111 0000 0000 0111 0000 0000 0000 0000|(z)|
+    //    1100 1111 0010 1001 0000 0001 0000 0000|(x)|0100 0111 0111 0111 1001 1010 1111 1111|(y)|0111 0000 0000 0111 0000 0000 0000 0000|(z)|
+    //    in        |  |cf.290100(x)|47.779aff(y)|70.070000(z)|64(qf)|
+    //    out       |00|cf.290100(x)|47.779aff(y)|70.070000(z)|64(qf)|
+    //    Positioning config test 3: (correct)
+    //    0100 0111 0111 0111 1001 1010 1111 1111|(x)|1110 0011 1001 0011 0110 0101 0000 0000|(y)|0101 1001 1001 0000 0001 1101 0000 0000|(z)|
+    //    0100 0111 0111 0111 1001 1010 1111 1111|(x)|1110 0011 1001 0011 0110 0101 0000 0000|(y)|0101 1001 1001 0000 0001 1101 0000 0000|(z)|
+    //    in        |  |47.779aff(x)|e3.936500(y)|59.901d00(z)|64(qf)|
+    //    out       |00|47.779aff(x)|e3.936500(y)|59.901d00(z)|64(qf)|
+    //    Positioning config test 4: (error, same as 1)
+    //    in        |  |a4.d7d503(x)|410bf301(y)|70dc72ff(z)|64(qf)|
+    //    out       |00|a8.d7d503(x)|420bf301(y)|6fdc72ff(z)|64(qf)|
+    //    Positioning config test 5: (error)
+    //    in        |  |68.548b04(x)|87.3b53fc(y)|70.cd5c00(z)|64(qf)|
+    //    out       |00|68.548b04(x)|84.3b53fc(y)|70.cd5c00(z)|64(qf)|
+    //    Positioning config test 6: (error)
+    //        set Position{x=76239973, y=-61654145, z=6081904, qualityFactor=100}
+    //        get Position{x=76239976, y=-61654148, z=6081904, qualityFactor=100}
+    //    in        |  |65.548b04(x)|7f.3b53fc(y)|70.cd5c00(z)|64(qf)|
+    //    out       |00|68.548b04(x)|7c.3b53fc(y)|70.cd5c00(z)|64(qf)|
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //    Preliminary conclusion:
+    //    The lowest byte (first byte) of each integer might be compromised.
+    //    Avoid using this for SlaveInformativePosition
     /**
      * encode the 13-byte SlaveInformativePosition (with the last byte unusable due to fw drawback)
      * 6-byte of X, Y, Z, followed by 1 byte of association id. See SlaveInformativePosition.java
@@ -225,11 +254,10 @@ public class GattEncoder {
         ByteBuffer buff = Util.newByteBuffer(new byte[13]);
         // slave info position follows
         byte[] slaveInfoPosBytes = slaveInfoPosition.getEncodedByteArray();
-        Log.d("bytearraytowrite", "encodeSlaveInfoPosition: " + slaveInfoPosBytes + " length: " + slaveInfoPosBytes.length + " original: " + slaveInfoPosition.toString());
         for(int i=0; i < slaveInfoPosBytes.length; i++) {
-            Log.d("bytearrayeachbyte", "encodeSlaveInfoPosition: " + i +"th " + String.format("0x%2X", slaveInfoPosBytes[i]));
             buff.put(slaveInfoPosBytes[i]);
         }
+        Log.d("bytearrayencodedecode", "encodeSlaveInfoPosition, anchor raw bytes: " + new String(Hex.encodeHex(buff.array())) + " length: " + buff.array().length);
         return buff.array();
     }
 

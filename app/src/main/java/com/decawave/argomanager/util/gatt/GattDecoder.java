@@ -39,6 +39,7 @@ import com.decawave.argomanager.exception.GattRepresentationException;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Preconditions;
 
+import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -307,6 +308,7 @@ public class GattDecoder {
             return null;
         }
         byte val = chLocationDataMode.getValue()[0];
+        Log.d("decodingtype", "decodeLocationDataMode: " + val);
         switch (val) {
             case 0:
                 return LocationDataMode.POSITION;
@@ -324,9 +326,11 @@ public class GattDecoder {
         if (bytes == null || bytes.length == 0) {
             return null;
         }
+        Log.d("bytearrayencodedecode", "decodeLocationData: " + new String(Hex.encodeHex(bytes)) + " length:" + bytes.length);
         ByteBuffer bb = Util.newByteBuffer(bytes);
         Position position = null;
         List<RangingAnchor> distances = null;
+
         try {
             //
             byte type = bb.get();
@@ -372,20 +376,19 @@ public class GattDecoder {
 
     @NonNull
     private Position decodePosition(ByteBuffer buff) {
+
+        Log.d("bytearrayencodedecode", "decodePosition, raw bytes: " + new String(Hex.encodeHex(buff.array())) + " length: "  + buff.array().length);
         int rX = buff.getInt();
         int rY = buff.getInt();
         int rZ = buff.getInt();
-        Log.d("bytearraydecodezw", "decodePosition: " +
+
+        Position r = new Position(rX, rY, rZ);
+        r.qualityFactor = buff.get();
+        Log.d("bytearrayencodedecode", "decodePosition: " + r.toString());
+        Log.d("bytearrayencodedecode", "decodePosition: hex" +
                 " x: " + String.format("%08X",rX) + ";" +
                 " y: " + String.format("%08X",rY) + ";" +
                 " z: " + String.format("%08X",rZ));
-        Position r = new Position(rX, rY, rZ);
-        r.qualityFactor = buff.get();
-        Log.d("bytearraydecodezw", "decodePosition: " +
-                " x: " + rX + ";" +
-                " y: " + rY + ";" +
-                " z: " + rZ + ";" +
-                " qf: " + r.qualityFactor);
         return r;
     }
 

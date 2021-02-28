@@ -9,18 +9,27 @@ import java.util.Arrays;
 
 public class SlaveInformativePosition {
 
-    // first two bytes cannot be recovered correctly - by observation (Zezhou Wang, 02282021)
-    private byte[] reservedFirstTwoBytes = new byte[2];
-    // relative X, Y, Z coordinate, each 2 Bytes
-    private byte[] pos = new byte[6];
+    // lowest byte (first byte) of each integer might be compromised by observation (Zezhou Wang, 02282021)
+    // relative X, Y, Z coordinate, each 2 Bytes. Skipping the lowest byte (first byte). Skipping 3 bytes.
+    // e.g. 0x00CDAB003412007856 -> X: 0xABCD; Y: 0x1234; Z: 0x5678
+    // pos[0], pos[4], pos[8] must be set as zero; not going to use them.
+    // See getters and setters of X, Y, Z for details.
+    private byte[] pos = new byte[9];
     // association id: 0 - 255
     private byte[] assocIdByteArray = new byte[1];
-    // reservedLastThreeBytes 3 Bytes for future use
+    // reservedLastTwoBytes 2 Bytes for future use
     // storing association ID cannot use the byte of qualityfactor. The fw of DWM1001-Dev anchor/slave
     // doesn't report individual qualityfactor per each UWB ranging request from tag. Therefore the
     // tag/master side cannot recover association id if stored in the last byte of 13-element array.
-    private byte[] reservedLastThreeBytes = new byte[3];
+    private byte[] reservedLastTwoBytes = new byte[2];
     private byte[] qualityFactorByteArray = new byte[1];
+
+
+    // Test 1 (correct):
+    // encoded:   002519cc007f64fc00fb000000
+    // decoded: 00002519cc007f64fc00fb000000
+    // Implication: the original firmware might not be able to handle some value cases and minor positioning
+    // errors should happen due to the compromised lowest byte of each millimeter integer.
 
     public SlaveInformativePosition(int x, int y, int z) {
         this.setX(x);
@@ -82,10 +91,10 @@ public class SlaveInformativePosition {
     }
 
     public void copyFrom(@NotNull SlaveInformativePosition source) {
-        this.reservedFirstTwoBytes = source.reservedFirstTwoBytes;
         this.pos = source.pos;
-        this.reservedLastThreeBytes = source.reservedLastThreeBytes;
         this.assocIdByteArray = source.assocIdByteArray;
+        this.reservedLastTwoBytes = source.reservedLastTwoBytes;
+        this.qualityFactorByteArray = source.qualityFactorByteArray;
     }
 
     @Override
@@ -109,24 +118,27 @@ public class SlaveInformativePosition {
         if (x < -32768 || x > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[0] = (byte) x;
-        this.pos[1] = (byte) (x >>> 8);
+        this.pos[0] = 0x00;
+        this.pos[1] = (byte) x;
+        this.pos[2] = (byte) (x >>> 8);
     }
 
     public void setY(int y) {
         if (y < -32768 || y > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[2] = (byte) y;
-        this.pos[3] = (byte) (y >>> 8);
+        this.pos[3] = (byte) y;
+        this.pos[4] = 0x00;
+        this.pos[5] = (byte) (y >>> 8);
     }
 
     public void setZ(int z) {
         if (z < -32768 || z > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[4] = (byte) z;
-        this.pos[5] = (byte) (z >>> 8);
+        this.pos[6] = (byte) z;
+        this.pos[7] = (byte) (z >>> 8);
+        this.pos[8] = 0x00;
     }
 
     public void setAssocId(int assocId) {
@@ -137,15 +149,15 @@ public class SlaveInformativePosition {
     }
 
     public int getX() {
-        return signedIntFromTwoBytes(pos[1], pos[0]);
+        return signedIntFromTwoBytes(pos[2], pos[1]);
     }
 
     public int getY() {
-        return signedIntFromTwoBytes(pos[3], pos[2]);
+        return signedIntFromTwoBytes(pos[5], pos[3]);
     }
 
     public int getZ() {
-        return signedIntFromTwoBytes(pos[5], pos[4]);
+        return signedIntFromTwoBytes(pos[7], pos[6]);
     }
 
     public Integer getAssocId() {
@@ -155,10 +167,9 @@ public class SlaveInformativePosition {
     public byte[] getEncodedByteArray() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            outputStream.write(this.reservedFirstTwoBytes);     // field for reservedFirstTwoBytes
             outputStream.write(this.pos);
             outputStream.write(this.assocIdByteArray);
-            outputStream.write(this.reservedLastThreeBytes);    // field for reservedLastThreeBytes
+            outputStream.write(this.reservedLastTwoBytes);    // field for reservedLastTwoBytes
             outputStream.write(this.qualityFactorByteArray);    // field for quality factor
         } catch (IOException e) {
             e.printStackTrace();

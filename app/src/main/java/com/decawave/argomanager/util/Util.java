@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -244,18 +245,18 @@ public class Util {
     }
 
     public static int parseLength(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
-        float factor;
+        double factor;
         switch (lengthUnit) {
             case METRIC:
-                factor = Util.MM_IN_METER;
+                factor = (double) Util.MM_IN_METER;
                 break;
             case IMPERIAL:
-                factor = Util.MM_IN_YARD;
+                factor = (double) Util.MM_IN_YARD;
                 break;
             default:
                 throw new IllegalArgumentException("unexpected length unit: " + lengthUnit);
         }
-        return (int) (Float.valueOf(strLength) * factor + 0.5);
+        return (int) (Double.valueOf(strLength) * factor);
     }
 
     public static int parseSlavePosition(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
