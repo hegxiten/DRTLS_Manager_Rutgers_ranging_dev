@@ -234,10 +234,10 @@ public class Util {
         switch (lengthUnit) {
             case METRIC:
                 // meters
-                return String.format(Locale.ENGLISH, "%.2f", value / MM_IN_METER);
+                return String.format(Locale.ENGLISH, "%.3f", (double) value / (double) MM_IN_METER);
             case IMPERIAL:
                 // yards
-                return String.format(Locale.ENGLISH, "%.2f", value / MM_IN_YARD);
+                return String.format(Locale.ENGLISH, "%.3f", (double) value / (double) MM_IN_YARD);
             default:
                 throw new IllegalArgumentException("unexpected length unit: " + lengthUnit);
         }
