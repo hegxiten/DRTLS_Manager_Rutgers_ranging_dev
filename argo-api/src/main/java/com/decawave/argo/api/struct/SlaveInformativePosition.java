@@ -9,15 +9,17 @@ import java.util.Arrays;
 
 public class SlaveInformativePosition {
 
+    // first two bytes cannot be recovered correctly - by observation (Zezhou Wang, 02282021)
+    private byte[] reservedFirstTwoBytes = new byte[2];
     // relative X, Y, Z coordinate, each 2 Bytes
     private byte[] pos = new byte[6];
     // association id: 0 - 255
     private byte[] assocIdByteArray = new byte[1];
-    // reserved 5 Bytes for future use
+    // reservedLastThreeBytes 3 Bytes for future use
     // storing association ID cannot use the byte of qualityfactor. The fw of DWM1001-Dev anchor/slave
     // doesn't report individual qualityfactor per each UWB ranging request from tag. Therefore the
     // tag/master side cannot recover association id if stored in the last byte of 13-element array.
-    private byte[] reserved = new byte[5];
+    private byte[] reservedLastThreeBytes = new byte[3];
     private byte[] qualityFactorByteArray = new byte[1];
 
     public SlaveInformativePosition(int x, int y, int z) {
@@ -80,8 +82,9 @@ public class SlaveInformativePosition {
     }
 
     public void copyFrom(@NotNull SlaveInformativePosition source) {
+        this.reservedFirstTwoBytes = source.reservedFirstTwoBytes;
         this.pos = source.pos;
-        this.reserved = source.reserved;
+        this.reservedLastThreeBytes = source.reservedLastThreeBytes;
         this.assocIdByteArray = source.assocIdByteArray;
     }
 
@@ -107,7 +110,7 @@ public class SlaveInformativePosition {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
         this.pos[0] = (byte) x;
-        this.pos[1] = (byte) (x >> 8);
+        this.pos[1] = (byte) (x >>> 8);
     }
 
     public void setY(int y) {
@@ -115,7 +118,7 @@ public class SlaveInformativePosition {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
         this.pos[2] = (byte) y;
-        this.pos[3] = (byte) (y >> 8);
+        this.pos[3] = (byte) (y >>> 8);
     }
 
     public void setZ(int z) {
@@ -123,7 +126,7 @@ public class SlaveInformativePosition {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
         this.pos[4] = (byte) z;
-        this.pos[5] = (byte) (z >> 8);
+        this.pos[5] = (byte) (z >>> 8);
     }
 
     public void setAssocId(int assocId) {
@@ -152,10 +155,11 @@ public class SlaveInformativePosition {
     public byte[] getEncodedByteArray() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
+            outputStream.write(this.reservedFirstTwoBytes);     // field for reservedFirstTwoBytes
             outputStream.write(this.pos);
             outputStream.write(this.assocIdByteArray);
-            outputStream.write(new byte[this.reserved.length]);                 // field for reserved
-            outputStream.write(new byte[this.qualityFactorByteArray.length]);   // field for quality factor
+            outputStream.write(this.reservedLastThreeBytes);    // field for reservedLastThreeBytes
+            outputStream.write(this.qualityFactorByteArray);    // field for quality factor
         } catch (IOException e) {
             e.printStackTrace();
             return new byte[13];

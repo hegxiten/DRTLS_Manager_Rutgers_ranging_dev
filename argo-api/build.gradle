@@ -16,4 +16,6 @@ dependencies {
     // intellij annotations
     compile 'com.intellij:annotations:12.0'
     compile 'io.reactivex:rxjava:1.1.6'
+    compile 'commons-codec:commons-codec:1.15'
+
 }

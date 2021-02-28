@@ -6,6 +6,8 @@
 
 package com.decawave.argomanager.util.gatt;
 
+import android.util.Log;
+
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.FirmwareMeta;
 import com.decawave.argo.api.struct.LocationDataMode;
@@ -22,6 +24,7 @@ import com.decawave.argomanager.argoapi.ble.connection.FwPushCommandType;
 import com.decawave.argomanager.util.Util;
 import com.google.common.base.Preconditions;
 
+import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
@@ -204,6 +207,7 @@ public class GattEncoder {
         buff.putInt(position.y);
         buff.putInt(position.z);
         buff.put(position.qualityFactor);
+        Log.d("bytearraytowrite", "encodePosition: " + new String(Hex.encodeHex(buff.array())));
         return buff.array();
     }
 
@@ -221,7 +225,9 @@ public class GattEncoder {
         ByteBuffer buff = Util.newByteBuffer(new byte[13]);
         // slave info position follows
         byte[] slaveInfoPosBytes = slaveInfoPosition.getEncodedByteArray();
+        Log.d("bytearraytowrite", "encodeSlaveInfoPosition: " + slaveInfoPosBytes + " length: " + slaveInfoPosBytes.length + " original: " + slaveInfoPosition.toString());
         for(int i=0; i < slaveInfoPosBytes.length; i++) {
+            Log.d("bytearrayeachbyte", "encodeSlaveInfoPosition: " + i +"th " + String.format("0x%2X", slaveInfoPosBytes[i]));
             buff.put(slaveInfoPosBytes[i]);
         }
         return buff.array();

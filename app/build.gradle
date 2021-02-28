@@ -132,6 +132,9 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
         transitive = true;
     }
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    compile 'commons-codec:commons-codec:1.15'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.22'
     // multidex

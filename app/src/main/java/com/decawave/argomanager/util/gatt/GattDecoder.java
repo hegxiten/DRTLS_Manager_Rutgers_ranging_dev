@@ -7,6 +7,7 @@
 package com.decawave.argomanager.util.gatt;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.annimon.stream.function.BiFunction;
 import com.decawave.argo.api.interaction.ErrorCode;
@@ -329,6 +330,7 @@ public class GattDecoder {
         try {
             //
             byte type = bb.get();
+            Log.d("decodingtype", "decodeLocationData: " + type);
             switch (type) {
                 case 0:
                     // position
@@ -373,8 +375,17 @@ public class GattDecoder {
         int rX = buff.getInt();
         int rY = buff.getInt();
         int rZ = buff.getInt();
+        Log.d("bytearraydecodezw", "decodePosition: " +
+                " x: " + String.format("%08X",rX) + ";" +
+                " y: " + String.format("%08X",rY) + ";" +
+                " z: " + String.format("%08X",rZ));
         Position r = new Position(rX, rY, rZ);
         r.qualityFactor = buff.get();
+        Log.d("bytearraydecodezw", "decodePosition: " +
+                " x: " + rX + ";" +
+                " y: " + rY + ";" +
+                " z: " + rZ + ";" +
+                " qf: " + r.qualityFactor);
         return r;
     }
 

@@ -66,7 +66,6 @@ import eu.kryl.android.common.Constants;
 import eu.kryl.android.common.hub.InterfaceHub;
 
 import static com.decawave.argomanager.ArgoApp.uiHandler;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 /**
  * Displays node details (enter from the edit button).
@@ -498,11 +497,16 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
                 Position position = anchor.extractPositionDirect();
+                Log.d("bytearraydecodezw", "fromNodeToUiElements: " + position.toString());
                 if (position != null) {
                     LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
                     origPosX = Util.formatLength(position.x, lengthUnit);
                     origPosY = Util.formatLength(position.y, lengthUnit);
                     origPosZ = Util.formatLength(position.z, lengthUnit);
+                    Log.d("bytearraydecodezw", "fromNodeToUiElements: " +
+                            origPosX + ";" +
+                            origPosY + ";" +
+                            origPosZ + ";");
                     //
                     etPosX.setText(origPosX);   // anchor origin pos input
                     etPosY.setText(origPosY);   // anchor origin pos input
