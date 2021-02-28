@@ -229,10 +229,11 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     @BindView(R.id.tvSlavePosTitle)
     TextView tvSlavePosTitle;
 
-    @BindViews({ R.id.chboxInitiator, R.id.tvPositionTitle, R.id.tvPositionContainer })
+    @BindViews({ R.id.chboxInitiator, R.id.tvPositionTitle, R.id.tvPositionContainer})
     List<View> anchorSpecificViews;
 
-    @BindViews({ R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer, R.id.tvSlaveAssocTitle, R.id.tvSlaveAssocContainer})
+    @BindViews({ R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer,
+            R.id.tvSlaveAssocTitle, R.id.tvSlaveAssocContainer, R.id.slaveFieldExplainContainer})
     List<View> slaveSpecificViews;
 
     @BindViews({ R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })

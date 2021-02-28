@@ -391,7 +391,94 @@
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/slaveFieldExplainContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="5dp">
 
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainXTitle"
+                    style="@style/NodeDetailReadOnlyTitle"
+                    android:text="@string/slave_field_x_title"/>
+
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainXDetail"
+                    style="@style/NodeDetailReadOnlyPayload"
+                    android:text="@string/slave_field_x_detail" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:id="@+id/tvSlaveFieldExplainXSign"
+                style="@style/NodeDetailReadOnlyPayload"
+                android:text="@string/slave_field_x_detail_sign" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainYTitle"
+                    style="@style/NodeDetailReadOnlyTitle"
+                    android:text="@string/slave_field_y_title"/>
+
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainYDetail"
+                    style="@style/NodeDetailReadOnlyPayload"
+                    android:text="@string/slave_field_y_detail" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:id="@+id/tvSlaveFieldExplainYSign"
+                style="@style/NodeDetailReadOnlyPayload"
+                android:text="@string/slave_field_y_detail_sign" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainZTitle"
+                    style="@style/NodeDetailReadOnlyTitle"
+                    android:text="@string/slave_field_z_title" />
+
+                <TextView
+                    android:id="@+id/tvSlaveFieldExplainZDetail"
+                    style="@style/NodeDetailReadOnlyPayload"
+                    android:text="@string/slave_field_z_detail" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:id="@+id/tvSlaveFieldExplainZSign"
+                style="@style/NodeDetailReadOnlyPayload"
+                android:text="@string/slave_field_z_detail_sign" />
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>
