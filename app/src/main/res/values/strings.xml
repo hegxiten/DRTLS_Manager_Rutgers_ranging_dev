@@ -124,7 +124,7 @@
     <string name="slave_field_y_detail">Lateral distance towards track center line.</string>
     <string name="slave_field_z_detail">Vertical distance towards top of the rail.</string>
     <string name="slave_field_x_detail_sign">\t\tPositive(+) towards inside of the vehicle.</string>
-    <string name="slave_field_y_detail_sign">\t\tPositive(+) towards conductor (COND.) side of the corresponding vehicle end.</string>
+    <string name="slave_field_y_detail_sign">\t\tPositive(+) towards conductor side of that vehicle end.</string>
     <string name="slave_field_z_detail_sign">\t\tPositive(+) upwards.</string>
 
 

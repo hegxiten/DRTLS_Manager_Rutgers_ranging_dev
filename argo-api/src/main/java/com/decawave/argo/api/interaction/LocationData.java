@@ -18,22 +18,23 @@ import java.util.List;
 public class LocationData {
     public final Position position;
     public final List<RangingAnchor> distances;
-    private SlaveInformativePosition slaveInfoPosition;
+    public final SlaveInformativePosition slaveInfoPosition;
 
     public LocationData(Position position, List<RangingAnchor> distances) {
         this.position = position;
+        this.slaveInfoPosition = null;
+        this.distances = distances;
+    }
+
+    public LocationData(Position position, List<RangingAnchor> distances, SlaveInformativePosition slaveInfoPos) {
+        this.position = position;
+        this.slaveInfoPosition = slaveInfoPos;
         this.distances = distances;
     }
 
     public boolean isEmpty() {
         return position == null && distances == null;
     }
-
-    public SlaveInformativePosition getSlaveInfoPosition(Position regularPosition) {
-        SlaveInformativePosition slaveInfoPos = new SlaveInformativePosition(regularPosition);
-        return slaveInfoPos;
-    }
-
 
     @Override
     public String toString() {

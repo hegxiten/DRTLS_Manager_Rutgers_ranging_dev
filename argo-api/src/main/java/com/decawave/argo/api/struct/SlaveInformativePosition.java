@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class SlaveInformativePosition {
@@ -49,26 +48,6 @@ public class SlaveInformativePosition {
     @SuppressWarnings("IncompleteCopyConstructor")
     public SlaveInformativePosition(@NotNull SlaveInformativePosition slaveInfoPosition) {
         copyFrom(slaveInfoPosition);
-    }
-
-    /**
-     * Decode regular Position objects into SlaveInformativePosition objects
-     */
-    public SlaveInformativePosition(Position regularPosition) {
-        // regularPosition units in MM, each dimention takes 4 bytes, signed int
-        ByteBuffer bbX = ByteBuffer.allocate(4);
-        bbX.putInt(regularPosition.x);
-        ByteBuffer bbY = ByteBuffer.allocate(4);
-        bbY.putInt(regularPosition.y);
-        ByteBuffer bbZ = ByteBuffer.allocate(4);
-        bbZ.putInt(regularPosition.z);
-
-        byte[] byteArrayX = bbX.array();
-        byte[] byteArrayY = bbY.array();
-        byte[] byteArrayZ = bbZ.array();
-
-        //TODO: finish the decoding part of the SlaveInformativePosition from Position
-
     }
 
     @Override
@@ -178,7 +157,7 @@ public class SlaveInformativePosition {
         return outputStream.toByteArray();
     }
 
-    private static int signedIntFromTwoBytes(byte highByte, byte lowByte) {
+    public static int signedIntFromTwoBytes(byte highByte, byte lowByte) {
         boolean isNegative;
         if (firstBitZero(highByte)) {
             isNegative = false;
@@ -196,7 +175,7 @@ public class SlaveInformativePosition {
         }
     }
 
-    private static int unsignedIntFromByte(byte b) {
+    public static int unsignedIntFromByte(byte b) {
         int ret = 0;
         for (int idx=0; idx<=7; idx++) {
             ret = (int) (ret + ((b >> idx) & 1) * Math.pow(2, idx));
@@ -204,7 +183,7 @@ public class SlaveInformativePosition {
         return ret;
     }
 
-    private static boolean firstBitZero(byte input) {
+    public static boolean firstBitZero(byte input) {
         return (input >> (7) & 1) == 0;
     }
 

@@ -498,7 +498,6 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
                 Position position = anchor.extractPositionDirect();
-                Log.d("bytearrayencodedecode", "fromNodeToUiElements: " + position.toString());
                 if (position != null) {
                     LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit();
                     origPosX = Util.formatLength(position.x, lengthUnit);
@@ -526,7 +525,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 AnchorNode anchor = (AnchorNode) inputNode;
                 chboxInitiator.setChecked(anchor.isInitiator());
                 // we do not need a deep copy
-                // TODO: Debug here as it returns null
+                // TODO: Debug here as it returns null. Link with the constructor of SlaveInformativePosition
+                //  by constructing from a Position object.
+
                 SlaveInformativePosition slaveInfoPosition = anchor.extractSlaveInfoPositionDirect();
                 if (slaveInfoPosition != null) {
                     // LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit(); // res. for future unit flexibility

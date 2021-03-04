@@ -22,6 +22,7 @@ import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
 import com.decawave.argo.api.struct.ServiceData;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.Constants;
 import com.decawave.argomanager.argoapi.ble.BleConstants;
@@ -55,6 +56,7 @@ import java.util.UUID;
 import eu.kryl.android.common.Pair;
 import eu.kryl.android.common.log.ComponentLog;
 import rx.functions.Action4;
+
 
 /**
  * Various GATT / BLE utility routines.
@@ -308,7 +310,9 @@ public class GattDecoder {
             return null;
         }
         byte val = chLocationDataMode.getValue()[0];
-        Log.d("decodingtype", "decodeLocationDataMode: " + val);
+        if (Constants.DEBUG) {
+            Log.d("decodingtype", "decodeLocationDataMode: " + val);
+        }
         switch (val) {
             case 0:
                 return LocationDataMode.POSITION;
@@ -326,19 +330,25 @@ public class GattDecoder {
         if (bytes == null || bytes.length == 0) {
             return null;
         }
-        Log.d("bytearrayencodedecode", "decodeLocationData: " + new String(Hex.encodeHex(bytes)) + " length:" + bytes.length);
+        if (Constants.DEBUG) {
+            Log.d("bytearrayencodedecode", "decodeLocationData: " + new String(Hex.encodeHex(bytes)) + " length:" + bytes.length);
+        }
         ByteBuffer bb = Util.newByteBuffer(bytes);
         Position position = null;
+        SlaveInformativePosition slaveInfoPosition = null;
         List<RangingAnchor> distances = null;
 
         try {
             //
             byte type = bb.get();
-            Log.d("decodingtype", "decodeLocationData: " + type);
+            if (Constants.DEBUG) {
+                Log.d("decodingtype", "decodeLocationData: " + type);
+            }
             switch (type) {
                 case 0:
                     // position
                     position = decodePosition(bb);
+                    slaveInfoPosition = decodeSlaveInfoPosition(bb);
                     break;
                 case 1:
                     // distances
@@ -355,7 +365,7 @@ public class GattDecoder {
         } catch (BufferUnderflowException e) {
             throw new GattRepresentationException(deviceBleAddress, "unexpected location data content: buffer underflow. Content: " + GattEncoder.printByteArray(bytes), e);
         }
-        return new LocationData(position, distances);
+        return new LocationData(position, distances, slaveInfoPosition);
     }
 
     private List<RangingAnchor> decodeDistances(ByteBuffer buffer, byte[] bytes) {
@@ -377,18 +387,48 @@ public class GattDecoder {
     @NonNull
     private Position decodePosition(ByteBuffer buff) {
 
-        Log.d("bytearrayencodedecode", "decodePosition, raw bytes: " + new String(Hex.encodeHex(buff.array())) + " length: "  + buff.array().length);
         int rX = buff.getInt();
         int rY = buff.getInt();
         int rZ = buff.getInt();
 
         Position r = new Position(rX, rY, rZ);
         r.qualityFactor = buff.get();
-        Log.d("bytearrayencodedecode", "decodePosition: " + r.toString());
-        Log.d("bytearrayencodedecode", "decodePosition: hex" +
-                " x: " + String.format("%08X",rX) + ";" +
-                " y: " + String.format("%08X",rY) + ";" +
-                " z: " + String.format("%08X",rZ));
+        if (Constants.DEBUG) {
+            Log.d("bytearrayencodedecode", "decodePosition: " + r.toString());
+            Log.d("bytearrayencodedecode", "decodePosition: hex" +
+                    " x: " + String.format("%08X", rX) + ";" +
+                    " y: " + String.format("%08X", rY) + ";" +
+                    " z: " + String.format("%08X", rZ));
+        }
+        return r;
+    }
+
+    /**
+     * Decode regular Position objects into SlaveInformativePosition objects, for anchor/slave conversion
+     */
+    @NonNull
+    private SlaveInformativePosition decodeSlaveInfoPosition(ByteBuffer bb) {
+        SlaveInformativePosition r = new SlaveInformativePosition();
+        // (regular) Position units in MM, each dimension takes 4 bytes, signed int
+        // SlaveInformativePosition units in MM, each dimension takes 2 bytes, signed int
+        // When calling ByteBuffer.array(), the 13-Byte buffer returns a 14-length ByteArray padded
+        // with 0x00 at index 0 - By observation from Zezhou Wang.
+        //   0x00251920007b64fc00fb000000 ByteBuffer
+        // 0x0000251920007b64fc00fb000000 ByteBuffer.array()
+        byte[] bbArray = bb.array();
+        int xSlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[3], bbArray[2]);
+        int ySlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[6], bbArray[4]);
+        int zSlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[8], bbArray[7]);
+        int id = SlaveInformativePosition.unsignedIntFromByte(bbArray[10]);
+
+        r.setX(xSlave);
+        r.setY(ySlave);
+        r.setZ(zSlave);
+        r.setAssocId(id);
+        if (Constants.DEBUG) {
+            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + new String(Hex.encodeHex(bbArray)) + " length:" + bbArray.length);
+            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + r.toString());
+        }
         return r;
     }
 
@@ -487,10 +527,12 @@ public class GattDecoder {
                                 ((NodeFactory.TagNodeBuilder) nodeBuilder).setLocationData(locationData);
                             } else {
                                 // this is anchor - separate properties in one characteristic
-                                // TODO: Do we need to include slaveinformative position here?
                                 NodeFactory.AnchorNodeBuilder anBuilder = (NodeFactory.AnchorNodeBuilder) nodeBuilder;
                                 if (locationData.position != null) {
                                     anBuilder.setPosition(locationData.position);
+                                }
+                                if (locationData.slaveInfoPosition != null) {
+                                    anBuilder.setSlaveInfoPosition(locationData.slaveInfoPosition);
                                 }
                                 if (locationData.distances != null) {
                                     anBuilder.setDistances(locationData.distances);
