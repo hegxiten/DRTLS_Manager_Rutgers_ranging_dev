@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +26,7 @@ import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.ArgoApp;
 import com.decawave.argomanager.BuildConfig;
@@ -229,6 +229,17 @@ public class Util {
         String z = Util.formatLength(position.z, lengthUnit);
         String q = String.valueOf(position.qualityFactor);
         return daApp.getString(R.string.position_template, x, y, z, q);
+    }
+
+    public static String formatSlaveInfoPosition(SlaveInformativePosition slaveInfoPosition) {
+        if (slaveInfoPosition == null) {
+            return "null";
+        }
+        String x = String.valueOf(slaveInfoPosition.getX());
+        String y = String.valueOf(slaveInfoPosition.getY());
+        String z = String.valueOf(slaveInfoPosition.getZ());
+        String q = String.valueOf(slaveInfoPosition.getAssocId());
+        return daApp.getString(R.string.slave_info_position_template, x, y, z, q);
     }
     
     public static String formatLength(float value, LengthUnit lengthUnit) {

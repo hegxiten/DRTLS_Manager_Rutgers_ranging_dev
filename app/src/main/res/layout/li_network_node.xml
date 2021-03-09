@@ -70,13 +70,31 @@
                     android:maxLines="1"/>
 
                 <TextView
-                    android:id="@+id/bleAddress"
-                    android:text="node BLE address too"
-                    style="@style/NodeDetailsInNodeList"
-                    android:ellipsize="end"
-                    android:maxLines="1"
+                    android:id="@+id/nodeLabel"
+                    android:text="node name it's too long asdfas"
+                    style="@style/NodeTitleInOverview"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+                <TextView
+                    android:id="@+id/nodeUwbId"
+                    android:text="node UWB address if it is too long it will be set as start ellipsis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/NodeDetailsInNodeList"
+                    android:ellipsize="start"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/bleAddress"
+                    android:text="node BLE address if it is too long it will be set as start ellipsis"
+                    style="@style/NodeDetailsInNodeList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="start"
+                    android:singleLine="true" />
 
             </LinearLayout>
 

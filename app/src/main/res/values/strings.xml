@@ -108,25 +108,28 @@
     <string name="on">ON</string>
     <string name="off">OFF</string>
 
-    <!-- slave detail -->
-    <string name="slave_detail_config">Slave Position (UNIT: CM)</string>
+    <!-- slave/master detail -->
+    <string name="slave_detail_config">Slave Position (CM)</string>
     <string name="slave_assoc_config">Slave Association ID</string>
-    <string name="slave_assoc_input_hint">Enter the Association ID (e.g. Vehicle ID)</string>
+    <string name="slave_master_assoc_input_hint">Enter the Association ID (e.g. Vehicle ID)</string>
     <string name="slave_detail_pos_x_coupler">CPLR(+:inside)</string>
     <string name="slave_detail_pos_y_centerline">CL(+:COND.)</string>
     <string name="slave_detail_pos_z_top_of_rail">TOR(+:over)</string>
     <string name="slave_input_invalid">Invalid slave values!</string>
     <string name="slave_input_exceeds_range">Slave values out of range!</string>
-    <string name="slave_field_x_title">CPLR: </string>
-    <string name="slave_field_y_title">CL: </string>
-    <string name="slave_field_z_title">TOR: </string>
-    <string name="slave_field_x_detail">Longitudinal distance towards coupler.</string>
-    <string name="slave_field_y_detail">Lateral distance towards track center line.</string>
-    <string name="slave_field_z_detail">Vertical distance towards top of the rail.</string>
-    <string name="slave_field_x_detail_sign">\t\tPositive(+) towards inside of the vehicle.</string>
-    <string name="slave_field_y_detail_sign">\t\tPositive(+) towards conductor side of that vehicle end.</string>
-    <string name="slave_field_z_detail_sign">\t\tPositive(+) upwards.</string>
-
+    <string name="slave_master_field_x_title">CPLR: </string>
+    <string name="slave_master_field_y_title">CL: </string>
+    <string name="slave_master_field_z_title">TOR: </string>
+    <string name="slave_master_field_x_detail">Longitudinal distance towards coupler.</string>
+    <string name="slave_master_field_y_detail">Lateral distance towards track center line.</string>
+    <string name="slave_master_field_z_detail">Vertical distance towards top of the rail.</string>
+    <string name="slave_master_field_x_detail_sign">\t\tPositive(+) towards inside of the vehicle.</string>
+    <string name="slave_master_field_y_detail_sign">\t\tPositive(+) towards conductor side of that vehicle end.</string>
+    <string name="slave_master_field_z_detail_sign">\t\tPositive(+) upwards.</string>
+    <string name="master_label_editable_disabled_explain">(Note: Label is NOT editable for Masters)</string>
+    <string name="slave_info_position_property_title">Position (CM)</string>
+    <string name="slave_info_position_template">CPLR = %1$s, CL = %2$s, TOR = %3$s, ID = %4$s</string>
+    
 
     <!-- discovery -->
     <string name="discovery_section_title_networks">networks</string>

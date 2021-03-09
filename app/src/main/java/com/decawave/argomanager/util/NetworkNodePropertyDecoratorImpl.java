@@ -13,6 +13,7 @@ import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.R;
 import com.decawave.argomanager.argoapi.ext.UpdateRate;
@@ -85,6 +86,7 @@ public class NetworkNodePropertyDecoratorImpl implements NetworkNodePropertyDeco
     };
 
     private static NetworkNodePropertyValueFormatter<Position> positionFormatter = null;
+    private static NetworkNodePropertyValueFormatter<SlaveInformativePosition> slaveInfoPositionFormatter = null;
 
     private static NetworkNodePropertyValueFormatter resolvePropertyValueFormatter(NetworkNodeProperty property, AppPreferenceAccessor appPreferenceAccessor) {
         switch (property) {
@@ -135,6 +137,12 @@ public class NetworkNodePropertyDecoratorImpl implements NetworkNodePropertyDeco
                     positionFormatter = (position) -> Util.formatPosition(position, appPreferenceAccessor.getLengthUnit());
                 }
                 return positionFormatter;
+            case ANCHOR_SLAVE_INFO_POSITION:
+                if (slaveInfoPositionFormatter == null) {
+                    // create the instance
+                    slaveInfoPositionFormatter = (slaveInfoPosition) -> Util.formatSlaveInfoPosition(slaveInfoPosition);
+                }
+                return slaveInfoPositionFormatter;
             default:
                 throw new Fixme("property " + property + " formatter not supported");
         }
@@ -160,6 +168,8 @@ public class NetworkNodePropertyDecoratorImpl implements NetworkNodePropertyDeco
                 return daApp.getString(R.string.node_detail_label);
             case ANCHOR_POSITION:
                 return daApp.getString(R.string.node_detail_position, daApp.getString(appPreferenceAccessor.getLengthUnit().unitLabelResource));
+            case ANCHOR_SLAVE_INFO_POSITION:
+                return daApp.getString(R.string.slave_info_position_property_title);
             case LOCATION_DATA_MODE:
                 return daApp.getString(R.string.node_detail_location_data_mode);
             case TAG_UPDATE_RATE:
@@ -206,7 +216,6 @@ public class NetworkNodePropertyDecoratorImpl implements NetworkNodePropertyDeco
                 return daApp.getString(R.string.node_detail_location_engine);
             case LAST_SEEN:
                 return daApp.getString(R.string.node_detail_last_seen);
-
             default:
                 throw new Fixme("property label not configured for " + property);
         }

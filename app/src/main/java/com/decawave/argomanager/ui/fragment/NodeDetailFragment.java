@@ -142,7 +142,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     @BindView(R.id.slave_detail_pos_z)
     EditText etSlavePosZ;            // editable anchor Z input/current value
 
-    @BindView(R.id.slave_detail_association)
+    @BindView(R.id.slave_master_detail_association)
     EditText etSlaveAssoc;
 
     @BindView(R.id.etNodeLabel)
@@ -229,15 +229,19 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     @BindView(R.id.tvSlavePosTitle)
     TextView tvSlavePosTitle;
 
-    @BindViews({ R.id.chboxInitiator, R.id.tvPositionTitle, R.id.tvPositionContainer})
+    @BindViews({R.id.chboxInitiator, R.id.tvPositionTitle, R.id.tvPositionContainer})
     List<View> anchorSpecificViews;
 
-    @BindViews({ R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer,
-            R.id.tvSlaveAssocTitle, R.id.tvSlaveAssocContainer, R.id.slaveFieldExplainContainer})
+    @BindViews({R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer,
+            R.id.tvSlaveAssocTitle, R.id.tvSlaveMasterAssocContainer, R.id.slaveMasterFieldExplainContainer})
     List<View> slaveSpecificViews;
 
-    @BindViews({ R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
+    @BindViews({R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
     List<View> tagSpecificViews;
+
+    @BindViews({R.id.masterEtNodeLabelDisabledExplain,
+                R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
+    List<View> masterSpecificViews;
 
     //
     private boolean fillUi = false;
@@ -885,25 +889,57 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         Short networkId = inputNode.getNetworkId();
         NetworkModel networkModel = networkNodeManager.getNetworks().get(networkId);
         final boolean isAnchor = selectedNodeType == NodeType.ANCHOR;
+        final boolean isTag = selectedNodeType == NodeType.TAG;
         final boolean isRanging = networkModel.getNetworkOperationMode() == NetworkOperationMode.RANGING;
         etNodeLabel.setHint(isAnchor ? R.string.anchor_label : R.string.tag_label);
+        etNodeLabel.setEnabled(true); // set enabled for all, except for masters (set within conditions below)
         if(isAnchor) {
-            for (View v : anchorSpecificViews) {
-                v.setVisibility(isRanging ? View.GONE : View.VISIBLE);
+            for (View v : tagSpecificViews) {
+                v.setVisibility(View.GONE);
             }
-            for (View v : slaveSpecificViews) {
-                v.setVisibility(isRanging ? View.VISIBLE : View.GONE);
+            for (View v : masterSpecificViews) {
+                v.setVisibility(View.GONE);
+            }
+            if (isRanging) {
+                for (View v : anchorSpecificViews) {
+                    v.setVisibility(View.GONE);
+                }
+                for (View v : slaveSpecificViews) {
+                    v.setVisibility(View.VISIBLE);
+                }
+            }
+            else {
+                for (View v : slaveSpecificViews) {
+                    v.setVisibility(View.GONE);
+                }
+                for (View v : anchorSpecificViews) {
+                    v.setVisibility(View.VISIBLE);
+                }
             }
         }
-        else {
-            for (View v : tagSpecificViews) {
-                v.setVisibility(View.VISIBLE);
+        if (isTag) {
+            for (View v : anchorSpecificViews) {
+                v.setVisibility(View.GONE);
             }
             for (View v : slaveSpecificViews) {
                 v.setVisibility(View.GONE);
             }
-            for (View v : anchorSpecificViews) {
-                v.setVisibility(View.GONE);
+            if (isRanging) {
+                for (View v : tagSpecificViews) {
+                    v.setVisibility(View.GONE);
+                }
+                for (View v : masterSpecificViews) {
+                    v.setVisibility(View.VISIBLE);
+                }
+                etNodeLabel.setEnabled(false);
+            }
+            else {
+                for (View v : masterSpecificViews) {
+                    v.setVisibility(View.GONE);
+                }
+                for (View v : tagSpecificViews) {
+                    v.setVisibility(View.VISIBLE);
+                }
             }
         }
     }

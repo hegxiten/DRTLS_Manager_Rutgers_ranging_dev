@@ -36,6 +36,16 @@
             android:inputType="text|textNoSuggestions|textCapWords"
             android:text="NS-2344" />
 
+        <TextView
+            android:id="@+id/masterEtNodeLabelDisabledExplain"
+            style="@style/NodeDetailReadOnlyPayload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="5dp"
+            android:text="@string/master_label_editable_disabled_explain" />
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -372,7 +382,7 @@
             android:text="@string/slave_assoc_config" />
 
         <LinearLayout
-            android:id="@+id/tvSlaveAssocContainer"
+            android:id="@+id/tvSlaveMasterAssocContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/node_value_left_padding"
@@ -382,17 +392,17 @@
             android:orientation="horizontal">
             <android.support.design.widget.TextInputLayout
                 style="@style/NodeDetailPositionCompound"
-                android:hint="@string/slave_assoc_input_hint">
+                android:hint="@string/slave_master_assoc_input_hint">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/slave_detail_association"
+                    android:id="@+id/slave_master_detail_association"
                     style="@style/editText.coordinate" />
 
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/slaveFieldExplainContainer"
+            android:id="@+id/slaveMasterFieldExplainContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -405,14 +415,14 @@
                 android:layout_marginTop="5dp">
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainXTitle"
+                    android:id="@+id/tvSlaveMasterFieldExplainXTitle"
                     style="@style/NodeDetailReadOnlyTitle"
-                    android:text="@string/slave_field_x_title"/>
+                    android:text="@string/slave_master_field_x_title"/>
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainXDetail"
+                    android:id="@+id/tvSlaveMasterFieldExplainXDetail"
                     style="@style/NodeDetailReadOnlyPayload"
-                    android:text="@string/slave_field_x_detail" />
+                    android:text="@string/slave_master_field_x_detail" />
 
             </LinearLayout>
 
@@ -421,9 +431,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="0dp"
-                android:id="@+id/tvSlaveFieldExplainXSign"
+                android:id="@+id/tvSlaveMasterFieldExplainXSign"
                 style="@style/NodeDetailReadOnlyPayload"
-                android:text="@string/slave_field_x_detail_sign" />
+                android:text="@string/slave_master_field_x_detail_sign" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -432,14 +442,14 @@
                 android:layout_marginTop="5dp">
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainYTitle"
+                    android:id="@+id/tvSlaveMasterFieldExplainYTitle"
                     style="@style/NodeDetailReadOnlyTitle"
-                    android:text="@string/slave_field_y_title"/>
+                    android:text="@string/slave_master_field_y_title"/>
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainYDetail"
+                    android:id="@+id/tvSlaveMasterFieldExplainYDetail"
                     style="@style/NodeDetailReadOnlyPayload"
-                    android:text="@string/slave_field_y_detail" />
+                    android:text="@string/slave_master_field_y_detail" />
 
             </LinearLayout>
 
@@ -448,9 +458,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="0dp"
-                android:id="@+id/tvSlaveFieldExplainYSign"
+                android:id="@+id/tvSlaveMasterFieldExplainYSign"
                 style="@style/NodeDetailReadOnlyPayload"
-                android:text="@string/slave_field_y_detail_sign" />
+                android:text="@string/slave_master_field_y_detail_sign" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -459,14 +469,14 @@
                 android:layout_marginTop="5dp">
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainZTitle"
+                    android:id="@+id/tvSlaveMasterFieldExplainZTitle"
                     style="@style/NodeDetailReadOnlyTitle"
-                    android:text="@string/slave_field_z_title" />
+                    android:text="@string/slave_master_field_z_title" />
 
                 <TextView
-                    android:id="@+id/tvSlaveFieldExplainZDetail"
+                    android:id="@+id/tvSlaveMasterFieldExplainZDetail"
                     style="@style/NodeDetailReadOnlyPayload"
-                    android:text="@string/slave_field_z_detail" />
+                    android:text="@string/slave_master_field_z_detail" />
 
             </LinearLayout>
 
@@ -475,9 +485,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="0dp"
-                android:id="@+id/tvSlaveFieldExplainZSign"
+                android:id="@+id/tvSlaveMasterFieldExplainZSign"
                 style="@style/NodeDetailReadOnlyPayload"
-                android:text="@string/slave_field_z_detail_sign" />
+                android:text="@string/slave_master_field_z_detail_sign" />
         </LinearLayout>
     </LinearLayout>
 

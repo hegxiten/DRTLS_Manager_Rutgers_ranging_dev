@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.annimon.stream.function.Supplier;
+import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NetworkOperationMode;
@@ -99,6 +100,11 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
     private static final List<NetworkNodeProperty> BASIC_PROPERTIES_TAG;
     private static final List<NetworkNodeProperty> ADVANCED_PROPERTIES_TAG;
 
+    private static final List<NetworkNodeProperty> BASIC_PROPERTIES_SLAVE;
+    private static final List<NetworkNodeProperty> ADVANCED_PROPERTIES_SLAVE;
+    private static final List<NetworkNodeProperty> BASIC_PROPERTIES_MASTER;
+    private static final List<NetworkNodeProperty> ADVANCED_PROPERTIES_MASTER;
+
     static {
         List<NetworkNodeProperty> commonBasicProperties = Lists.newArrayList(
                 NetworkNodeProperty.ID,
@@ -117,6 +123,24 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 NetworkNodeProperty.LAST_SEEN
         );
 
+        List<NetworkNodeProperty> anchorAdvancedProperties = Lists.newArrayList(
+                // anchor-specific
+                NetworkNodeProperty.ANCHOR_CLUSTER_MAP,
+                NetworkNodeProperty.ANCHOR_CLUSTER_NEIGHBOUR_MAP,
+                NetworkNodeProperty.ANCHOR_MAC_STATS
+        );
+
+        List<NetworkNodeProperty> slaveBasicProperties = Lists.newArrayList(
+                // slave-specific
+                NetworkNodeProperty.ANCHOR_INITIATOR,
+                NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION,
+                NetworkNodeProperty.ANCHOR_SEAT,
+                NetworkNodeProperty.OPERATING_FIRMWARE,
+                NetworkNodeProperty.LAST_SEEN
+        );
+
+        List<NetworkNodeProperty> slaveAdvancedProperties = anchorAdvancedProperties;
+
         List<NetworkNodeProperty> tagBasicProperties = Lists.newArrayList(
                 NetworkNodeProperty.TAG_LOW_POWER_MODE_ENABLE,
                 NetworkNodeProperty.TAG_LOCATION_ENGINE_ENABLE,
@@ -127,6 +151,8 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 NetworkNodeProperty.LAST_SEEN
                 );
 
+        List<NetworkNodeProperty> masterBasicProperties = tagBasicProperties;
+
         List<NetworkNodeProperty> commonAdvancedProperties = Lists.newArrayList(
                 NetworkNodeProperty.HW_VERSION,
                 NetworkNodeProperty.FW1_VERSION,
@@ -135,18 +161,19 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 NetworkNodeProperty.FW2_CHECKSUM
         );
 
-        List<NetworkNodeProperty> anchorAdvancedProperties = Lists.newArrayList(
-                // anchor-specific
-                NetworkNodeProperty.ANCHOR_CLUSTER_MAP,
-                NetworkNodeProperty.ANCHOR_CLUSTER_NEIGHBOUR_MAP,
-                NetworkNodeProperty.ANCHOR_MAC_STATS
-        );
         // TAG
         BASIC_PROPERTIES_TAG = new ArrayList<>(commonBasicProperties);
         BASIC_PROPERTIES_TAG.addAll(tagBasicProperties);
 
         ADVANCED_PROPERTIES_TAG = new ArrayList<>(BASIC_PROPERTIES_TAG);
         ADVANCED_PROPERTIES_TAG.addAll(commonAdvancedProperties);
+
+        // MASTER
+        BASIC_PROPERTIES_MASTER = new ArrayList<>(commonBasicProperties);
+        BASIC_PROPERTIES_MASTER.addAll(masterBasicProperties);
+
+        ADVANCED_PROPERTIES_MASTER = new ArrayList<>(BASIC_PROPERTIES_MASTER);
+        ADVANCED_PROPERTIES_MASTER.addAll(commonAdvancedProperties);
 
         // ANCHOR
         BASIC_PROPERTIES_ANCHOR = new ArrayList<>(commonBasicProperties);
@@ -155,6 +182,14 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
         ADVANCED_PROPERTIES_ANCHOR = new ArrayList<>(BASIC_PROPERTIES_ANCHOR);
         ADVANCED_PROPERTIES_ANCHOR.addAll(commonAdvancedProperties);
         ADVANCED_PROPERTIES_ANCHOR.addAll(anchorAdvancedProperties);
+
+        // SLAVE
+        BASIC_PROPERTIES_SLAVE = new ArrayList<>(commonBasicProperties);
+        BASIC_PROPERTIES_SLAVE.addAll(slaveBasicProperties);
+
+        ADVANCED_PROPERTIES_SLAVE = new ArrayList<>(BASIC_PROPERTIES_SLAVE);
+        ADVANCED_PROPERTIES_SLAVE.addAll(commonAdvancedProperties);
+        ADVANCED_PROPERTIES_SLAVE.addAll(slaveAdvancedProperties);
 
     }
 
@@ -433,6 +468,10 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
         // references to views
         @BindView(R.id.nodeName)
         TextView nodeName;
+        @BindView(R.id.nodeLabel)
+        TextView nodeLabel;
+        @BindView(R.id.nodeUwbId)
+        TextView nodeUwbId;
         @BindView(R.id.bleAddress)
         TextView tvNodeBleAddress;
         @BindView(R.id.cardTop)
@@ -546,6 +585,11 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             if (DEBUG) {
                 log("bind: networkNode = [" + networkNode + "], continuous = [" + continuous + "]");
             }
+            boolean isRanging = false;
+            NetworkModel activeNetwork = networkNodeManager.getActiveNetwork();
+            if (activeNetwork != null) {
+                isRanging = activeNetwork.getNetworkOperationMode() == NetworkOperationMode.RANGING;
+            }
             // fill simple variables first
             nodeId = networkNode.getId();
             NetworkNode nn = networkNode.asPlainNode();
@@ -566,7 +610,9 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             //
             itemView.setTag(nodeBle);
             // fill UI elements next
-            nodeName.setText(nn.getLabel());
+            setNodeNameText(nodeName, nn, isRanging);       // Auto-generated label
+            nodeLabel.setText("Label: " + nn.getLabel());   // Original text of the customized label (Zezhou Wang)
+            nodeUwbId.setText(Util.formatAsHexa(nodeId, true));
             tvNodeBleAddress.setText(nn.getBleAddress());
             nodeStateView.setNetworkNode(nn);
             configureNodeStateView(continuous);
@@ -633,6 +679,31 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 }
             } else {
                 detailsTable.setVisibility(View.GONE);
+            }
+        }
+
+        private void setNodeNameText(TextView nodeName, NetworkNode nn, boolean isRanging) {
+            String label = nn.getLabel();
+            if(!isRanging) {
+                nodeName.setText(label);
+            }
+            else {
+                if (nn.getType() == NodeType.ANCHOR) {
+                    // slave
+                    AnchorNode slaveNode = (AnchorNode) nn;
+                    int id = slaveNode.getSlaveInfoPosition().getAssocId();
+                    nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                            + String.format("%03d", id));
+                }
+                else if (nn.getType() == NodeType.TAG) {
+                    // master
+                    // TODO: implement master info position
+                    // nn.getProperty(NetworkNodeProperty.TAG_MASTER_INFO_POSITION);
+                    nodeName.setText(label);
+                }
+                else {
+                    throw new IllegalStateException("unsupported node type: " + nn.getType());
+                }
             }
         }
 
@@ -724,10 +795,25 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
 
     private List<NetworkNodeProperty> getPropertiesForModeAndNode(NodeType nodeType, ApplicationMode applicationMode) {
         boolean advancedMode = applicationMode == ApplicationMode.ADVANCED;
+        NetworkModel activeNetwork = networkNodeManager.getActiveNetwork();
+        boolean isRanging = false;
+        if (activeNetwork != null) {
+            isRanging = activeNetwork.getNetworkOperationMode() == NetworkOperationMode.RANGING;
+        }
         if (nodeType == NodeType.ANCHOR) {
-            return advancedMode ? ADVANCED_PROPERTIES_ANCHOR : BASIC_PROPERTIES_ANCHOR;
+            if (!isRanging) {
+                return advancedMode ? ADVANCED_PROPERTIES_ANCHOR : BASIC_PROPERTIES_ANCHOR;
+            }
+            else {
+                return advancedMode ? ADVANCED_PROPERTIES_SLAVE : BASIC_PROPERTIES_SLAVE;
+            }
         } else {
-            return advancedMode ? ADVANCED_PROPERTIES_TAG : BASIC_PROPERTIES_TAG;
+            if (!isRanging) {
+                return advancedMode ? ADVANCED_PROPERTIES_TAG : BASIC_PROPERTIES_TAG;
+            }
+            else {
+                return advancedMode ? ADVANCED_PROPERTIES_MASTER : BASIC_PROPERTIES_MASTER;
+            }
         }
     }
 
@@ -801,6 +887,7 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                     network.getNetworkOperationMode() == NetworkOperationMode.POSITIONING ? R.plurals.number_of_tags : R.plurals.number_of_masters,
                     tags, tags));
             networkId.setText(daApp.getString(R.string.network_id, Util.formatNetworkId(network.getNetworkId())));
+            // bind the correct operation mode (RANGING v.s. POSITIONING) - Zezhou Wang 03.07.2021
             networkOperationMode.setText(daApp.getString(R.string.network_opmode, network.getNetworkOperationMode().name()));
         }
 
