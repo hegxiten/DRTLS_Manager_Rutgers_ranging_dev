@@ -7,6 +7,7 @@
 package com.decawave.argomanager.argoapi.ble;
 
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argomanager.ble.BleGattCharacteristic;
 import com.google.common.base.Preconditions;
 
@@ -50,7 +51,7 @@ class WriteRequestToCharacteristicVisitor implements WriteCharacteristicRequestV
     }
 
     @Override
-    public void visitSlaveInfoPosition(WriteCharacteristicRequest.SlaveInformativePosition request) {
+    public void visitSlaveInfoPosition(WriteCharacteristicRequest<SlaveInformativePosition> request) {
         doVisit(() -> characteristic.setSlaveInfoPositionValue(request.getValue()), "setSlaveInfoPositionValue()");
     }
 

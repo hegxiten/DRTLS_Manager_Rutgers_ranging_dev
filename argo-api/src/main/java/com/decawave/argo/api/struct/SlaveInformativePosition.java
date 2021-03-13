@@ -8,27 +8,22 @@ import java.util.Arrays;
 
 public class SlaveInformativePosition {
 
-    // lowest byte (first byte) of each integer might be compromised by observation (Zezhou Wang, 02282021)
-    // relative X, Y, Z coordinate, each 2 Bytes. Skipping the lowest byte (first byte). Skipping 3 bytes.
-    // e.g. 0x00CDAB003412007856 -> X: 0xABCD; Y: 0x1234; Z: 0x5678
-    // pos[0], pos[4], pos[8] must be set as zero; not going to use them.
-    // See getters and setters of X, Y, Z for details.
-    private byte[] pos = new byte[9];
-    // association id: 0 - 255
-    private byte[] assocIdByteArray = new byte[1];
-    // reservedLastTwoBytes 2 Bytes for future use
+    // lowest byte (first byte) of each integer might be compromised by observation (Zezhou Wang, 03122021)
+    // relative X, Y, Z coordinate, each 2 Bytes. Lower bytes of original 3 (4-byte) integers are volatile.
+    // Using the original higher bytes for storing our X (CPLR), Y (CL), Z (TOR) values.
+    // Current Position design:
+    //  |00 |01 |02 |03 |04 |05 |06 |07 |08 |09 |10 |11 |12 | (13-bytes)
+    //  |RV |ID |XL |XH |RV |RS |YL |YH |RV |RV |ZL |ZH |qf |
+    //  R: reserved; V: volatile; S: stable (relatively); L: lower-byte; H: higher-byte; ID: assocId
+    // Using byte 01 for storing vehicle association id. If needed, can expand to 2/3 byte id.
+    // e.g. 0x00ABCDAB0000341200007856 -> X: 0xABCD; Y: 0x1234; Z: 0x5678; assocId: 0xAB
+    // See getters and setters of X, Y, Z, assocId for details.
+    // association id: 0 - 255 unsigned integer
+    private byte[] slaveInfoBytes = new byte[12];
     // storing association ID cannot use the byte of qualityfactor. The fw of DWM1001-Dev anchor/slave
     // doesn't report individual qualityfactor per each UWB ranging request from tag. Therefore the
     // tag/master side cannot recover association id if stored in the last byte of 13-element array.
-    private byte[] reservedLastTwoBytes = new byte[2];
     private byte[] qualityFactorByteArray = new byte[1];
-
-
-    // Test 1 (correct):
-    // encoded:   002519cc007f64fc00fb000000
-    // decoded: 00002519cc007f64fc00fb000000
-    // Implication: the original firmware might not be able to handle some value cases and minor positioning
-    // errors should happen due to the compromised lowest byte of each millimeter integer.
 
     public SlaveInformativePosition(int x, int y, int z) {
         this.setX(x);
@@ -40,6 +35,15 @@ public class SlaveInformativePosition {
     public SlaveInformativePosition(int x, int y, int z, int associationId) {
         this(x, y, z);
         this.setAssocId(associationId);
+    }
+
+    public SlaveInformativePosition(byte[] byteArray) {
+        this.slaveInfoBytes = Arrays.copyOfRange(byteArray, 0, 12);
+        this.qualityFactorByteArray = Arrays.copyOfRange(byteArray, 12, 13);
+        this.setX(signedIntFromTwoBytes(this.slaveInfoBytes[3], this.slaveInfoBytes[2]));
+        this.setY(signedIntFromTwoBytes(this.slaveInfoBytes[7], this.slaveInfoBytes[6]));
+        this.setZ(signedIntFromTwoBytes(this.slaveInfoBytes[11],this.slaveInfoBytes[10]));
+        this.setAssocId(unsignedIntFromByte(this.slaveInfoBytes[1]));
     }
 
     public SlaveInformativePosition() {
@@ -55,8 +59,8 @@ public class SlaveInformativePosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SlaveInformativePosition otherSlaveInfoPosition = (SlaveInformativePosition) o;
-        if (this.pos != otherSlaveInfoPosition.pos) return false;
-        return assocIdByteArray != null ? Arrays.equals(assocIdByteArray, otherSlaveInfoPosition.assocIdByteArray) : otherSlaveInfoPosition.assocIdByteArray == null;
+        if (this.slaveInfoBytes != otherSlaveInfoPosition.slaveInfoBytes) return false;
+        return this.getAssocId() != null ? (this.getAssocId() == otherSlaveInfoPosition.getAssocId()) : (otherSlaveInfoPosition.getAssocId() == null);
 
     }
 
@@ -70,9 +74,7 @@ public class SlaveInformativePosition {
     }
 
     public void copyFrom(@NotNull SlaveInformativePosition source) {
-        this.pos = source.pos;
-        this.assocIdByteArray = source.assocIdByteArray;
-        this.reservedLastTwoBytes = source.reservedLastTwoBytes;
+        this.slaveInfoBytes = source.slaveInfoBytes;
         this.qualityFactorByteArray = source.qualityFactorByteArray;
     }
 
@@ -97,58 +99,58 @@ public class SlaveInformativePosition {
         if (x < -32768 || x > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[0] = 0x00;
-        this.pos[1] = (byte) x;
-        this.pos[2] = (byte) (x >>> 8);
+        this.slaveInfoBytes[0] = 0x00;  // Reserved
+        this.slaveInfoBytes[2] = (byte) x;
+        this.slaveInfoBytes[3] = (byte) (x >>> 8);
     }
 
     public void setY(int y) {
         if (y < -32768 || y > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[3] = (byte) y;
-        this.pos[4] = 0x00;
-        this.pos[5] = (byte) (y >>> 8);
+        this.slaveInfoBytes[4] = 0x00;  // Reserved
+        this.slaveInfoBytes[5] = 0x00;  // Reserved
+        this.slaveInfoBytes[6] = (byte) y;
+        this.slaveInfoBytes[7] = (byte) (y >>> 8);
     }
 
     public void setZ(int z) {
         if (z < -32768 || z > 32767) {
             throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
         }
-        this.pos[6] = (byte) z;
-        this.pos[7] = (byte) (z >>> 8);
-        this.pos[8] = 0x00;
+        this.slaveInfoBytes[8] = 0x00;  // Reserved
+        this.slaveInfoBytes[9] = 0x00;  // Reserved
+        this.slaveInfoBytes[10] = (byte) z;
+        this.slaveInfoBytes[11] = (byte) (z >>> 8);
     }
 
     public void setAssocId(int assocId) {
         if (assocId < 0 || assocId > 255) {
             throw new IllegalArgumentException("association id range has to be limited from 0 to 255!");
         }
-        this.assocIdByteArray[0] = (byte) assocId;
+        this.slaveInfoBytes[1] = (byte) assocId;    // relatively stable byte from original X
     }
 
     public int getX() {
-        return signedIntFromTwoBytes(pos[2], pos[1]);
+        return signedIntFromTwoBytes(slaveInfoBytes[3], slaveInfoBytes[2]);
     }
 
     public int getY() {
-        return signedIntFromTwoBytes(pos[5], pos[3]);
+        return signedIntFromTwoBytes(slaveInfoBytes[7], slaveInfoBytes[6]);
     }
 
     public int getZ() {
-        return signedIntFromTwoBytes(pos[7], pos[6]);
+        return signedIntFromTwoBytes(slaveInfoBytes[11], slaveInfoBytes[10]);
     }
 
     public Integer getAssocId() {
-        return unsignedIntFromByte(assocIdByteArray[0]);
+        return unsignedIntFromByte(slaveInfoBytes[1]);
     }
 
     public byte[] getEncodedByteArray() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            outputStream.write(this.pos);
-            outputStream.write(this.assocIdByteArray);
-            outputStream.write(this.reservedLastTwoBytes);    // field for reservedLastTwoBytes
+            outputStream.write(this.slaveInfoBytes);
             outputStream.write(this.qualityFactorByteArray);    // field for quality factor
         } catch (IOException e) {
             e.printStackTrace();

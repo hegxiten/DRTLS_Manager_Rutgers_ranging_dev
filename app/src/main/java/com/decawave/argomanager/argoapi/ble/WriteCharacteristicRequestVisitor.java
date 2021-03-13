@@ -7,11 +7,12 @@
 package com.decawave.argomanager.argoapi.ble;
 
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 
 import java.util.UUID;
 
 /**
- * Write reqeust visitor.
+ * Write request visitor.
  */
 interface WriteCharacteristicRequestVisitor {
 
@@ -21,7 +22,7 @@ interface WriteCharacteristicRequestVisitor {
 
     void visitPosition(WriteCharacteristicRequest<Position> request);
 
-    void visitSlaveInfoPosition(WriteCharacteristicRequest.SlaveInformativePosition request);
+    void visitSlaveInfoPosition(WriteCharacteristicRequest<SlaveInformativePosition> request);
 
     void visitInteger(WriteCharacteristicRequest<Integer> request);
 

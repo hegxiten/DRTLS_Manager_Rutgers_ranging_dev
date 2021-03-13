@@ -47,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -408,28 +409,20 @@ public class GattDecoder {
      */
     @NonNull
     private SlaveInformativePosition decodeSlaveInfoPosition(ByteBuffer bb) {
-        SlaveInformativePosition r = new SlaveInformativePosition();
-        // (regular) Position units in MM, each dimension takes 4 bytes, signed int
+        // (regular) Position unit is in MM, each dimension takes 4 bytes, signed integer
         // SlaveInformativePosition units in MM, each dimension takes 2 bytes, signed int
         // When calling ByteBuffer.array(), the 13-Byte buffer returns a 14-length ByteArray padded
         // with 0x00 at index 0 - By observation from Zezhou Wang.
-        //   0x00251920007b64fc00fb000000 ByteBuffer
-        // 0x0000251920007b64fc00fb000000 ByteBuffer.array()
+        // Example:
+        //   0x00fa25190000957d000064fc00 ByteBuffer written
+        // 0x0020fa25198000957d000064fc00 ByteBuffer.array() read
         byte[] bbArray = bb.array();
-        int xSlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[3], bbArray[2]);
-        int ySlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[6], bbArray[4]);
-        int zSlave = SlaveInformativePosition.signedIntFromTwoBytes(bbArray[8], bbArray[7]);
-        int id = SlaveInformativePosition.unsignedIntFromByte(bbArray[10]);
-
-        r.setX(xSlave);
-        r.setY(ySlave);
-        r.setZ(zSlave);
-        r.setAssocId(id);
+        SlaveInformativePosition slaveInfoPos = new SlaveInformativePosition(Arrays.copyOfRange(bbArray, 1, bbArray.length + 1));
         if (Constants.DEBUG) {
             Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + new String(Hex.encodeHex(bbArray)) + " length:" + bbArray.length);
-            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + r.toString());
+            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + slaveInfoPos.toString());
         }
-        return r;
+        return slaveInfoPos;
     }
 
 
