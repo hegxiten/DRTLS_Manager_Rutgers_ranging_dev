@@ -32,6 +32,7 @@ import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
+import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.Constants;
@@ -691,9 +692,12 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                 if (nn.getType() == NodeType.ANCHOR) {
                     // slave
                     AnchorNode slaveNode = (AnchorNode) nn;
-                    int id = slaveNode.getSlaveInfoPosition().getAssocId();
-                    nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
-                            + String.format("%03d", id));
+                    SlaveInformativePosition slaveInfoPos = slaveNode.getSlaveInfoPosition();
+                    if (slaveInfoPos != null) {
+                        int id = slaveInfoPos.getAssocId();
+                        nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                                + String.format("%03d", id));
+                    }
                 }
                 else if (nn.getType() == NodeType.TAG) {
                     // master
