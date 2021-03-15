@@ -15,6 +15,7 @@ import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.argoapi.ble.BleConnectionApi;
@@ -106,7 +107,9 @@ class UpdateNodeTask {
                   @Nullable String posSlaveX,
                   @Nullable String posSlaveY,
                   @Nullable String posSlaveZ,
-                  @Nullable String slaveAssocId) {
+                  @Nullable String slaveAssocId,
+                  @Nullable SlaveMasterSide slaveMasterSide
+                  ) {
 
         LogEntryTag tag = LogEntryTagFactory.getDeviceLogEntryTag(originalInput.getBleAddress());
 
@@ -163,7 +166,9 @@ class UpdateNodeTask {
         // create the target node where we will set only changed characteristics
         NetworkNode targetEntity = uiContentToNetworkNode(originalInput, operationMode, selectedNetworkId, nodeLabel, updateRate, stationaryUpdateRate,
                 uwbMode, isInitiator, isFirmwareUpdateEnable, isLedIndicationEnable, isBleEnable, isAccelerometerEnable, isLocationEngineEnable, isLowPowerModeEnable,
-                origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit, origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId, posSlaveX, posSlaveY, posSlaveZ, slaveAssocId);
+                origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit,
+                origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
+                posSlaveX, posSlaveY, posSlaveZ, slaveAssocId, slaveMasterSide);
         if (targetEntity == null) {
             // no change detected
             running = false;
@@ -255,7 +260,7 @@ class UpdateNodeTask {
      * If there is no change performed (comparing to the original), null is returned.
      * @param originalInput original
      * @param targetNodeType target node type
-     * @param slaveAssocId
+     * @param slaveAssocId TODO
      * @return built network node or null if no change is detected
      */
     private NetworkNode uiContentToNetworkNode(NetworkNode originalInput,
@@ -287,7 +292,8 @@ class UpdateNodeTask {
                                                @Nullable String posSlaveX,
                                                @Nullable String posSlaveY,
                                                @Nullable String posSlaveZ,
-                                               @Nullable String slaveAssocId) {
+                                               @Nullable String slaveAssocId,
+                                               @Nullable SlaveMasterSide slaveMasterSide) {
         if (Constants.DEBUG) {
             Preconditions.checkState(posX == null && posY == null && posZ == null ||
                     posX != null && posY != null && posZ != null);
@@ -384,16 +390,18 @@ class UpdateNodeTask {
                         position.z = uiPosZ;
                     }
                 }
-                else if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null) {
+                else if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null && slaveMasterSide != null) {
                     Integer uiSlavePosX;
                     Integer uiSlavePosY;
                     Integer uiSlavePosZ;
                     Integer uiSlaveAssocId;
+                    Integer uiSlaveMasterSide;
                     try {
                         uiSlavePosX = Util.parseSlavePosition(posSlaveX, lengthUnit);
                         uiSlavePosY = Util.parseSlavePosition(posSlaveY, lengthUnit);
                         uiSlavePosZ = Util.parseSlavePosition(posSlaveZ, lengthUnit);
                         uiSlaveAssocId = Util.parseSlaveAssoc(slaveAssocId);
+                        uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("wrong number format", e);
                     }
@@ -427,6 +435,17 @@ class UpdateNodeTask {
                             slaveInfoPosition.setZ(uiSlavePosZ);
                         }
                         slaveInfoPosition.setAssocId(uiSlaveAssocId);
+                    }
+                    if (slaveInfoPosition != null || !slaveMasterSide.equals(SlaveMasterSide.UNKNOWN)) {
+                        if (slaveInfoPosition == null) {
+                            slaveInfoPosition = new SlaveInformativePosition();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            slaveInfoPosition.setX(uiSlavePosX);
+                            slaveInfoPosition.setY(uiSlavePosY);
+                            slaveInfoPosition.setZ(uiSlavePosZ);
+                            slaveInfoPosition.setAssocId(uiSlaveAssocId);
+                        }
+                        slaveInfoPosition.setSlaveSideByValue(uiSlaveMasterSide);
                     }
                 }
                 else if (nodeTypeSwitch) {

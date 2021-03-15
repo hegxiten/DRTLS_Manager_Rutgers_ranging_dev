@@ -14,6 +14,7 @@ package com.decawave.argomanager.argoapi.ext;
  import com.decawave.argo.api.struct.NodeStatistics;
  import com.decawave.argo.api.struct.NodeType;
  import com.decawave.argo.api.struct.OperatingFirmware;
+ import com.decawave.argo.api.struct.SlaveMasterSide;
  import com.decawave.argo.api.struct.UwbMode;
  import com.decawave.argomanager.Constants;
  import com.decawave.argomanager.util.Util;
@@ -158,6 +159,11 @@ abstract class NetworkNodeImpl implements NetworkNode, NetworkNodePropertySetter
     }
 
     @Override
+    public SlaveMasterSide getSlaveMasterSide() {
+        return getProperty(NetworkNodeProperty.SLAVE_MASTER_SIDE);
+    }
+
+    @Override
     public void setLedIndicationEnable(Boolean enable) {
         setProperty(NetworkNodeProperty.LED_INDICATION_ENABLE, enable);
     }
@@ -170,6 +176,11 @@ abstract class NetworkNodeImpl implements NetworkNode, NetworkNodePropertySetter
     @Override
     public void setUwbMode(UwbMode uwbMode) {
         setProperty(NetworkNodeProperty.UWB_MODE, uwbMode);
+    }
+
+    @Override
+    public void setSlaveMasterSide(SlaveMasterSide slaveMasterSide) {
+        setProperty(NetworkNodeProperty.SLAVE_MASTER_SIDE, slaveMasterSide);
     }
 
     @Override
@@ -296,6 +307,7 @@ abstract class NetworkNodeImpl implements NetworkNode, NetworkNodePropertySetter
             case ID:
             case NODE_TYPE:
             case UWB_MODE:
+            case SLAVE_MASTER_SIDE:
             case LED_INDICATION_ENABLE:
             case OPERATING_FIRMWARE:
             case FIRMWARE_UPDATE_ENABLE:

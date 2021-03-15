@@ -6,16 +6,13 @@
 
 package com.decawave.argomanager.argoapi.ext;
 
-import android.util.Log;
-
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
-import com.decawave.argomanager.Constants;
-import com.decawave.argomanager.util.ToastUtil;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -77,13 +74,11 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
 
     @Override
     public void setPosition(Position position) {
-        //TODO: once the decoding method is sorted out, interlock setPosition() and setSlaveInfoPosition()
         setProperty(NetworkNodeProperty.ANCHOR_POSITION, position);
     }
 
     @Override
     public void setSlaveInfoPosition(SlaveInformativePosition infoPosition) {
-        //TODO: once the decoding method is sorted out, interlock setPosition() and setSlaveInfoPosition()
         setProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION, infoPosition);
     }
 
@@ -95,6 +90,20 @@ class AnchorNodeImpl extends NetworkNodeImpl implements AnchorNode {
     public boolean anyDistance() {
         List<RangingAnchor> distances = getProperty(NetworkNodeProperty.ANCHOR_DISTANCES);
         return distances != null && distances.size() > 0;
+    }
+
+    @Override
+    public SlaveMasterSide getSlaveMasterSide() {
+        SlaveInformativePosition slaveInfoPos = getProperty(NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION);
+        Integer slaveSide = slaveInfoPos.getSlaveSideValue();
+        switch (Integer.valueOf(slaveSide)) {
+            case 2:
+                return SlaveMasterSide.A;
+            case 1:
+                return SlaveMasterSide.B;
+            default:
+                return SlaveMasterSide.UNKNOWN;
+        }
     }
 
     @Override

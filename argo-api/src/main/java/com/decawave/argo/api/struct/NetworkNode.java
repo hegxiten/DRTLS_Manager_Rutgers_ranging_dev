@@ -49,7 +49,11 @@ public interface NetworkNode {
 
     UwbMode getUwbMode();
 
+    SlaveMasterSide getSlaveMasterSide();
+
     void setUwbMode(UwbMode uwbMode);
+
+    void setSlaveMasterSide(SlaveMasterSide slaveMasterSide);
 
     void setLedIndicationEnable(Boolean enable);
 
@@ -78,6 +82,8 @@ public interface NetworkNode {
     void copyFrom(NetworkNode node);
 
     boolean isCompatible(NetworkNode node);
+
+
 
     enum CompareResult {
         NO_CHANGE,

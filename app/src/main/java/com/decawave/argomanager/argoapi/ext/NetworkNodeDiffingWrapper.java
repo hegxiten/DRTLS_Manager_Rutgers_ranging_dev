@@ -14,6 +14,7 @@ import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.UwbMode;
 import com.google.common.base.Objects;
 
@@ -99,8 +100,18 @@ public abstract class NetworkNodeDiffingWrapper<T extends NetworkNode> implement
     }
 
     @Override
+    public void setSlaveMasterSide(SlaveMasterSide slaveMasterSide) {
+        delegate.setSlaveMasterSide(slaveMasterSide);
+    }
+
+    @Override
     public UwbMode getUwbMode() {
         return delegate.getUwbMode();
+    }
+
+    @Override
+    public SlaveMasterSide getSlaveMasterSide() {
+        return delegate.getSlaveMasterSide();
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 
@@ -139,6 +140,11 @@ public class NodeFactory {
 
         public U setUwbMode(UwbMode uwbMode) {
             networkNode.setUwbMode(uwbMode);
+            return (U) this;
+        }
+
+        public U setSlaveMasterSide(SlaveMasterSide slaveMasterSide) {
+            networkNode.setSlaveMasterSide(slaveMasterSide);
             return (U) this;
         }
 

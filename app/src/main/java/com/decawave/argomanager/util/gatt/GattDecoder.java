@@ -419,8 +419,9 @@ public class GattDecoder {
         byte[] bbArray = bb.array();
         SlaveInformativePosition slaveInfoPos = new SlaveInformativePosition(Arrays.copyOfRange(bbArray, 1, bbArray.length + 1));
         if (Constants.DEBUG) {
-            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + new String(Hex.encodeHex(bbArray)) + " length:" + bbArray.length);
-            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition: " + slaveInfoPos.toString());
+            Log.d("bytearrayencodedecode", "decodeSlaveInfoPosition, anchor raw bytes: "
+                    + new String(Hex.encodeHex(bbArray)) + " length: " + bbArray.length + " "
+                    + slaveInfoPos.toString());
         }
         return slaveInfoPos;
     }

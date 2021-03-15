@@ -257,7 +257,11 @@ public class GattEncoder {
         for(int i=0; i < slaveInfoPosBytes.length; i++) {
             buff.put(slaveInfoPosBytes[i]);
         }
-        Log.d("bytearrayencodedecode", "encodeSlaveInfoPosition, anchor raw bytes: " + new String(Hex.encodeHex(buff.array())) + " length: " + buff.array().length);
+        if (Constants.DEBUG) {
+            Log.d("bytearrayencodedecode", "encodeSlaveInfoPosition, anchor raw bytes: "
+                    + new String(Hex.encodeHex(buff.array())) + " length: " + buff.array().length + " "
+                    + slaveInfoPosition.toString());
+        }
         return buff.array();
     }
 

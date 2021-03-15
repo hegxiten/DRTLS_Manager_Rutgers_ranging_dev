@@ -21,6 +21,7 @@ public enum NetworkNodeProperty {
     ID,
     NODE_TYPE,
     UWB_MODE,
+    SLAVE_MASTER_SIDE,
     OPERATING_FIRMWARE,
     FIRMWARE_UPDATE_ENABLE,
     BLE_ENABLE,

@@ -27,6 +27,7 @@ import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.OperatingFirmware;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.ArgoApp;
 import com.decawave.argomanager.BuildConfig;
@@ -162,6 +163,19 @@ public class Util {
 
     public static String nodeTypeString(NodeType nodeType) {
         return nodeTypeString(nodeType, null);
+    }
+
+    public static String slaveMasterSideString(SlaveMasterSide slaveMasterSide) {
+        switch (slaveMasterSide) {
+            case A:
+                return daApp.getString(R.string.slave_master_side_A);
+            case B:
+                return daApp.getString(R.string.slave_master_side_B);
+            case UNKNOWN:
+                return daApp.getString(R.string.slave_master_side_unknown);
+            default:
+                throw new IllegalStateException("unsupported slave/master side: " + slaveMasterSide);
+        }
     }
 
     public static ByteBuffer newByteBuffer(byte[] bytes) {
@@ -391,6 +405,18 @@ public class Util {
                 throw new IllegalStateException("unexpected uwb mode: " + uwbMode);
         }
 
+    }
+    public static String formatSlaveMasterSide(SlaveMasterSide slaveMasterSide) {
+        switch (slaveMasterSide) {
+            case A:
+                return daApp.getString(R.string.slave_master_side_A);
+            case B:
+                return daApp.getString(R.string.slave_master_side_B);
+            case UNKNOWN:
+                return daApp.getString(R.string.slave_master_side_unknown);
+            default:
+                throw new IllegalStateException("unexpected slave/master side: " + slaveMasterSide);
+        }
     }
 
     public static <T> Collector<T, ?, ArrayList<T>> toArrayList(int size) {

@@ -30,6 +30,7 @@ import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.R;
@@ -46,6 +47,7 @@ import com.decawave.argomanager.prefs.LengthUnit;
 import com.decawave.argomanager.ui.dialog.NetworkPickerDialogFragment;
 import com.decawave.argomanager.ui.dialog.NewNetworkNameDialogFragment;
 import com.decawave.argomanager.ui.dialog.NodeTypePickerDialogFragment;
+import com.decawave.argomanager.ui.dialog.SlaveMasterSidePickerDialogFragment;
 import com.decawave.argomanager.ui.dialog.UpdateRatePickerDialogFragment;
 import com.decawave.argomanager.ui.dialog.UwbModePickerDialogFragment;
 import com.decawave.argomanager.ui.uiutil.DecimalDigitsInputFilter;
@@ -75,6 +77,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         UpdateRatePickerDialogFragment.IhCallback,
         NodeTypePickerDialogFragment.IhCallback,
         UwbModePickerDialogFragment.IhCallback,
+        SlaveMasterSidePickerDialogFragment.IhCallback,
         UpdateNodeTask.Ih {
     public static final String BK_PAUSED = "PAUSED";
     public static final String BK_NODE_ID = "NODE_ID";
@@ -84,6 +87,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     public static final String BK_SELECTED_STATIONARY_UPDATE_RATE = "TAG_STATIONARY_UPDATE_RATE";
     public static final String BK_SELECTED_NODE_TYPE = "NODE_TYPE";
     public static final String BK_SELECTED_UWB_MODE = "UWB_MODE";
+    public static final String BK_SELECTED_SLAVE_MASTER_SIDE = "SLAVE_MASTER_SIDE";
     public static final String BK_RAW_UPDATE_RATE = "UPDATE_RATE_RAW";
     public static final String BK_ORIG_POS_X = "ORIG_POS_X";
     public static final String BK_ORIG_POS_Y = "ORIG_POS_Y";
@@ -143,7 +147,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     EditText etSlavePosZ;            // editable anchor Z input/current value
 
     @BindView(R.id.slave_master_detail_association)
-    EditText etSlaveAssoc;
+    EditText etSlaveAssoc;           // editable anchor id input/current value
 
     @BindView(R.id.etNodeLabel)
     EditText etNodeLabel;
@@ -187,6 +191,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     @BindView(R.id.tvUwbMode)
     TextView tvUwbMode;
 
+    @BindView(R.id.tvSlaveMasterSide)
+    TextView tvSlaveMasterSide;
+
     @BindView(R.id.networkNameSelector)
     View networkViewGroup;
 
@@ -195,6 +202,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
 
     @BindView(R.id.uwbModeSelector)
     View uwbModeViewGroup;          // Shown as "UWB" as UI: off, active, passive
+
+    @BindView(R.id.slaveMasterSideSelector)
+    View slaveMasterSideViewGroup;
 
     @BindView(R.id.chboxInitiator)
     CheckBox chboxInitiator;
@@ -233,13 +243,15 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     List<View> anchorSpecificViews;
 
     @BindViews({R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer,
-            R.id.tvSlaveAssocTitle, R.id.tvSlaveMasterAssocContainer, R.id.slaveMasterFieldExplainContainer})
+                R.id.slaveMasterSideLabel, R.id.slaveMasterSideSelector,
+                R.id.tvSlaveAssocTitle, R.id.tvSlaveMasterAssocContainer, R.id.slaveMasterFieldExplainContainer})
     List<View> slaveSpecificViews;
 
     @BindViews({R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
     List<View> tagSpecificViews;
 
     @BindViews({R.id.masterEtNodeLabelDisabledExplain,
+                R.id.slaveMasterSideLabel, R.id.slaveMasterSideSelector,
                 R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
     List<View> masterSpecificViews;
 
@@ -254,6 +266,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     private UpdateRate selectedStationaryUpdateRate;
     private NodeType selectedNodeType;
     private UwbMode selectedUwbMode;
+    private SlaveMasterSide selectedSlaveMasterSide;
     private Integer rawUpdateRate;
     private Integer rawStationaryUpdateRate;
 
@@ -331,6 +344,11 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     void onUpdateRateClicked() {
         UpdateRatePickerDialogFragment.showDialog(getMainActivity().getSupportFragmentManager(),
                 selectedUpdateRate, true);
+    }
+
+    @OnClick(R.id.slaveMasterSideSelector)
+    void onSlaveMasterSideClicked() {
+        SlaveMasterSidePickerDialogFragment.showDialog(getMainActivity().getSupportFragmentManager(), selectedSlaveMasterSide);
     }
 
     @OnClick(R.id.stationaryUpdateRateSelector)
@@ -415,6 +433,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             }
             if (savedInstanceState.containsKey(BK_SELECTED_UWB_MODE)) {
                 selectedUwbMode = UwbMode.valueOf(savedInstanceState.getString(BK_SELECTED_UWB_MODE));
+            }
+            if (savedInstanceState.containsKey(BK_SELECTED_SLAVE_MASTER_SIDE)) {
+                selectedSlaveMasterSide = SlaveMasterSide.valueOf(savedInstanceState.getString(BK_SELECTED_SLAVE_MASTER_SIDE));
             }
             if (savedInstanceState.containsKey(BK_RAW_UPDATE_RATE)) {
                 rawUpdateRate = savedInstanceState.getInt(BK_RAW_UPDATE_RATE);
@@ -527,11 +548,8 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             if (networkNodeManager.getActiveNetwork().getNetworkOperationMode() == NetworkOperationMode.RANGING) {
                 // slave specific
                 AnchorNode anchor = (AnchorNode) inputNode;
-                chboxInitiator.setChecked(anchor.isInitiator());
+                chboxInitiator.setChecked(true);
                 // we do not need a deep copy
-                // TODO: Debug here as it returns null. Link with the constructor of SlaveInformativePosition
-                //  by constructing from a Position object.
-
                 SlaveInformativePosition slaveInfoPosition = anchor.extractSlaveInfoPositionDirect();
                 if (slaveInfoPosition != null) {
                     // LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit(); // res. for future unit flexibility
@@ -539,11 +557,16 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     origSlavePosY = String.valueOf(slaveInfoPosition.getY()); // slave units in cm
                     origSlavePosZ = String.valueOf(slaveInfoPosition.getZ()); // slave units in cm
                     origSlaveAssocId = slaveInfoPosition.getAssocId().toString();
-
                     etSlavePosX.setText(origSlavePosX);     // slave origin pos input
                     etSlavePosY.setText(origSlavePosY);     // slave origin pos input
                     etSlavePosZ.setText(origSlavePosZ);     // slave origin pos input
                     etSlaveAssoc.setText(origSlaveAssocId); // slave association id input
+                    selectedSlaveMasterSide = slaveInfoPosition.getSlaveSide(); // slave side selector
+                }
+                if (selectedSlaveMasterSide != null) {
+                    tvSlaveMasterSide.setText(Util.formatSlaveMasterSide(selectedSlaveMasterSide));
+                } else {
+                    tvSlaveMasterSide.setText(R.string.slave_master_side_unknown);
                 }
                 // when we switch to Master we want to have all the checkboxes checked
                 chboxAccelerometer.setChecked(true);
@@ -566,6 +589,12 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             selectedStationaryUpdateRate = stationaryUpdateRate == null ? null : UpdateRate.getUpdateRateForValue(stationaryUpdateRate);
             if (selectedStationaryUpdateRate == null && stationaryUpdateRate != null) {
                 rawStationaryUpdateRate = stationaryUpdateRate;
+            }
+            // TODO: finish the setting for MasterInfoPosition
+            if (selectedSlaveMasterSide != null) {
+                tvSlaveMasterSide.setText(Util.formatSlaveMasterSide(selectedSlaveMasterSide));
+            } else {
+                tvSlaveMasterSide.setText(R.string.slave_master_side_unknown);
             }
             chboxLocationEngine.setChecked(asBoolean(tag.isLocationEngineEnable()));
             chboxResponsiveMode.setChecked(!asBoolean(tag.isLowPowerModeEnable()));
@@ -709,25 +738,22 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 Editable slavePosY = etSlavePosY.getText();
                 Editable slavePosZ = etSlavePosZ.getText();
                 Editable slaveAssoc = etSlaveAssoc.getText();
+                SlaveMasterSide slaveMasterside = selectedSlaveMasterSide;
 
                 int posSlaveXl = slavePosX.length();
                 int posSlaveYl = slavePosY.length();
                 int posSlaveZl = slavePosZ.length();
                 int assocSlaveL = slaveAssoc.length();
-                slaveConfigValuesNotEmpty = (posSlaveXl > 0 && posSlaveYl > 0 && posSlaveZl > 0 && assocSlaveL > 0);
+                slaveConfigValuesNotEmpty = (posSlaveXl > 0 && posSlaveYl > 0 && posSlaveZl > 0 && assocSlaveL > 0 && slaveMasterside != null);
                 slaveConfigValuesInputOk = posSlaveXl == 0 && posSlaveYl == 0 && posSlaveZl == 0 && assocSlaveL == 0
                         || (slaveConfigValuesNotEmpty);
 
-                if (!slaveConfigValuesInputOk) {
-                    ToastUtil.showToast(R.string.slave_input_invalid, Toast.LENGTH_LONG);
-                    return false;
-                }
-                else if (slaveConfigValuesNotEmpty) {
+                if (slaveConfigValuesNotEmpty) {
                     int inputSlaveX = Integer.valueOf(slavePosX.toString());
                     int inputSlaveY = Integer.valueOf(slavePosY.toString());
                     int inputSlaveZ = Integer.valueOf(slavePosZ.toString());
                     int inputSlaveAssoc = Integer.valueOf(slaveAssoc.toString());
-
+                    int inputSlaveSide = Integer.valueOf(slaveMasterside.getValue());
                     slaveConfigValuesRangeOk = (inputSlaveX >= -32768 && inputSlaveX <= 32767)
                             && (inputSlaveY >= -32768 && inputSlaveY <= 32767)
                             && (inputSlaveZ >= -32768 && inputSlaveZ <= 32767)
@@ -736,6 +762,14 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                         ToastUtil.showToast(R.string.slave_input_exceeds_range, Toast.LENGTH_LONG);
                         return false;
                     }
+                    if (inputSlaveSide == SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE) {
+                        ToastUtil.showToast(R.string.slave_master_must_select_side, Toast.LENGTH_LONG);
+                        return false;
+                    }
+                }
+                else if (!slaveConfigValuesInputOk) {
+                    ToastUtil.showToast(R.string.slave_input_invalid, Toast.LENGTH_LONG);
+                    return false;
                 }
             }
             else if (selectedNetworkId == null && selectedNewNetworkName == null) {
@@ -758,7 +792,8 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 origPosX, origPosY, origPosZ,
                 etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
                 origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
-                etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString());
+                etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString(),
+                selectedSlaveMasterSide);
         return true;
 
     }
@@ -771,6 +806,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         outState.putLong(BK_NODE_ID, nodeId);
         outState.putString(BK_SELECTED_NODE_TYPE, selectedNodeType.name());
         outState.putString(BK_SELECTED_UWB_MODE, selectedUwbMode.name());
+        outState.putString(BK_SELECTED_SLAVE_MASTER_SIDE, selectedSlaveMasterSide.name());
         if (selectedNewNetworkName != null) {
             outState.putString(BK_SELECTED_NEW_NETWORK_NAME, selectedNewNetworkName);
         } else if (selectedNetworkId != null) {
@@ -879,6 +915,12 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         selectedUwbMode = uwbMode;
         tvUwbMode.setText(Util.formatUwbMode(uwbMode));
         enableDisableDependentControls();
+    }
+
+    @Override
+    public void onSlaveMasterSidePicked(SlaveMasterSide slaveMasterSide) {
+        selectedSlaveMasterSide = slaveMasterSide;
+        tvSlaveMasterSide.setText(Util.formatSlaveMasterSide(slaveMasterSide));
     }
 
     private void adjustNodeTypeSpecificViews() {
@@ -1019,5 +1061,4 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     private void onAccelerometerChange() {
         setStationaryUpdateRateEnabled(selectedUwbMode == UwbMode.ACTIVE && chboxAccelerometer.isChecked());
     }
-
 }
