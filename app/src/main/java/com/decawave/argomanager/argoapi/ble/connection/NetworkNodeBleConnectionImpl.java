@@ -8,7 +8,7 @@ package com.decawave.argomanager.argoapi.ble.connection;
 
 import android.bluetooth.BluetoothGattDescriptor;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.util.Base64;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
@@ -1241,6 +1241,7 @@ class NetworkNodeBleConnectionImpl implements NetworkNodeBleConnection {
                 // now we will encode position (specific write-only characteristic)
                 builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, (Position) anchor.getPosition());
             }
+            // slave info position
             if (anchor.isSlaveInfoPosChanged()){
                 appLog.d("different SLAVE INFO POSITION injected");
                 builder.addValue(BleConstants.CHARACTERISTIC_PERSISTED_POSITION, (SlaveInformativePosition) anchor.getSlaveInfoPosition());
@@ -1257,6 +1258,12 @@ class NetworkNodeBleConnectionImpl implements NetworkNodeBleConnection {
             }
             if (tag.isLowPowerModeChanged() || tag.isLocationEngineEnableChanged() ||  tag.isAccelerometerEnableChanged()) {
                 needsOperationMode = true;
+            }
+            if (tag.isMasterInfoPosChanged()) {
+                // Borrowing the label field for Master Info Position
+                appLog.d("different MASTER INFO POSITION injected");
+                builder.setService(BleConstants.SERVICE_UUID_STD_GAP);
+                builder.addValue(BleConstants.CHARACTERISTIC_STD_LABEL, Base64.encodeToString(tag.getMasterInfoPosition().getMasterInfoBytes(), Base64.DEFAULT));
             }
         }
         // operation mode change

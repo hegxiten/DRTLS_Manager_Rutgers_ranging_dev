@@ -7,11 +7,11 @@
 package com.decawave.argomanager.argoapi.ext;
 
 import com.decawave.argo.api.interaction.LocationData;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.RangingAnchor;
-import com.decawave.argo.api.struct.SlaveInformativePosition;
 import com.decawave.argo.api.struct.TagNode;
 
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +72,17 @@ class TagNodeImpl extends NetworkNodeImpl implements TagNode {
     }
 
     @Override
+    public void setMasterInfoPosition(MasterInformativePosition infoPosition) {
+        setProperty(NetworkNodeProperty.TAG_MASTER_INFO_POSITION, infoPosition);
+    }
+
+    @Override
+    public MasterInformativePosition getMasterInfoPosition() {
+        MasterInformativePosition masterInfoPos = getProperty(NetworkNodeProperty.TAG_MASTER_INFO_POSITION);
+        return masterInfoPos == null ? null : new MasterInformativePosition(masterInfoPos);
+    }
+
+    @Override
     public LocationData getLocationData() {
         return getProperty(NetworkNodeProperty.TAG_LOCATION_DATA);
     }
@@ -106,6 +117,7 @@ class TagNodeImpl extends NetworkNodeImpl implements TagNode {
             case TAG_LOCATION_ENGINE_ENABLE:
             case TAG_LOW_POWER_MODE_ENABLE:
             case TAG_LOCATION_DATA:
+            case TAG_MASTER_INFO_POSITION:
                 return true;
             default:
                 return super.isPropertyRecognized(property);
@@ -129,6 +141,12 @@ class TagNodeImpl extends NetworkNodeImpl implements TagNode {
             return ld.distances;
         } // else:
         return null;
+    }
+
+    @Nullable
+    @Override
+    public MasterInformativePosition extractMasterInfoPositionDirect() {
+        return getProperty(NetworkNodeProperty.TAG_MASTER_INFO_POSITION);
     }
 
 }

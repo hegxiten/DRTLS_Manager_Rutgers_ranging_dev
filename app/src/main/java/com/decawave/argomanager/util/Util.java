@@ -284,7 +284,7 @@ public class Util {
         return (int) (Double.valueOf(strLength) * factor);
     }
 
-    public static int parseSlavePosition(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
+    public static int parseSlaveMasterPosition(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
         // TODO: Implement unit flexibility when needed. Currently only checking for integer centimeters
         if(Integer.valueOf(strLength) < -32768 | Integer.valueOf(strLength) > 32767 ) {
             throw new IllegalArgumentException("slave length must be within [-32767, +32768] cm");
@@ -292,7 +292,7 @@ public class Util {
         return Integer.valueOf(strLength);
     }
 
-    public static int parseSlaveAssoc(String strSlaveAssocId) throws NumberFormatException {
+    public static int parseSlaveMasterAssoc(String strSlaveAssocId) throws NumberFormatException {
         if(Integer.valueOf(strSlaveAssocId) < 0 | Integer.valueOf(strSlaveAssocId) > 255 ) {
             throw new IllegalArgumentException("slave group id must be within [0, 255]");
         }

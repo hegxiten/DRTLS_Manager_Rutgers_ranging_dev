@@ -360,12 +360,12 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvSlavePosTitle"
+            android:id="@+id/tvSlaveMasterPosTitle"
             style="@style/NodeDetailPropertyTitle"
-            android:text="@string/slave_detail_config" />
+            android:text="@string/slave_master_detail_config" />
 
         <LinearLayout
-            android:id="@+id/tvSlaveConfigContainer"
+            android:id="@+id/tvSlavePosConfigContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/node_value_left_padding"
@@ -376,7 +376,7 @@
 
             <android.support.design.widget.TextInputLayout
                 style="@style/NodeDetailPositionCompound"
-                android:hint="@string/slave_detail_pos_x_coupler">
+                android:hint="@string/slave_master_detail_pos_x_coupler">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/slave_detail_pos_x"
@@ -386,7 +386,7 @@
 
             <android.support.design.widget.TextInputLayout
                 style="@style/NodeDetailPositionCompound"
-                android:hint="@string/slave_detail_pos_y_centerline">
+                android:hint="@string/slave_master_detail_pos_y_centerline">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/slave_detail_pos_y"
@@ -396,7 +396,7 @@
 
             <android.support.design.widget.TextInputLayout
                 style="@style/NodeDetailPositionCompound"
-                android:hint="@string/slave_detail_pos_z_top_of_rail">
+                android:hint="@string/slave_master_detail_pos_z_top_of_rail">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/slave_detail_pos_z"
@@ -406,13 +406,55 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/tvMasterPosConfigContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/node_value_left_padding"
+            android:layout_marginEnd="@dimen/node_value_left_padding"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_detail_pos_x_coupler">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/master_detail_pos_x"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_detail_pos_y_centerline">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/master_detail_pos_y"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_detail_pos_z_top_of_rail">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/master_detail_pos_z"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
         <TextView
-            android:id="@+id/tvSlaveAssocTitle"
+            android:id="@+id/tvSlaveMasterAssocTitle"
             style="@style/NodeDetailPropertyTitle"
-            android:text="@string/slave_assoc_config" />
+            android:text="@string/slave_master_assoc_config" />
 
         <LinearLayout
-            android:id="@+id/tvSlaveMasterAssocContainer"
+            android:id="@+id/tvSlaveAssocContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/node_value_left_padding"
@@ -425,7 +467,27 @@
                 android:hint="@string/slave_master_assoc_input_hint">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/slave_master_detail_association"
+                    android:id="@+id/slave_detail_association"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tvMasterAssocContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/node_value_left_padding"
+            android:layout_marginEnd="@dimen/node_value_left_padding"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_assoc_input_hint">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/master_detail_association"
                     style="@style/editText.coordinate" />
 
             </android.support.design.widget.TextInputLayout>

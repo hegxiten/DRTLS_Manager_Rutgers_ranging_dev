@@ -10,6 +10,7 @@ import com.annimon.stream.function.Function;
 import com.decawave.argo.api.interaction.ErrorCode;
 import com.decawave.argo.api.interaction.NetworkNodeConnection;
 import com.decawave.argo.api.struct.AnchorNode;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeType;
@@ -100,6 +101,14 @@ class UpdateNodeTask {
                   @Nullable String posY,
                   @Nullable String posZ,
                   LengthUnit lengthUnit,
+                  @Nullable String origMasterPosX,
+                  @Nullable String origMasterPosY,
+                  @Nullable String origMasterPosZ,
+                  @Nullable String origMasterAssocId,
+                  @Nullable String posMasterX,
+                  @Nullable String posMasterY,
+                  @Nullable String posMasterZ,
+                  @Nullable String masterAssocId,
                   @Nullable String origSlavePosX,
                   @Nullable String origSlavePosY,
                   @Nullable String origSlavePosZ,
@@ -126,6 +135,15 @@ class UpdateNodeTask {
         }
         if (posZ != null && posZ.length() == 0) {
             posZ = null;
+        }
+        if (posMasterX != null && posMasterX.length() == 0) {
+            posMasterX = null;
+        }
+        if (posMasterY != null && posMasterY.length() == 0) {
+            posMasterY = null;
+        }
+        if (posMasterZ != null && posMasterZ.length() == 0) {
+            posMasterZ = null;
         }
         if (posSlaveX != null && posSlaveX.length() == 0) {
             posSlaveX = null;
@@ -167,8 +185,11 @@ class UpdateNodeTask {
         NetworkNode targetEntity = uiContentToNetworkNode(originalInput, operationMode, selectedNetworkId, nodeLabel, updateRate, stationaryUpdateRate,
                 uwbMode, isInitiator, isFirmwareUpdateEnable, isLedIndicationEnable, isBleEnable, isAccelerometerEnable, isLocationEngineEnable, isLowPowerModeEnable,
                 origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit,
+                origMasterPosX, origMasterPosY, origMasterPosZ, origMasterAssocId,
+                posMasterX, posMasterY, posMasterZ, masterAssocId,
                 origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
-                posSlaveX, posSlaveY, posSlaveZ, slaveAssocId, slaveMasterSide);
+                posSlaveX, posSlaveY, posSlaveZ, slaveAssocId,
+                slaveMasterSide);
         if (targetEntity == null) {
             // no change detected
             running = false;
@@ -285,6 +306,14 @@ class UpdateNodeTask {
                                                @Nullable String posZ,
                                                LogEntryTag logTag,
                                                LengthUnit lengthUnit,
+                                               @Nullable String origMasterPosX,
+                                               @Nullable String origMasterPosY,
+                                               @Nullable String origMasterPosZ,
+                                               @Nullable String origMasterAssoc,
+                                               @Nullable String posMasterX,
+                                               @Nullable String posMasterY,
+                                               @Nullable String posMasterZ,
+                                               @Nullable String masterAssocId,
                                                @Nullable String origSlavePosX,
                                                @Nullable String origSlavePosY,
                                                @Nullable String origSlavePosZ,
@@ -397,10 +426,10 @@ class UpdateNodeTask {
                     Integer uiSlaveAssocId;
                     Integer uiSlaveMasterSide;
                     try {
-                        uiSlavePosX = Util.parseSlavePosition(posSlaveX, lengthUnit);
-                        uiSlavePosY = Util.parseSlavePosition(posSlaveY, lengthUnit);
-                        uiSlavePosZ = Util.parseSlavePosition(posSlaveZ, lengthUnit);
-                        uiSlaveAssocId = Util.parseSlaveAssoc(slaveAssocId);
+                        uiSlavePosX = Util.parseSlaveMasterPosition(posSlaveX, lengthUnit);
+                        uiSlavePosY = Util.parseSlaveMasterPosition(posSlaveY, lengthUnit);
+                        uiSlavePosZ = Util.parseSlaveMasterPosition(posSlaveZ, lengthUnit);
+                        uiSlaveAssocId = Util.parseSlaveMasterAssoc(slaveAssocId);
                         uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("wrong number format", e);
@@ -469,12 +498,72 @@ class UpdateNodeTask {
         } else {
             // TAG
             NodeFactory.TagNodeBuilder tagBuilder = (NodeFactory.TagNodeBuilder) builder;
+            MasterInformativePosition masterInfoPosition = null;
+            if (posMasterX != null && posMasterY != null && posMasterZ != null && masterAssocId != null && slaveMasterSide != null) {
+                Integer uiMasterPosX;
+                Integer uiMasterPosY;
+                Integer uiMasterPosZ;
+                Integer uiMasterAssocId;
+                Integer uiSlaveMasterSide;
+                try {
+                    uiMasterPosX = Util.parseSlaveMasterPosition(posMasterX, lengthUnit);
+                    uiMasterPosY = Util.parseSlaveMasterPosition(posMasterY, lengthUnit);
+                    uiMasterPosZ = Util.parseSlaveMasterPosition(posMasterZ, lengthUnit);
+                    uiMasterAssocId = Util.parseSlaveMasterAssoc(masterAssocId);
+                    uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("wrong number format", e);
+                }
+                if (nodeTypeSwitch || origMasterPosX == null || !posMasterX.equals(origMasterPosX)) {
+                    masterInfoPosition = new MasterInformativePosition();
+                    masterInfoPosition.setX(uiMasterPosX);
+                }
+                if (masterInfoPosition != null || !posMasterY.equals(origMasterPosY)) {
+                    if (masterInfoPosition == null) {
+                        masterInfoPosition = new MasterInformativePosition();
+                        // we will take the value from the UI (it makes sense as a whole)
+                        masterInfoPosition.setX(uiMasterPosX);
+                    }
+                    masterInfoPosition.setY(uiMasterPosY);
+                }
+                if (masterInfoPosition != null || !posMasterZ.equals(origMasterPosZ)) {
+                    if (masterInfoPosition == null) {
+                        masterInfoPosition = new MasterInformativePosition();
+                        // we will take the value from the UI (it makes sense as a whole)
+                        masterInfoPosition.setX(uiMasterPosX);
+                        masterInfoPosition.setY(uiMasterPosY);
+                    }
+                    masterInfoPosition.setZ(uiMasterPosZ);
+                }
+                if (masterInfoPosition != null || !masterAssocId.equals(origMasterAssoc)) {
+                    if (masterInfoPosition == null) {
+                        masterInfoPosition = new MasterInformativePosition();
+                        // we will take the value from the UI (it makes sense as a whole)
+                        masterInfoPosition.setX(uiMasterPosX);
+                        masterInfoPosition.setY(uiMasterPosY);
+                        masterInfoPosition.setZ(uiMasterPosZ);
+                    }
+                    masterInfoPosition.setAssocId(uiMasterAssocId);
+                }
+                if (masterInfoPosition != null || !slaveMasterSide.equals(SlaveMasterSide.UNKNOWN)) {
+                    if (masterInfoPosition == null) {
+                        masterInfoPosition = new MasterInformativePosition();
+                        // we will take the value from the UI (it makes sense as a whole)
+                        masterInfoPosition.setX(uiMasterPosX);
+                        masterInfoPosition.setY(uiMasterPosY);
+                        masterInfoPosition.setZ(uiMasterPosZ);
+                        masterInfoPosition.setAssocId(uiMasterAssocId);
+                    }
+                    masterInfoPosition.setMasterSideByValue(uiSlaveMasterSide);
+                }
+            }
             // update rate
-            if (nodeTypeSwitch) {
+            else if (nodeTypeSwitch) {
                 // we have to set update rate explicitly to the value shown in the UI, or default if null (?)
                 handleUpdateRate(updateRate, tagBuilder, originalInput, TagNode::getUpdateRate, NodeFactory.TagNodeBuilder::setUpdateRate);
                 handleUpdateRate(stationaryUpdateRate, tagBuilder, originalInput, TagNode::getStationaryUpdateRate, NodeFactory.TagNodeBuilder::setStationaryUpdateRate);
-            } else if ((updateRate != null && isPropertyChanged(originalInput, NodeType.TAG, NetworkNodeProperty.TAG_UPDATE_RATE, updateRate.msValue))
+            }
+            if ((updateRate != null && isPropertyChanged(originalInput, NodeType.TAG, NetworkNodeProperty.TAG_UPDATE_RATE, updateRate.msValue))
                     ||
                     (stationaryUpdateRate != null && isPropertyChanged(originalInput, NodeType.TAG, NetworkNodeProperty.TAG_STATIONARY_UPDATE_RATE, stationaryUpdateRate.msValue))) {
                 // we have to handle both update rates
@@ -492,6 +581,11 @@ class UpdateNodeTask {
             }
             if (nodeTypeSwitch || isPropertyChanged(originalInput, NodeType.TAG, NetworkNodeProperty.TAG_LOCATION_ENGINE_ENABLE, isLocationEngineEnable)) {
                 tagBuilder.setLocationEngineEnable(isLocationEngineEnable);
+                b = true;
+            }
+            if (masterInfoPosition != null) {
+                appLog.d("MASTER INFORMATIVE POSITION change detected", logTag);
+                tagBuilder.setMasterInfoPosition(masterInfoPosition);
                 b = true;
             }
         }

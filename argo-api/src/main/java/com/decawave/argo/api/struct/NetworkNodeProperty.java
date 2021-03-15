@@ -54,6 +54,7 @@ public enum NetworkNodeProperty {
     TAG_STATIONARY_UPDATE_RATE,
     TAG_LOW_POWER_MODE_ENABLE,
     TAG_LOCATION_ENGINE_ENABLE,
+    TAG_MASTER_INFO_POSITION(true, false),
     TAG_LOCATION_DATA(true, false),
     // application specific (not stored in a node)
     LAST_SEEN(false, true);

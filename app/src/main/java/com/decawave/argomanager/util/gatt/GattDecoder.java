@@ -7,6 +7,7 @@
 package com.decawave.argomanager.util.gatt;
 
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 
 import com.annimon.stream.function.BiFunction;
@@ -14,6 +15,7 @@ import com.decawave.argo.api.interaction.ErrorCode;
 import com.decawave.argo.api.interaction.LocationData;
 import com.decawave.argo.api.interaction.ProxyPosition;
 import com.decawave.argo.api.struct.LocationDataMode;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeStatistics;
@@ -496,7 +498,16 @@ public class GattDecoder {
     static {
         MappingBuilder builder = new MappingBuilder();
         builder.map(BleConstants.SERVICE_UUID_STD_GAP, BleConstants.CHARACTERISTIC_STD_LABEL,
-                (gattDecoder,gattCharacteristic,nodeBuilder,nodeType) -> nodeBuilder.setLabel(gattDecoder.decodeString(gattCharacteristic)))
+                (gattDecoder,gattCharacteristic,nodeBuilder,nodeType) -> {
+                    String label = gattDecoder.decodeString(gattCharacteristic);
+                    nodeBuilder.setLabel(label);
+                    if (nodeType == NodeType.TAG) {
+                        nodeBuilder.setProperty(
+                                NetworkNodeProperty.TAG_MASTER_INFO_POSITION,
+                                new MasterInformativePosition(Base64.decode(label, Base64.DEFAULT))
+                        );
+                    }
+                })
                 .map(BleConstants.CHARACTERISTIC_DEVICE_INFO,
                 (gattDecoder,gattCharacteristic,nodeBuilder,nodeType) -> {
                     DeviceInfo deviceInfo = gattDecoder.decodeDeviceInfo(gattCharacteristic, nodeType);

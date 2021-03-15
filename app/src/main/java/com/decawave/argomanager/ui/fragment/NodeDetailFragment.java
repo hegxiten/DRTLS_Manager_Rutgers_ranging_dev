@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.decawave.argo.api.struct.AnchorNode;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
@@ -96,6 +97,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     public static final String BK_ORIG_SLAVE_POS_Y = "ORIG_SLAVE_POS_Y";
     public static final String BK_ORIG_SLAVE_POS_Z = "ORIG_SLAVE_POS_Z";
     public static final String BK_ORIG_SLAVE_ASSOC = "ORIG_SLAVE_ASSOC";
+    public static final String BK_ORIG_MASTER_POS_X = "ORIG_MASTER_POS_X";
+    public static final String BK_ORIG_MASTER_POS_Y = "ORIG_MASTER_POS_Y";
+    public static final String BK_ORIG_MASTER_POS_Z = "ORIG_MASTER_POS_Z";
+    public static final String BK_ORIG_MASTER_ASSOC = "ORIG_MASTER_ASSOC";
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_3 = new DecimalDigitsInputFilter(5, 3);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_0 = new DecimalDigitsInputFilter(5, 0);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_3_0 = new DecimalDigitsInputFilter(3, 0);
@@ -129,25 +134,37 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // members - views
     @BindView(R.id.node_detail_position_x)
-    EditText etPosX;            // editable anchor X input/current value
+    EditText etPosX;                    // editable anchor X input/current value
 
     @BindView(R.id.node_detail_position_y)
-    EditText etPosY;            // editable anchor Y input/current value
+    EditText etPosY;                    // editable anchor Y input/current value
 
     @BindView(R.id.node_detail_position_z)
-    EditText etPosZ;            // editable anchor Z input/current value
+    EditText etPosZ;                    // editable anchor Z input/current value
 
     @BindView(R.id.slave_detail_pos_x)
-    EditText etSlavePosX;            // editable anchor X input/current value
+    EditText etSlavePosX;               // editable slave X input/current value
 
     @BindView(R.id.slave_detail_pos_y)
-    EditText etSlavePosY;            // editable anchor Y input/current value
+    EditText etSlavePosY;               // editable slave Y input/current value
 
     @BindView(R.id.slave_detail_pos_z)
-    EditText etSlavePosZ;            // editable anchor Z input/current value
+    EditText etSlavePosZ;               // editable slave Z input/current value
 
-    @BindView(R.id.slave_master_detail_association)
-    EditText etSlaveAssoc;           // editable anchor id input/current value
+    @BindView(R.id.slave_detail_association)
+    EditText etSlaveAssoc;              // editable slave id input/current value
+
+    @BindView(R.id.master_detail_pos_x)
+    EditText etMasterPosX;              // editable master X input/current value
+
+    @BindView(R.id.master_detail_pos_y)
+    EditText etMasterPosY;              // editable master Y input/current value
+
+    @BindView(R.id.master_detail_pos_z)
+    EditText etMasterPosZ;              // editable master Z input/current value
+
+    @BindView(R.id.master_detail_association)
+    EditText etMasterAssoc;             // editable master id input/current value
 
     @BindView(R.id.etNodeLabel)
     EditText etNodeLabel;
@@ -236,22 +253,23 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     @BindView(R.id.tvPositionTitle)
     TextView tvPositionTitle;
 
-    @BindView(R.id.tvSlavePosTitle)
+    @BindView(R.id.tvSlaveMasterPosTitle)
     TextView tvSlavePosTitle;
 
     @BindViews({R.id.chboxInitiator, R.id.tvPositionTitle, R.id.tvPositionContainer})
     List<View> anchorSpecificViews;
 
-    @BindViews({R.id.chboxInitiator, R.id.tvSlavePosTitle, R.id.tvSlaveConfigContainer,
+    @BindViews({R.id.chboxInitiator, R.id.tvSlaveMasterPosTitle, R.id.tvSlavePosConfigContainer,
                 R.id.slaveMasterSideLabel, R.id.slaveMasterSideSelector,
-                R.id.tvSlaveAssocTitle, R.id.tvSlaveMasterAssocContainer, R.id.slaveMasterFieldExplainContainer})
+                R.id.tvSlaveMasterAssocTitle, R.id.tvSlaveAssocContainer, R.id.slaveMasterFieldExplainContainer})
     List<View> slaveSpecificViews;
 
     @BindViews({R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
     List<View> tagSpecificViews;
 
-    @BindViews({R.id.masterEtNodeLabelDisabledExplain,
+    @BindViews({R.id.masterEtNodeLabelDisabledExplain, R.id.tvSlaveMasterPosTitle, R.id.tvMasterPosConfigContainer,
                 R.id.slaveMasterSideLabel, R.id.slaveMasterSideSelector,
+                R.id.tvSlaveMasterAssocTitle, R.id.tvMasterAssocContainer, R.id.slaveMasterFieldExplainContainer,
                 R.id.updateRateContainer, R.id.chboxAccelerometer, R.id.chboxResponsiveMode, R.id.chboxLocationEngine })
     List<View> masterSpecificViews;
 
@@ -270,7 +288,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     private Integer rawUpdateRate;
     private Integer rawStationaryUpdateRate;
 
-    private String origPosX, origPosY, origPosZ, origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId;
+    private String origPosX, origPosY, origPosZ;
+    private String origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId;
+    private String origMasterPosX, origMasterPosY, origMasterPosZ, origMasterAssocId;
+
     //
     private Unbinder unbinder;
 
@@ -461,6 +482,18 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             if (savedInstanceState.containsKey(BK_ORIG_SLAVE_ASSOC)) {
                 origSlaveAssocId = savedInstanceState.getString(BK_ORIG_SLAVE_ASSOC);
             }
+            if (savedInstanceState.containsKey(BK_ORIG_MASTER_POS_X)) {
+                origMasterPosX = savedInstanceState.getString(BK_ORIG_MASTER_POS_X);
+            }
+            if (savedInstanceState.containsKey(BK_ORIG_MASTER_POS_Y)) {
+                origMasterPosY = savedInstanceState.getString(BK_ORIG_MASTER_POS_Y);
+            }
+            if (savedInstanceState.containsKey(BK_ORIG_MASTER_POS_Z)) {
+                origMasterPosZ = savedInstanceState.getString(BK_ORIG_MASTER_POS_Z);
+            }
+            if (savedInstanceState.containsKey(BK_ORIG_MASTER_ASSOC)) {
+                origMasterAssocId = savedInstanceState.getString(BK_ORIG_MASTER_ASSOC);
+            }
             if (chboxResponsiveMode != null) {
                 // set up enabled/disabled state
                 enableDisableDependentControls();
@@ -590,14 +623,32 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
             if (selectedStationaryUpdateRate == null && stationaryUpdateRate != null) {
                 rawStationaryUpdateRate = stationaryUpdateRate;
             }
-            // TODO: finish the setting for MasterInfoPosition
-            if (selectedSlaveMasterSide != null) {
-                tvSlaveMasterSide.setText(Util.formatSlaveMasterSide(selectedSlaveMasterSide));
-            } else {
-                tvSlaveMasterSide.setText(R.string.slave_master_side_unknown);
-            }
             chboxLocationEngine.setChecked(asBoolean(tag.isLocationEngineEnable()));
             chboxResponsiveMode.setChecked(!asBoolean(tag.isLowPowerModeEnable()));
+            if (networkNodeManager.getActiveNetwork().getNetworkOperationMode() == NetworkOperationMode.RANGING) {
+                MasterInformativePosition masterInfoPosition = tag.extractMasterInfoPositionDirect();
+
+                if (masterInfoPosition != null) {
+                    // LengthUnit lengthUnit = appPreferenceAccessor.getLengthUnit(); // res. for future unit flexibility
+                    origMasterPosX = String.valueOf(masterInfoPosition.getX()); // master units in cm
+                    origMasterPosY = String.valueOf(masterInfoPosition.getY()); // master units in cm
+                    origMasterPosZ = String.valueOf(masterInfoPosition.getZ()); // master units in cm
+                    origMasterAssocId = masterInfoPosition.getAssocId().toString();
+                    etMasterPosX.setText(origMasterPosX);     // master origin pos input
+                    etMasterPosY.setText(origMasterPosY);     // master origin pos input
+                    etMasterPosZ.setText(origMasterPosZ);     // master origin pos input
+                    etMasterAssoc.setText(origMasterAssocId); // master association id input
+                    selectedSlaveMasterSide = masterInfoPosition.getMasterSide(); // master side selector
+                }
+
+                if (selectedSlaveMasterSide != null) {
+                    tvSlaveMasterSide.setText(Util.formatSlaveMasterSide(selectedSlaveMasterSide));
+                } else {
+                    tvSlaveMasterSide.setText(R.string.slave_master_side_unknown);
+                }
+                // when we switch to Slave we want to have all the checkboxes checked
+                chboxInitiator.setChecked(true);
+            }
         }
     }
 
@@ -663,7 +714,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         fillTvStationaryUpdateRate();
         setBleStyle();
         tvPositionTitle.setText(daApp.getString(R.string.node_detail_position, daApp.getString(appPreferenceAccessor.getLengthUnit().unitLabelResource)));
-        tvSlavePosTitle.setText(daApp.getString(R.string.slave_detail_config));
+        tvSlavePosTitle.setText(daApp.getString(R.string.slave_master_detail_config));
         InterfaceHub.registerHandler(this);
     }
 
@@ -707,9 +758,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         // √ check sign on top right menu
         // for anchor, we have to consider selected position
         boolean positionAncInputOk;
-        boolean slaveConfigValuesNotEmpty;
-        boolean slaveConfigValuesInputOk;
-        boolean slaveConfigValuesRangeOk;
+        boolean slaveConfigValuesNotEmpty, masterConfigValuesNotEmpty;
+        boolean slaveConfigValuesInputOk, masterConfigValuesInputOk;
+        boolean slaveConfigValuesRangeOk, masterConfigValuesRangeOk;
 
         NetworkOperationMode networkMode = networkNodeManager.getActiveNetwork().getNetworkOperationMode();
         if (selectedNodeType == NodeType.ANCHOR) {
@@ -780,6 +831,54 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 return false;
             }
         }
+        if (selectedNodeType == NodeType.TAG){
+            if (networkMode == NetworkOperationMode.RANGING) {
+                Editable masterPosX = etMasterPosX.getText();
+                Editable masterPosY = etMasterPosY.getText();
+                Editable masterPosZ = etMasterPosZ.getText();
+                Editable masterAssoc = etMasterAssoc.getText();
+                SlaveMasterSide slaveMasterside = selectedSlaveMasterSide;
+
+                int posMasterXl = masterPosX.length();
+                int posMasterYl = masterPosY.length();
+                int posMasterZl = masterPosZ.length();
+                int assocMasterL = masterAssoc.length();
+                masterConfigValuesNotEmpty = (posMasterXl > 0 && posMasterYl > 0 && posMasterZl > 0 && assocMasterL > 0 && slaveMasterside != null);
+                masterConfigValuesInputOk = posMasterXl == 0 && posMasterYl == 0 && posMasterZl == 0 && assocMasterL == 0
+                        || (masterConfigValuesNotEmpty);
+
+                if (masterConfigValuesNotEmpty) {
+                    int inputMasterX = Integer.valueOf(masterPosX.toString());
+                    int inputMasterY = Integer.valueOf(masterPosY.toString());
+                    int inputMasterZ = Integer.valueOf(masterPosZ.toString());
+                    int inputMasterAssoc = Integer.valueOf(masterAssoc.toString());
+                    int inputMasterSide = Integer.valueOf(slaveMasterside.getValue());
+                    masterConfigValuesRangeOk = (inputMasterX >= -32768 && inputMasterX <= 32767)
+                            && (inputMasterY >= -32768 && inputMasterY <= 32767)
+                            && (inputMasterZ >= -32768 && inputMasterZ <= 32767)
+                            && (inputMasterAssoc >= 0 && inputMasterAssoc <= 255);
+                    if (!masterConfigValuesRangeOk) {
+                        ToastUtil.showToast(R.string.master_input_exceeds_range, Toast.LENGTH_LONG);
+                        return false;
+                    }
+                    if (inputMasterSide == SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE) {
+                        ToastUtil.showToast(R.string.slave_master_must_select_side, Toast.LENGTH_LONG);
+                        return false;
+                    }
+                }
+                else if (!masterConfigValuesInputOk) {
+                    ToastUtil.showToast(R.string.master_input_invalid, Toast.LENGTH_LONG);
+                    return false;
+                }
+            }
+            else if (selectedNetworkId == null && selectedNewNetworkName == null) {
+                ToastUtil.showToast(R.string.node_detail_must_selected_network, Toast.LENGTH_LONG);
+                return false;
+            } else if (etNodeLabel.getText().length() == 0) {
+                ToastUtil.showToast(R.string.node_detail_empty_node_label, Toast.LENGTH_LONG);
+                return false;
+            }
+        }
         // do the save if reaches here
         hideKeyboard();
         updateNodeTask = new UpdateNodeTask(networkNodeManager, bleConnectionApi);
@@ -791,6 +890,8 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                 etNodeLabel.getText().toString(), selectedUpdateRate, selectedStationaryUpdateRate,
                 origPosX, origPosY, origPosZ,
                 etPosX.getText().toString(), etPosY.getText().toString(), etPosZ.getText().toString(), appPreferenceAccessor.getLengthUnit(),
+                origMasterPosX, origMasterPosY, origMasterPosZ, origMasterAssocId,
+                etMasterPosX.getText().toString(), etMasterPosY.getText().toString(), etMasterPosZ.getText().toString(), etMasterAssoc.getText().toString(),
                 origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
                 etSlavePosX.getText().toString(), etSlavePosY.getText().toString(), etSlavePosZ.getText().toString(), etSlaveAssoc.getText().toString(),
                 selectedSlaveMasterSide);
@@ -841,6 +942,18 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         }
         if (origSlaveAssocId != null) {
             outState.putString(BK_ORIG_SLAVE_ASSOC, origSlaveAssocId);
+        }
+        if (origMasterPosX != null) {
+            outState.putString(BK_ORIG_MASTER_POS_X, origMasterPosX);
+        }
+        if (origMasterPosY != null) {
+            outState.putString(BK_ORIG_MASTER_POS_Y, origMasterPosY);
+        }
+        if (origMasterPosZ != null) {
+            outState.putString(BK_ORIG_MASTER_POS_Z, origMasterPosZ);
+        }
+        if (origMasterAssocId != null) {
+            outState.putString(BK_ORIG_MASTER_ASSOC, origMasterAssocId);
         }
 
     }

@@ -7,9 +7,12 @@
 package com.decawave.argomanager.argoapi.ext;
 
 import com.decawave.argo.api.interaction.LocationData;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.TagNode;
 import com.google.common.base.Objects;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Tag diffing wrapper - actually there is nothing to diff.
@@ -91,6 +94,16 @@ public class TagNodeDiffingWrapper extends NetworkNodeDiffingWrapper<TagNode> im
         return delegate.anyRangingAnchorInLocationData();
     }
 
+    @Override
+    public void setMasterInfoPosition(MasterInformativePosition masterInfoPosition) {
+        delegate.setMasterInfoPosition(masterInfoPosition);
+    }
+
+    @Override
+    public MasterInformativePosition getMasterInfoPosition() {
+        return delegate.getMasterInfoPosition();
+    }
+
     public boolean isAccelerometerEnableChanged() {
         return isPropertyChanged(NetworkNodeProperty.TAG_ACCELEROMETER_ENABLE);
     }
@@ -99,16 +112,27 @@ public class TagNodeDiffingWrapper extends NetworkNodeDiffingWrapper<TagNode> im
         return !Objects.equal(delegate.isLowPowerModeEnable(), original.isLowPowerModeEnable());
     }
 
+    public boolean isMasterInfoPosChanged() {
+        return isPropertyChanged(NetworkNodeProperty.TAG_MASTER_INFO_POSITION);
+    }
+
     @Override
     public void copyWritablePropertiesFrom(TagNode node) {
         super.copyWritablePropertiesFrom(node);
         setUpdateRate(node.getUpdateRate());
         setAccelerometerEnable(node.isAccelerometerEnable());
         setStationaryUpdateRate(node.getStationaryUpdateRate());
+        setMasterInfoPosition(node.getMasterInfoPosition());
     }
 
     @Override
     public <T> T getProperty(NetworkNodeProperty property, boolean deepCopy) {
         return delegate.getProperty(property, deepCopy);
+    }
+
+    @Nullable
+    @Override
+    public MasterInformativePosition extractMasterInfoPositionDirect() {
+        return delegate.getMasterInfoPosition();
     }
 }

@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import com.decawave.argo.api.interaction.LocationData;
 import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.LocationDataMode;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NodeStatistics;
@@ -307,6 +308,11 @@ public class NodeFactory {
 
         public TagNodeBuilder setLocationEngineEnable(Boolean enable) {
             networkNode.setLocationEngineEnable(enable);
+            return this;
+        }
+
+        public TagNodeBuilder setMasterInfoPosition(MasterInformativePosition masterInfoPosition) {
+            networkNode.setMasterInfoPosition(masterInfoPosition);
             return this;
         }
 

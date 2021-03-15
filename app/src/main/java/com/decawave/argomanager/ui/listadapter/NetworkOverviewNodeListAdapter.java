@@ -27,12 +27,14 @@ import android.widget.Toast;
 
 import com.annimon.stream.function.Supplier;
 import com.decawave.argo.api.struct.AnchorNode;
+import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
 import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
+import com.decawave.argo.api.struct.SlaveMasterSide;
 import com.decawave.argo.api.struct.TagNode;
 import com.decawave.argo.api.struct.UwbMode;
 import com.decawave.argomanager.Constants;
@@ -694,16 +696,22 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                     AnchorNode slaveNode = (AnchorNode) nn;
                     SlaveInformativePosition slaveInfoPos = slaveNode.getSlaveInfoPosition();
                     if (slaveInfoPos != null) {
+                        SlaveMasterSide side = slaveInfoPos.getSlaveSide();
                         int id = slaveInfoPos.getAssocId();
                         nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
-                                + String.format("%03d", id));
+                                + String.format("%03d", id) + "-" + side.name());
                     }
                 }
                 else if (nn.getType() == NodeType.TAG) {
                     // master
-                    // TODO: implement master info position
-                    // nn.getProperty(NetworkNodeProperty.TAG_MASTER_INFO_POSITION);
-                    nodeName.setText(label);
+                    TagNode masterNode = (TagNode) nn;
+                    MasterInformativePosition masterInfoPos = masterNode.getMasterInfoPosition();
+                    if (masterInfoPos != null) {
+                        SlaveMasterSide side = masterInfoPos.getMasterSide();
+                        int id = masterInfoPos.getAssocId();
+                        nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                                + String.format("%03d", id) + "-" + side.name());
+                    }
                 }
                 else {
                     throw new IllegalStateException("unsupported node type: " + nn.getType());
