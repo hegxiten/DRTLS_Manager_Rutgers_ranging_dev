@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class MasterInformativePosition {
-    public final int TOTAL_BYTES = 16;
+    public final int TOTAL_BYTES = 12;
 
     public final int X_L_BYTE_IDX = 0;
     public final int X_H_BYTE_IDX = 1;
@@ -18,8 +18,12 @@ public class MasterInformativePosition {
 
     public final int ASSOC_ID_BYTE_IDX = 6;
     public final int SIDE_BYTE_IDX = 7;
-    public final int[] RESERVED_BYTE_IDX = new int[]{8, 9, 10, 11, 12, 13, 14, 15};
-
+    public final int[] RESERVED_BYTE_IDX = new int[]{8, 9 ,10, 11};
+    //  |00 |01 |02 |03 |04 |05 |06 |07 |08 |09 |10 |11 | (12-bytes)
+    //  |XL |XH |YL |YH |ZL |ZH |ID |MS |RS |RS |RS |RS |
+    //  RS: stable reserved byte field; L: lower-byte; H: higher-byte; ID: association (vehicle) Id; MS: Master End Side
+    //  MAX_LABEL_BYTE_LENGTH (in NodeDetailFragment.java) is set is 16, meaning that by Base64 encoding:
+    //  12 bytes at max can be encoded into label string - 12 Bytes / 3 * 4 = 16 Base64 characters
     private byte[] masterInfoBytes = new byte[TOTAL_BYTES];
 
     public MasterInformativePosition(int x, int y, int z) {

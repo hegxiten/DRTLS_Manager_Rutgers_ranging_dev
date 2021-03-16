@@ -504,7 +504,7 @@ public class GattDecoder {
                     if (nodeType == NodeType.TAG) {
                         nodeBuilder.setProperty(
                                 NetworkNodeProperty.TAG_MASTER_INFO_POSITION,
-                                new MasterInformativePosition(Base64.decode(label, Base64.DEFAULT))
+                                new MasterInformativePosition(Base64.decode(label, Base64.NO_WRAP))
                         );
                     }
                 })

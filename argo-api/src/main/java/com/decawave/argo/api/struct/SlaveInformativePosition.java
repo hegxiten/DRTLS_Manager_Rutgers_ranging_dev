@@ -25,8 +25,8 @@ public class SlaveInformativePosition {
     // Using the original higher bytes for storing our X (CPLR), Y (CL), Z (TOR) values.
     // Current Position design:
     //  |00 |01 |02 |03 |04 |05 |06 |07 |08 |09 |10 |11 |12 | (13-bytes)
-    //  |SS |ID |XL |XH |RV |RS |YL |YH |RV |RV |ZL |ZH |qf |
-    //  R: reserved; V: volatile; S: stable (relatively); L: lower-byte; H: higher-byte; ID: assocId; SS: slaveSide
+    //  |RV |RS |XL |XH |RV |RS |YL |YH |RV |RS |ZL |ZH |qf |
+    //  R: reserved; V: volatile; S: stable (relatively); L: lower-byte; H: higher-byte; ID: association (vehicle) Id; qf: Quality Factor (cannot use)
     // Using byte 01 for storing vehicle association id. If needed, can expand to 2/3 byte id.
     // e.g. 0x00ABCDAB0000341200007856 -> X: 0xABCD; Y: 0x1234; Z: 0x5678; assocId: 0xAB
     // See getters and setters of X, Y, Z, assocId for details.
