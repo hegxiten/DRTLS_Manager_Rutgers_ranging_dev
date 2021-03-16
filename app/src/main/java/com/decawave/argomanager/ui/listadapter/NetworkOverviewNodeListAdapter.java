@@ -711,7 +711,7 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                     if (masterInfoPos != null) {
                         SlaveMasterSide side = masterInfoPos.getMasterSide();
                         int id = masterInfoPos.getAssocId();
-                        v.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                        v.setText("DW" + Util.shortenNodeId(nodeId, false) + "-M-"
                                 + String.format("%03d", id) + "-" + side.name());
                     }
                 }
