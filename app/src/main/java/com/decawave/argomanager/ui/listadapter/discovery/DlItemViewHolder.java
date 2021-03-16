@@ -40,7 +40,7 @@ class DlItemViewHolder {
         // common stuff here
         @BindView(R.id.progressView)
         SimpleProgressView progress;
-        @BindView(R.id.nodeName)
+        @BindView(R.id.nodeDescriptionAutoGen)
         TextView nodeName;
         @BindView(R.id.nodeId)
         TextView tvNodeId;

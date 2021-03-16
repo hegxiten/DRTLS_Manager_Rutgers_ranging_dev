@@ -105,7 +105,9 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_5_0 = new DecimalDigitsInputFilter(5, 0);
     public static final DecimalDigitsInputFilter INPUT_FILTER_DECIMAL_3_0 = new DecimalDigitsInputFilter(3, 0);
     public static final InputFilter[] POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_3};
+    public static final InputFilter[] MASTER_POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_0};
     public static final InputFilter[] SLAVE_POSITION_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_5_0};
+    public static final InputFilter[] MASTER_ASSOC_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_3_0};
     public static final InputFilter[] SLAVE_ASSOC_INPUT_FILTERS = new InputFilter[]{INPUT_FILTER_DECIMAL_3_0};
     private static UpdateNodeTask updateNodeTask;
 
@@ -342,6 +344,10 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
         for (EditText etSlavePos : new EditText[] {etSlavePosX, etSlavePosY, etSlavePosZ}) {
             etSlavePos.setFilters(SLAVE_POSITION_INPUT_FILTERS);
         }
+        for (EditText etMasterPos : new EditText[] {etMasterPosX, etMasterPosY, etMasterPosZ}) {
+            etMasterPos.setFilters(MASTER_POSITION_INPUT_FILTERS);
+        }
+        etMasterAssoc.setFilters(MASTER_ASSOC_INPUT_FILTERS);
         etSlaveAssoc.setFilters(SLAVE_ASSOC_INPUT_FILTERS);
     }
 

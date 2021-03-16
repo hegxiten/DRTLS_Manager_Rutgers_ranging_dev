@@ -196,7 +196,7 @@ public class AutoPositioningNodeListAdapter extends RecyclerView.Adapter<AutoPos
         // references to views
         @BindView(R.id.btnDragHandle)
         View btnDragHandle;
-        @BindView(R.id.nodeName)
+        @BindView(R.id.nodeDescriptionAutoGen)
         TextView nodeName;
         @BindView(R.id.bleAddress)
         TextView tvNodeBleAddress;

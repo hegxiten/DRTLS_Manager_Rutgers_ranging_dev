@@ -355,7 +355,7 @@ public class FirmwareUpdateNodeListAdapter extends RecyclerView.Adapter<Firmware
         CheckBox nodeCheckbox;
         @BindView(R.id.nodeType)
         NodeStateView nodeTypeView;
-        @BindView(R.id.nodeName)
+        @BindView(R.id.nodeDescriptionAutoGen)
         TextView nodeName;
         @BindView(R.id.bleAddress)
         TextView tvNodeBleAddress;

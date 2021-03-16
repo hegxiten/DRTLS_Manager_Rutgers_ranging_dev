@@ -9,7 +9,6 @@ package com.decawave.argomanager.argoapi.ble.connection;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.support.annotation.NonNull;
 import android.util.Base64;
-import android.util.Log;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
@@ -1261,7 +1260,7 @@ class NetworkNodeBleConnectionImpl implements NetworkNodeBleConnection {
                 needsOperationMode = true;
             }
             if (tag.isMasterInfoPosChanged()) {
-                // Borrowing the label field for Master Info Position
+                // Borrowing the label field to encode MasterInformativePosition bytes into label string
                 appLog.d("different MASTER INFO POSITION injected");
                 builder.setService(BleConstants.SERVICE_UUID_STD_GAP);
                 builder.addValue(BleConstants.CHARACTERISTIC_STD_LABEL, Base64.encodeToString(tag.getMasterInfoPosition().getMasterInfoBytes(), Base64.NO_WRAP));

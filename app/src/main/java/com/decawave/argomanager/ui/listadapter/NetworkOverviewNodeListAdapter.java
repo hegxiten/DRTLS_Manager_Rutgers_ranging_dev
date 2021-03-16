@@ -469,8 +469,8 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
 
     public class NetworkNodeListItemHolder extends ViewHolder {
         // references to views
-        @BindView(R.id.nodeName)
-        TextView nodeName;
+        @BindView(R.id.nodeDescriptionAutoGen)
+        TextView nodeDescriptionAutoGen;
         @BindView(R.id.nodeLabel)
         TextView nodeLabel;
         @BindView(R.id.nodeUwbId)
@@ -613,8 +613,8 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             //
             itemView.setTag(nodeBle);
             // fill UI elements next
-            setNodeNameText(nodeName, nn, isRanging);       // Auto-generated label
-            nodeLabel.setText("Label: " + nn.getLabel());   // Original text of the customized label (Zezhou Wang)
+            setNodeDescriptionText(nodeDescriptionAutoGen, nn, isRanging);       // Auto-generated label
+            nodeLabel.setText(isRanging ? "Label: " + nn.getLabel() : nn.getLabel());   // Original text of the customized label (Zezhou Wang)
             nodeUwbId.setText(Util.formatAsHexa(nodeId, true));
             tvNodeBleAddress.setText(nn.getBleAddress());
             nodeStateView.setNetworkNode(nn);
@@ -685,12 +685,14 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
             }
         }
 
-        private void setNodeNameText(TextView nodeName, NetworkNode nn, boolean isRanging) {
-            String label = nn.getLabel();
+        private void setNodeDescriptionText(TextView v, NetworkNode nn, boolean isRanging) {
             if(!isRanging) {
-                nodeName.setText(label);
+                // Don't set this for original (OEM) positioning mode
+                v.setVisibility(View.GONE);
+                return;
             }
             else {
+                v.setVisibility(View.VISIBLE);
                 if (nn.getType() == NodeType.ANCHOR) {
                     // slave
                     AnchorNode slaveNode = (AnchorNode) nn;
@@ -698,7 +700,7 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                     if (slaveInfoPos != null) {
                         SlaveMasterSide side = slaveInfoPos.getSlaveSide();
                         int id = slaveInfoPos.getAssocId();
-                        nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                        v.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
                                 + String.format("%03d", id) + "-" + side.name());
                     }
                 }
@@ -709,7 +711,7 @@ public class NetworkOverviewNodeListAdapter extends RecyclerView.Adapter<Network
                     if (masterInfoPos != null) {
                         SlaveMasterSide side = masterInfoPos.getMasterSide();
                         int id = masterInfoPos.getAssocId();
-                        nodeName.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
+                        v.setText("DW" + Util.shortenNodeId(nodeId, false) + "-S-"
                                 + String.format("%03d", id) + "-" + side.name());
                     }
                 }

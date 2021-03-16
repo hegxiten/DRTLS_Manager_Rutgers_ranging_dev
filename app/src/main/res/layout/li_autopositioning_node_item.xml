@@ -45,7 +45,7 @@
             >
 
             <TextView
-                android:id="@+id/nodeName"
+                android:id="@+id/nodeDescriptionAutoGen"
                 android:text="node name"
                 style="@style/NodeTitleInNodeList"
                 android:layout_width="wrap_content"

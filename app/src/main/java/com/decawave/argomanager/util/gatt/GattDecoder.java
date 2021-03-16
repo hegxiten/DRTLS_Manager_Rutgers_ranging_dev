@@ -502,6 +502,7 @@ public class GattDecoder {
                     String label = gattDecoder.decodeString(gattCharacteristic);
                     nodeBuilder.setLabel(label);
                     if (nodeType == NodeType.TAG) {
+                        // Decode the label, set the MasterInformativePosition property
                         nodeBuilder.setProperty(
                                 NetworkNodeProperty.TAG_MASTER_INFO_POSITION,
                                 new MasterInformativePosition(Base64.decode(label, Base64.NO_WRAP))

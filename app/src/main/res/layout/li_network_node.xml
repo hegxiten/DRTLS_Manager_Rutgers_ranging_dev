@@ -61,8 +61,8 @@
                 >
 
                 <TextView
-                    android:id="@+id/nodeName"
-                    android:text="node name it's too long asdfas"
+                    android:id="@+id/nodeDescriptionAutoGen"
+                    android:text="Description N/A. Please Refresh."
                     style="@style/NodeTitleInOverview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
 
                 <TextView
                     android:id="@+id/nodeLabel"
-                    android:text="node name it's too long asdfas"
+                    android:text="Label N/A. Please Refresh."
                     style="@style/NodeTitleInOverview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
 
                 <TextView
                     android:id="@+id/nodeUwbId"
-                    android:text="node UWB address if it is too long it will be set as start ellipsis"
+                    android:text="UWB ID N/A. Please Refresh."
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/NodeDetailsInNodeList"
@@ -89,7 +89,7 @@
 
                 <TextView
                     android:id="@+id/bleAddress"
-                    android:text="node BLE address if it is too long it will be set as start ellipsis"
+                    android:text="BLE Address N/A. Please Refresh."
                     style="@style/NodeDetailsInNodeList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
