@@ -426,9 +426,9 @@ class UpdateNodeTask {
                     Integer uiSlaveAssocId;
                     Integer uiSlaveMasterSide;
                     try {
-                        uiSlavePosX = Util.parseSlaveMasterPosition(posSlaveX, lengthUnit);
-                        uiSlavePosY = Util.parseSlaveMasterPosition(posSlaveY, lengthUnit);
-                        uiSlavePosZ = Util.parseSlaveMasterPosition(posSlaveZ, lengthUnit);
+                        uiSlavePosX = Util.parseSlaveMasterPositionSigned(posSlaveX, lengthUnit);
+                        uiSlavePosY = Util.parseSlaveMasterPositionSigned(posSlaveY, lengthUnit);
+                        uiSlavePosZ = Util.parseSlaveMasterPositionUnsigned(posSlaveZ, lengthUnit);
                         uiSlaveAssocId = Util.parseSlaveMasterAssoc(slaveAssocId);
                         uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                     } catch (NumberFormatException e) {
@@ -506,9 +506,9 @@ class UpdateNodeTask {
                 Integer uiMasterAssocId;
                 Integer uiSlaveMasterSide;
                 try {
-                    uiMasterPosX = Util.parseSlaveMasterPosition(posMasterX, lengthUnit);
-                    uiMasterPosY = Util.parseSlaveMasterPosition(posMasterY, lengthUnit);
-                    uiMasterPosZ = Util.parseSlaveMasterPosition(posMasterZ, lengthUnit);
+                    uiMasterPosX = Util.parseSlaveMasterPositionSigned(posMasterX, lengthUnit);
+                    uiMasterPosY = Util.parseSlaveMasterPositionSigned(posMasterY, lengthUnit);
+                    uiMasterPosZ = Util.parseSlaveMasterPositionUnsigned(posMasterZ, lengthUnit);
                     uiMasterAssocId = Util.parseSlaveMasterAssoc(masterAssocId);
                     uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                 } catch (NumberFormatException e) {

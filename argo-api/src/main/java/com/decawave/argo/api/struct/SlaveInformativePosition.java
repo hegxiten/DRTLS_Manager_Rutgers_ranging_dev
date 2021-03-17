@@ -64,7 +64,7 @@ public class SlaveInformativePosition {
         this.slaveInfoBytes = Arrays.copyOfRange(byteArray, 0, TOTAL_BYTES);
         this.setX(signedIntFromTwoBytes(this.slaveInfoBytes[X_H_BYTE_IDX], this.slaveInfoBytes[X_L_BYTE_IDX]));
         this.setY(signedIntFromTwoBytes(this.slaveInfoBytes[Y_H_BYTE_IDX], this.slaveInfoBytes[Y_L_BYTE_IDX]));
-        this.setZ(signedIntFromTwoBytes(this.slaveInfoBytes[Z_H_BYTE_IDX], this.slaveInfoBytes[Z_L_BYTE_IDX]));
+        this.setZ(unSignedIntFromTwoBytes(this.slaveInfoBytes[Z_H_BYTE_IDX], this.slaveInfoBytes[Z_L_BYTE_IDX]));
         this.setAssocId(unsignedIntFromByte(this.slaveInfoBytes[ASSOC_ID_BYTE_IDX]));
     }
 
@@ -124,8 +124,8 @@ public class SlaveInformativePosition {
     }
 
     public void setZ(int z) {
-        if (z < -32768 || z > 32767) {
-            throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
+        if (z < 0 || z > 65535) {
+            throw new IllegalArgumentException("input position value out of range! (min 0 max 65535)");
         }
         this.slaveInfoBytes[Z_L_BYTE_IDX] = (byte) z;
         this.slaveInfoBytes[Z_H_BYTE_IDX] = (byte) (z >>> 8);
@@ -139,27 +139,30 @@ public class SlaveInformativePosition {
     }
 
     public void setSlaveSideByValue(int sideInt) {
-        int slaveInfoPosY = this.getY();
+        int slaveInfoPosZ = this.getZ();
         switch (sideInt) {
             case SlaveMasterSide.Constants.A_SIDE_VALUE:
-                this.setY(closestIntEncodeByRemainderAndDivisor(
-                        slaveInfoPosY,
+                this.setZ(closestIntEncodeByRemainderAndDivisor(
+                        slaveInfoPosZ,
                         SlaveMasterSide.Constants.A_SIDE_VALUE,
-                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES
+                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES,
+                        true
                 ));
                 break;
             case SlaveMasterSide.Constants.B_SIDE_VALUE:
-                this.setY(closestIntEncodeByRemainderAndDivisor(
-                        slaveInfoPosY,
+                this.setZ(closestIntEncodeByRemainderAndDivisor(
+                        slaveInfoPosZ,
                         SlaveMasterSide.Constants.B_SIDE_VALUE,
-                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES
+                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES,
+                        true
                 ));
                 break;
             case SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE:
-                this.setY(closestIntEncodeByRemainderAndDivisor(
-                        slaveInfoPosY,
+                this.setZ(closestIntEncodeByRemainderAndDivisor(
+                        slaveInfoPosZ,
                         SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE,
-                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES));
+                        SlaveMasterSide.Constants.TOTAL_SIDE_CASES,
+                        true));
                 break;
         }
     }
@@ -179,7 +182,7 @@ public class SlaveInformativePosition {
     }
 
     public int getZ() {
-        return signedIntFromTwoBytes(slaveInfoBytes[Z_H_BYTE_IDX], slaveInfoBytes[Z_L_BYTE_IDX]);
+        return unSignedIntFromTwoBytes(slaveInfoBytes[Z_H_BYTE_IDX], slaveInfoBytes[Z_L_BYTE_IDX]);
     }
 
     public Integer getAssocId() {
@@ -187,7 +190,7 @@ public class SlaveInformativePosition {
     }
 
     public Integer getSlaveSideValue() {
-        return Math.floorMod(this.getY(), SlaveMasterSide.Constants.TOTAL_SIDE_CASES); // Modulo of 3
+        return Math.floorMod(this.getZ(), SlaveMasterSide.Constants.TOTAL_SIDE_CASES); // Modulo of 3
     }
 
     public SlaveMasterSide getSlaveSide() {
@@ -242,6 +245,17 @@ public class SlaveInformativePosition {
         }
     }
 
+    public static int unSignedIntFromTwoBytes(byte highByte, byte lowByte) {
+        int ret = 0;
+        for (int idx=0; idx<=7; idx++) {
+            ret = (int) (ret + ((lowByte >> idx) & 1) * Math.pow(2, idx));
+        }
+        for (int idx=0; idx<=7; idx++) {
+            ret = (int) (ret + ((highByte >> idx) & 1) * Math.pow(2, idx + 8));
+        }
+        return ret;
+    }
+
     public static int unsignedIntFromByte(byte b) {
         int ret = 0;
         for (int idx=0; idx<=7; idx++) {
@@ -254,7 +268,7 @@ public class SlaveInformativePosition {
         return (input >> (7) & 1) == 0;
     }
 
-    public static int closestIntEncodeByRemainderAndDivisor(int origInt, int remainder, int divisor) {
+    public static int closestIntEncodeByRemainderAndDivisor(int origInt, int remainder, int divisor, boolean isUnsigned) {
         int[] options = new int[]{
                 closestMultipleByDivisor(origInt - divisor, divisor) + remainder,
                 closestMultipleByDivisor(origInt, divisor) + remainder,
@@ -262,14 +276,25 @@ public class SlaveInformativePosition {
         };
         int idx = 0;
         int distance = Math.abs(options[0] - origInt);
-        for(int c = 1; c < options.length; c++){
+        for (int c = 1; c < options.length; c++) {
             int cDistance = Math.abs(options[c] - origInt);
-            if(cDistance < distance){
+            if (cDistance < distance) {
                 idx = c;
                 distance = cDistance;
             }
         }
-        return options[idx];
+        int ret = options[idx];
+        if (!isUnsigned) {
+            return ret;
+        }
+        else if (ret >= 0 || ret <= 65535) {
+            return ret;
+        }
+        // handle the corner case: if the return is negative but an unsigned value is needed:
+        else if (ret < 0) {
+            return ret + divisor; // preserve the same remainder value after modulo operation.
+        }
+        else return ret - divisor; // when 65535
     }
 
     private static int closestMultipleByDivisor (int origInt, int divisor) {

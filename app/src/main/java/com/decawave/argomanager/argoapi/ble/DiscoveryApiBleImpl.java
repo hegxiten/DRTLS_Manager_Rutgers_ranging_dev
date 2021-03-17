@@ -7,6 +7,7 @@
 package com.decawave.argomanager.argoapi.ble;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.decawave.argo.api.ConnectionState;
 import com.decawave.argo.api.DiscoveryApi;
@@ -382,6 +383,7 @@ public class DiscoveryApiBleImpl implements DiscoveryApi {
                             appLog.imp("discovered " + bluetoothDevice + ", nextConnectAttempt elapsed, connecting, newServiceData = " + newServiceData, loggingTag);
                         } else {
                             // connection is null, these are injected service data
+                            // TODO: check the usability here for encoding validation
                             nodeIc.device = bluetoothDevice;
                             appLog.imp("discovered " + bluetoothDevice + ", overriding injected service data with = " + newServiceData, loggingTag);
                         }
@@ -480,6 +482,7 @@ public class DiscoveryApiBleImpl implements DiscoveryApi {
                                       LogEntryTag loggingTag) {
         try {
             gattDecoderCache.getDecoder(bleAddress).decodeServiceData(serviceDataBytes, newServiceData);
+            Log.d("gattdecoder", "decodeServiceData: " + bleAddress + " " + newServiceData);
             return true;
         } catch (GattCharacteristicDecodeException exc) {
             // report

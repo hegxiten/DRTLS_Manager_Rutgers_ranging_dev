@@ -284,10 +284,18 @@ public class Util {
         return (int) (Double.valueOf(strLength) * factor);
     }
 
-    public static int parseSlaveMasterPosition(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
+    public static int parseSlaveMasterPositionSigned(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
         // TODO: Implement unit flexibility when needed. Currently only checking for integer centimeters
         if(Integer.valueOf(strLength) < -32768 | Integer.valueOf(strLength) > 32767 ) {
             throw new IllegalArgumentException("slave length must be within [-32767, +32768] cm");
+        }
+        return Integer.valueOf(strLength);
+    }
+
+    public static int parseSlaveMasterPositionUnsigned(@NotNull String strLength, LengthUnit lengthUnit) throws NumberFormatException {
+        // TODO: Implement unit flexibility when needed. Currently only checking for integer centimeters
+        if(Integer.valueOf(strLength) < 0 | Integer.valueOf(strLength) > 65535 ) {
+            throw new IllegalArgumentException("slave length must be within [0, +65535] cm");
         }
         return Integer.valueOf(strLength);
     }

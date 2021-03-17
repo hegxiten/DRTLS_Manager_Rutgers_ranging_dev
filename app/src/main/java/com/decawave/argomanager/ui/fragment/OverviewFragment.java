@@ -408,7 +408,9 @@ public class OverviewFragment extends MainScreenFragment implements
         refreshLayout.setDistanceToTriggerSync(DISTANCE_TO_TRIGGER_SYNC);
         refreshLayout.setOnRefreshListener(() -> {
             if (!discoveryApi.isDiscovering()) {
-                permissionHelper.mkSureServicesEnabledAndPermissionsGranted(getMainActivity(), () -> discoveryManager.startTimeLimitedDiscovery(false));
+                permissionHelper.mkSureServicesEnabledAndPermissionsGranted(
+                        getMainActivity(),
+                        () -> discoveryManager.startTimeLimitedDiscovery(false));
             }
         });
         //

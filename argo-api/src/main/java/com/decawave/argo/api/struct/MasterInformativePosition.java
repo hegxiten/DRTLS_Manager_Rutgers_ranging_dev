@@ -53,7 +53,7 @@ public class MasterInformativePosition {
         this.masterInfoBytes = Arrays.copyOfRange(byteArray, 0, TOTAL_BYTES);
         this.setX(signedIntFromTwoBytes(this.masterInfoBytes[X_H_BYTE_IDX], this.masterInfoBytes[X_L_BYTE_IDX]));
         this.setY(signedIntFromTwoBytes(this.masterInfoBytes[Y_H_BYTE_IDX], this.masterInfoBytes[Y_L_BYTE_IDX]));
-        this.setZ(signedIntFromTwoBytes(this.masterInfoBytes[Z_H_BYTE_IDX], this.masterInfoBytes[Z_L_BYTE_IDX]));
+        this.setZ(unSignedIntFromTwoBytes(this.masterInfoBytes[Z_H_BYTE_IDX], this.masterInfoBytes[Z_L_BYTE_IDX]));
         this.setAssocId(unsignedIntFromByte(this.masterInfoBytes[ASSOC_ID_BYTE_IDX]));
         this.setMasterSideByValue(unsignedIntFromByte(this.masterInfoBytes[SIDE_BYTE_IDX]));
     }
@@ -114,8 +114,8 @@ public class MasterInformativePosition {
     }
 
     public void setZ(int z) {
-        if (z < -32768 || z > 32767) {
-            throw new IllegalArgumentException("input position value out of range! (min -32768 max 32767)");
+        if (z < 0 || z > 65535) {
+            throw new IllegalArgumentException("input position value out of range! (min 0 max 65535)");
         }
         this.masterInfoBytes[Z_L_BYTE_IDX] = (byte) z;
         this.masterInfoBytes[Z_H_BYTE_IDX] = (byte) (z >>> 8);
@@ -150,7 +150,7 @@ public class MasterInformativePosition {
     }
 
     public int getZ() {
-        return signedIntFromTwoBytes(masterInfoBytes[Z_H_BYTE_IDX], masterInfoBytes[Z_L_BYTE_IDX]);
+        return unSignedIntFromTwoBytes(masterInfoBytes[Z_H_BYTE_IDX], masterInfoBytes[Z_L_BYTE_IDX]);
     }
 
     public Integer getAssocId() {
@@ -215,6 +215,17 @@ public class MasterInformativePosition {
             int ret = ((highByte & 0xFF) << 8 | (lowByte & 0xFF)) | 0x00000000; // no sign ext.
             return ret;
         }
+    }
+
+    public static int unSignedIntFromTwoBytes(byte highByte, byte lowByte) {
+        int ret = 0;
+        for (int idx=0; idx<=7; idx++) {
+            ret = (int) (ret + ((lowByte >> idx) & 1) * Math.pow(2, idx));
+        }
+        for (int idx=0; idx<=7; idx++) {
+            ret = (int) (ret + ((highByte >> idx) & 1) * Math.pow(2, idx + 8));
+        }
+        return ret;
     }
 
     public static int unsignedIntFromByte(byte b) {

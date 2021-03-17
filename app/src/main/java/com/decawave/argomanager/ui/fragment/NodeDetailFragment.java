@@ -813,7 +813,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     int inputSlaveSide = Integer.valueOf(slaveMasterside.getValue());
                     slaveConfigValuesRangeOk = (inputSlaveX >= -32768 && inputSlaveX <= 32767)
                             && (inputSlaveY >= -32768 && inputSlaveY <= 32767)
-                            && (inputSlaveZ >= -32768 && inputSlaveZ <= 32767)
+                            && (inputSlaveZ >= 0 && inputSlaveZ <= 65535)
                             && (inputSlaveAssoc >= 0 && inputSlaveAssoc <= 255);
                     if (!slaveConfigValuesRangeOk) {
                         ToastUtil.showToast(R.string.slave_input_exceeds_range, Toast.LENGTH_LONG);
@@ -861,7 +861,7 @@ public class NodeDetailFragment extends AbstractArgoFragment implements NetworkP
                     int inputMasterSide = Integer.valueOf(slaveMasterside.getValue());
                     masterConfigValuesRangeOk = (inputMasterX >= -32768 && inputMasterX <= 32767)
                             && (inputMasterY >= -32768 && inputMasterY <= 32767)
-                            && (inputMasterZ >= -32768 && inputMasterZ <= 32767)
+                            && (inputMasterZ >= 0 && inputMasterZ <= 65535)
                             && (inputMasterAssoc >= 0 && inputMasterAssoc <= 255);
                     if (!masterConfigValuesRangeOk) {
                         ToastUtil.showToast(R.string.master_input_exceeds_range, Toast.LENGTH_LONG);

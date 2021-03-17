@@ -156,7 +156,8 @@ public class DiscoveryManagerImpl implements DiscoveryManager {
             }
             cancelScheduledDiscoveryStop();
         }
-        // post runnable to stop discovery after 10 seconds
+        log.d("running discovery by " + (long) DEFAULT_DISCOVERY_DURATION + " ms, not prolonged.");
+        // post runnable to stop discovery after 15 seconds
         scheduleDiscoveryStop((long) DEFAULT_DISCOVERY_DURATION);
     }
 
