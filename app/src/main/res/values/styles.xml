@@ -110,6 +110,10 @@
         <item name="android:duplicateParentState">true</item>
     </style>
 
+    <style name="LabelTextMonospace" parent="NodeTitleInOverview">
+        <item name="android:fontFamily">monospace</item>
+    </style>
+
     <style name="NodeTitleInOverview" parent="NodeTitleInNodeList">
         <item name="android:layout_marginTop">0dp</item>
     </style>

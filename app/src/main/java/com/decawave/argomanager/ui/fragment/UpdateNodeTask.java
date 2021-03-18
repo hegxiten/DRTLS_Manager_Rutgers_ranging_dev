@@ -13,6 +13,7 @@ import com.decawave.argo.api.struct.AnchorNode;
 import com.decawave.argo.api.struct.MasterInformativePosition;
 import com.decawave.argo.api.struct.NetworkNode;
 import com.decawave.argo.api.struct.NetworkNodeProperty;
+import com.decawave.argo.api.struct.NetworkOperationMode;
 import com.decawave.argo.api.struct.NodeType;
 import com.decawave.argo.api.struct.Position;
 import com.decawave.argo.api.struct.SlaveInformativePosition;
@@ -385,7 +386,6 @@ class UpdateNodeTask {
             if (targetNodeType == NodeType.ANCHOR) {
                 // position and slave informative position
                 Position position = null;
-                SlaveInformativePosition slaveInfoPosition = null;
                 if (posX != null && posY != null && posZ != null) {
                     Integer uiPosX;
                     Integer uiPosY;
@@ -419,7 +419,8 @@ class UpdateNodeTask {
                         position.z = uiPosZ;
                     }
                 }
-                else if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null && slaveMasterSide != null) {
+                SlaveInformativePosition slaveInfoPosition = null;
+                if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null && slaveMasterSide != null) {
                     Integer uiSlavePosX;
                     Integer uiSlavePosY;
                     Integer uiSlavePosZ;
@@ -477,7 +478,7 @@ class UpdateNodeTask {
                         slaveInfoPosition.setSlaveSideByValue(uiSlaveMasterSide);
                     }
                 }
-                else if (nodeTypeSwitch) {
+                if (nodeTypeSwitch) {
                     // let's avoid a situation when user switched from TAG to ANCHOR and did not set explicit position
                     // there might be stored position from previous anchor mode
                     position = new Position();
@@ -490,9 +491,11 @@ class UpdateNodeTask {
                     b = true;
                 }
                 if (slaveInfoPosition != null) {
-                    appLog.d("SLAVE INFORMATIVE POSITION change detected", logTag);
-                    anchorBuilder.setSlaveInfoPosition(slaveInfoPosition);
-                    b = true;
+                    if (nodeTypeSwitch || isPropertyChanged(originalInput, NodeType.ANCHOR, NetworkNodeProperty.ANCHOR_SLAVE_INFO_POSITION, slaveInfoPosition)) {
+                        appLog.d("SLAVE INFORMATIVE POSITION change detected", logTag);
+                        anchorBuilder.setSlaveInfoPosition(slaveInfoPosition);
+                        b = true;
+                    }
                 }
             }
         } else {
@@ -583,7 +586,9 @@ class UpdateNodeTask {
                 tagBuilder.setLocationEngineEnable(isLocationEngineEnable);
                 b = true;
             }
-            if (masterInfoPosition != null) {
+            boolean isRanging = networkNodeManager.getActiveNetwork() != null && networkNodeManager.getActiveNetwork().getNetworkOperationMode() == NetworkOperationMode.RANGING;
+            if (nodeTypeSwitch || isPropertyChanged(originalInput, NodeType.TAG, NetworkNodeProperty.TAG_MASTER_INFO_POSITION, masterInfoPosition)
+                && isRanging) {
                 appLog.d("MASTER INFORMATIVE POSITION change detected", logTag);
                 tagBuilder.setMasterInfoPosition(masterInfoPosition);
                 b = true;
