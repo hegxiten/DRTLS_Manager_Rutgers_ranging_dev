@@ -81,7 +81,10 @@ public class SlaveInformativePosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SlaveInformativePosition otherSlaveInfoPosition = (SlaveInformativePosition) o;
-        if (this.slaveInfoBytes != otherSlaveInfoPosition.slaveInfoBytes) return false;
+        if (this.getX() != otherSlaveInfoPosition.getX()) return false;
+        if (this.getY() != otherSlaveInfoPosition.getY()) return false;
+        if (this.getZ() != otherSlaveInfoPosition.getZ()) return false;
+        if (this.getSlaveSide() != otherSlaveInfoPosition.getSlaveSide()) return false;
         return this.getAssocId() != null ? (this.getAssocId() == otherSlaveInfoPosition.getAssocId()) : (otherSlaveInfoPosition.getAssocId() == null);
 
     }

@@ -71,7 +71,10 @@ public class MasterInformativePosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MasterInformativePosition otherMasterInfoPosition = (MasterInformativePosition) o;
-        if (this.masterInfoBytes != otherMasterInfoPosition.masterInfoBytes) return false;
+        if (this.getX() != otherMasterInfoPosition.getX()) return false;
+        if (this.getY() != otherMasterInfoPosition.getY()) return false;
+        if (this.getZ() != otherMasterInfoPosition.getZ()) return false;
+        if (this.getMasterSide() != otherMasterInfoPosition.getMasterSide()) return false;
         return this.getAssocId() != null ? (this.getAssocId() == otherMasterInfoPosition.getAssocId()) : (otherMasterInfoPosition.getAssocId() == null);
 
     }
