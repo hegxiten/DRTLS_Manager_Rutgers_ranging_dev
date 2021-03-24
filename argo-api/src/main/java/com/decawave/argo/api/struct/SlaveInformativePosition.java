@@ -16,10 +16,13 @@ public class SlaveInformativePosition {
     public final int Z_L_BYTE_IDX = 10;
     public final int Z_H_BYTE_IDX = 11;
 
+    public final int LENGTH_L_BYTE_IDX = 8;
+    public final int LENGTH_H_BYTE_IDX = 9;
+
     public final int ASSOC_ID_BYTE_IDX = 1;
 
     public final int QUAL_FACTOR_BYTE_IDX = 12;
-    public final int[] RESERVED_BYTE_IDX = new int[]{0, 4, 5, 8, 9};
+    public final int[] RESERVED_BYTE_IDX = new int[]{0, 4, 5};
     // lowest byte (first byte) of each integer might be compromised by observation (Zezhou Wang, 03122021)
     // relative X, Y, Z coordinate, each 2 Bytes. Lower bytes of original 3 (4-byte) integers are volatile.
     // Using the original higher bytes for storing our X (CPLR), Y (CL), Z (TOR) values.
@@ -43,6 +46,7 @@ public class SlaveInformativePosition {
         this.setZ(z);
         this.setAssocId(0); // if not set, set to 0
         this.setSlaveSideByValue(SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE);
+        this.setVehicleLength(0);
         this.setReserved();
     }
 
@@ -50,6 +54,7 @@ public class SlaveInformativePosition {
         this(x, y, z);
         this.setAssocId(associationId);
         this.setSlaveSideByValue(SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE);
+        this.setVehicleLength(0);
         this.setReserved();
     }
 
@@ -60,12 +65,21 @@ public class SlaveInformativePosition {
         this.setReserved();
     }
 
+    public SlaveInformativePosition(int x, int y, int z, int associationId, int slaveSideValue, int length) {
+        this(x, y, z);
+        this.setAssocId(associationId);
+        this.setSlaveSideByValue(slaveSideValue);
+        this.setVehicleLength(length);
+        this.setReserved();
+    }
+
     public SlaveInformativePosition(byte[] byteArray) {
         this.slaveInfoBytes = Arrays.copyOfRange(byteArray, 0, TOTAL_BYTES);
         this.setX(signedIntFromTwoBytes(this.slaveInfoBytes[X_H_BYTE_IDX], this.slaveInfoBytes[X_L_BYTE_IDX]));
         this.setY(signedIntFromTwoBytes(this.slaveInfoBytes[Y_H_BYTE_IDX], this.slaveInfoBytes[Y_L_BYTE_IDX]));
         this.setZ(unSignedIntFromTwoBytes(this.slaveInfoBytes[Z_H_BYTE_IDX], this.slaveInfoBytes[Z_L_BYTE_IDX]));
         this.setAssocId(unsignedIntFromByte(this.slaveInfoBytes[ASSOC_ID_BYTE_IDX]));
+        this.setVehicleLength(unSignedIntFromTwoBytes(this.slaveInfoBytes[LENGTH_H_BYTE_IDX], this.slaveInfoBytes[LENGTH_L_BYTE_IDX]));
     }
 
     public SlaveInformativePosition() {
@@ -85,6 +99,7 @@ public class SlaveInformativePosition {
         if (this.getY() != otherSlaveInfoPosition.getY()) return false;
         if (this.getZ() != otherSlaveInfoPosition.getZ()) return false;
         if (this.getSlaveSide() != otherSlaveInfoPosition.getSlaveSide()) return false;
+        if (this.getVehicleLength() != otherSlaveInfoPosition.getVehicleLength()) return false;
         return this.getAssocId() != null ? (this.getAssocId() == otherSlaveInfoPosition.getAssocId()) : (otherSlaveInfoPosition.getAssocId() == null);
 
     }
@@ -94,6 +109,7 @@ public class SlaveInformativePosition {
         int result = this.getX();
         result = 31 * result + this.getY();
         result = 31 * result + this.getZ();
+        result = 31 * result + this.getVehicleLength();
         result = 31 * result + (this.getAssocId() != null ? this.getAssocId().hashCode() : 0);
         result = 31 * result + (this.getSlaveSideValue() != null ? this.getSlaveSideValue().hashCode() : 0);
         return result;
@@ -132,6 +148,15 @@ public class SlaveInformativePosition {
         }
         this.slaveInfoBytes[Z_L_BYTE_IDX] = (byte) z;
         this.slaveInfoBytes[Z_H_BYTE_IDX] = (byte) (z >>> 8);
+    }
+
+
+    public void setVehicleLength(int length) {
+        if (length < 0 || length > 65535) {
+            throw new IllegalArgumentException("input length value out of range! (min 0 max 65535)");
+        }
+        this.slaveInfoBytes[LENGTH_L_BYTE_IDX] = (byte) length;
+        this.slaveInfoBytes[LENGTH_H_BYTE_IDX] = (byte) (length >>> 8);
     }
 
     public void setAssocId(int assocId) {
@@ -188,6 +213,10 @@ public class SlaveInformativePosition {
         return unSignedIntFromTwoBytes(slaveInfoBytes[Z_H_BYTE_IDX], slaveInfoBytes[Z_L_BYTE_IDX]);
     }
 
+    public int getVehicleLength() {
+        return unSignedIntFromTwoBytes(slaveInfoBytes[LENGTH_H_BYTE_IDX], slaveInfoBytes[LENGTH_L_BYTE_IDX]);
+    }
+
     public Integer getAssocId() {
         return unsignedIntFromByte(slaveInfoBytes[ASSOC_ID_BYTE_IDX]);
     }
@@ -215,6 +244,7 @@ public class SlaveInformativePosition {
                 ", y=" + this.getY() +
                 ", z=" + this.getZ() +
                 ", association=" + this.getAssocId() +
+                ", vehicle length=" + this.getVehicleLength() +
                 ", side=" + this.getSlaveSide() +
                 '}';
     }

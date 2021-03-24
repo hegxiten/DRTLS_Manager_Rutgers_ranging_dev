@@ -113,6 +113,8 @@
     <string name="slave_master_detail_config">Master/Slave Position (CM)</string>
     <string name="slave_master_assoc_config">Master/Slave Association ID</string>
     <string name="slave_master_assoc_input_hint">Enter the Association ID (e.g. Vehicle ID)</string>
+    <string name="slave_master_vehicle_length_title">Master/Slave Vehicle Length (CM)</string>
+    <string name="slave_master_vehicle_length_input_hint">Enter the Vehicle Length ID in Centimeters</string>
     <string name="slave_master_detail_pos_x_coupler">CPLR(+:inside)</string>
     <string name="slave_master_detail_pos_y_centerline">CL(+:COND.)</string>
     <string name="slave_master_detail_pos_z_top_of_rail">TOR(+:over)</string>
@@ -129,8 +131,8 @@
     <string name="slave_master_field_z_detail">Vertical distance towards top of the rail.</string>
     <string name="slave_master_field_x_detail_sign">\t\tPOS.(+) towards inside of the vehicle.</string>
     <string name="slave_master_field_y_detail_sign">\t\tPOS.(+) towards conductor side of that end.</string>
-    <string name="slave_master_field_y_error_sign">\t\tExpect ±2cm error for Slave due to encoding method.</string>
     <string name="slave_master_field_z_detail_sign">\t\tPOS.(+) upwards.</string>
+    <string name="slave_master_field_error_explanation">\t\tExpect ±2cm error for Slave due to encoding method.</string>
     <string name="master_label_editable_disabled_explain">(Note: Label is NOT editable for Masters)</string>
 
     <string name="slave_info_position_property_title">Position (CM)</string>

@@ -106,18 +106,22 @@ class UpdateNodeTask {
                   @Nullable String origMasterPosY,
                   @Nullable String origMasterPosZ,
                   @Nullable String origMasterAssocId,
+                  @Nullable String origMasterVehicleLength,
                   @Nullable String posMasterX,
                   @Nullable String posMasterY,
                   @Nullable String posMasterZ,
                   @Nullable String masterAssocId,
+                  @Nullable String masterVehicleLength,
                   @Nullable String origSlavePosX,
                   @Nullable String origSlavePosY,
                   @Nullable String origSlavePosZ,
                   @Nullable String origSlaveAssocId,
+                  @Nullable String origSlaveVehicleLength,
                   @Nullable String posSlaveX,
                   @Nullable String posSlaveY,
                   @Nullable String posSlaveZ,
                   @Nullable String slaveAssocId,
+                  @Nullable String slaveVehicleLength,
                   @Nullable SlaveMasterSide slaveMasterSide
                   ) {
 
@@ -187,9 +191,13 @@ class UpdateNodeTask {
                 uwbMode, isInitiator, isFirmwareUpdateEnable, isLedIndicationEnable, isBleEnable, isAccelerometerEnable, isLocationEngineEnable, isLowPowerModeEnable,
                 origPosX, origPosY, origPosZ, posX, posY, posZ, tag, lengthUnit,
                 origMasterPosX, origMasterPosY, origMasterPosZ, origMasterAssocId,
+                origMasterVehicleLength,
                 posMasterX, posMasterY, posMasterZ, masterAssocId,
+                masterVehicleLength,
                 origSlavePosX, origSlavePosY, origSlavePosZ, origSlaveAssocId,
+                origSlaveVehicleLength,
                 posSlaveX, posSlaveY, posSlaveZ, slaveAssocId,
+                slaveVehicleLength,
                 slaveMasterSide);
         if (targetEntity == null) {
             // no change detected
@@ -282,7 +290,6 @@ class UpdateNodeTask {
      * If there is no change performed (comparing to the original), null is returned.
      * @param originalInput original
      * @param targetNodeType target node type
-     * @param slaveAssocId TODO
      * @return built network node or null if no change is detected
      */
     private NetworkNode uiContentToNetworkNode(NetworkNode originalInput,
@@ -311,18 +318,22 @@ class UpdateNodeTask {
                                                @Nullable String origMasterPosY,
                                                @Nullable String origMasterPosZ,
                                                @Nullable String origMasterAssoc,
+                                               @Nullable String origMasterVehicleLength,
                                                @Nullable String posMasterX,
                                                @Nullable String posMasterY,
                                                @Nullable String posMasterZ,
                                                @Nullable String masterAssocId,
+                                               @Nullable String masterVehicleLength,
                                                @Nullable String origSlavePosX,
                                                @Nullable String origSlavePosY,
                                                @Nullable String origSlavePosZ,
                                                @Nullable String origSlaveAssoc,
+                                               @Nullable String origSlaveVehicleLength,
                                                @Nullable String posSlaveX,
                                                @Nullable String posSlaveY,
                                                @Nullable String posSlaveZ,
                                                @Nullable String slaveAssocId,
+                                               @Nullable String slaveVehicleLength,
                                                @Nullable SlaveMasterSide slaveMasterSide) {
         if (Constants.DEBUG) {
             Preconditions.checkState(posX == null && posY == null && posZ == null ||
@@ -420,17 +431,20 @@ class UpdateNodeTask {
                     }
                 }
                 SlaveInformativePosition slaveInfoPosition = null;
-                if (posSlaveX != null && posSlaveY != null && posSlaveZ != null && slaveAssocId != null && slaveMasterSide != null) {
+                if (posSlaveX != null && posSlaveY != null && posSlaveZ != null
+                        && slaveAssocId != null && slaveMasterSide != null && slaveVehicleLength != null) {
                     Integer uiSlavePosX;
                     Integer uiSlavePosY;
                     Integer uiSlavePosZ;
                     Integer uiSlaveAssocId;
                     Integer uiSlaveMasterSide;
+                    Integer uiSlaveVehicleLength;
                     try {
                         uiSlavePosX = Util.parseSlaveMasterPositionSigned(posSlaveX, lengthUnit);
                         uiSlavePosY = Util.parseSlaveMasterPositionSigned(posSlaveY, lengthUnit);
                         uiSlavePosZ = Util.parseSlaveMasterPositionUnsigned(posSlaveZ, lengthUnit);
                         uiSlaveAssocId = Util.parseSlaveMasterAssoc(slaveAssocId);
+                        uiSlaveVehicleLength = Util.parseSlaveMasterPositionUnsigned(slaveVehicleLength, lengthUnit);
                         uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("wrong number format", e);
@@ -477,6 +491,18 @@ class UpdateNodeTask {
                         }
                         slaveInfoPosition.setSlaveSideByValue(uiSlaveMasterSide);
                     }
+                    if (slaveInfoPosition != null || !slaveVehicleLength.equals(origSlaveVehicleLength)) {
+                        if (slaveInfoPosition == null) {
+                            slaveInfoPosition = new SlaveInformativePosition();
+                            // we will take the value from the UI (it makes sense as a whole)
+                            slaveInfoPosition.setX(uiSlavePosX);
+                            slaveInfoPosition.setY(uiSlavePosY);
+                            slaveInfoPosition.setZ(uiSlavePosZ);
+                            slaveInfoPosition.setAssocId(uiSlaveAssocId);
+                            slaveInfoPosition.setSlaveSideByValue(uiSlaveMasterSide);
+                        }
+                        slaveInfoPosition.setVehicleLength(uiSlaveVehicleLength);
+                    }
                 }
                 if (nodeTypeSwitch) {
                     // let's avoid a situation when user switched from TAG to ANCHOR and did not set explicit position
@@ -502,17 +528,20 @@ class UpdateNodeTask {
             // TAG
             NodeFactory.TagNodeBuilder tagBuilder = (NodeFactory.TagNodeBuilder) builder;
             MasterInformativePosition masterInfoPosition = null;
-            if (posMasterX != null && posMasterY != null && posMasterZ != null && masterAssocId != null && slaveMasterSide != null) {
+            if (posMasterX != null && posMasterY != null && posMasterZ != null
+                    && masterAssocId != null && slaveMasterSide != null && masterVehicleLength != null) {
                 Integer uiMasterPosX;
                 Integer uiMasterPosY;
                 Integer uiMasterPosZ;
                 Integer uiMasterAssocId;
                 Integer uiSlaveMasterSide;
+                Integer uiMasterVehicleLength;
                 try {
                     uiMasterPosX = Util.parseSlaveMasterPositionSigned(posMasterX, lengthUnit);
                     uiMasterPosY = Util.parseSlaveMasterPositionSigned(posMasterY, lengthUnit);
                     uiMasterPosZ = Util.parseSlaveMasterPositionUnsigned(posMasterZ, lengthUnit);
                     uiMasterAssocId = Util.parseSlaveMasterAssoc(masterAssocId);
+                    uiMasterVehicleLength = Util.parseSlaveMasterPositionUnsigned(masterVehicleLength, lengthUnit);
                     uiSlaveMasterSide = Integer.valueOf(slaveMasterSide.getValue());
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("wrong number format", e);
@@ -558,6 +587,18 @@ class UpdateNodeTask {
                         masterInfoPosition.setAssocId(uiMasterAssocId);
                     }
                     masterInfoPosition.setMasterSideByValue(uiSlaveMasterSide);
+                }
+                if (masterInfoPosition != null || !masterVehicleLength.equals(origMasterVehicleLength)) {
+                    if (masterInfoPosition == null) {
+                        masterInfoPosition = new MasterInformativePosition();
+                        // we will take the value from the UI (it makes sense as a whole)
+                        masterInfoPosition.setX(uiMasterPosX);
+                        masterInfoPosition.setY(uiMasterPosY);
+                        masterInfoPosition.setZ(uiMasterPosZ);
+                        masterInfoPosition.setAssocId(uiMasterAssocId);
+                        masterInfoPosition.setMasterSideByValue(uiSlaveMasterSide);
+                    }
+                    masterInfoPosition.setVehicleLength(uiMasterVehicleLength);
                 }
             }
             // update rate

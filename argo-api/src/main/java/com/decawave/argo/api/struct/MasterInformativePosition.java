@@ -18,7 +18,11 @@ public class MasterInformativePosition {
 
     public final int ASSOC_ID_BYTE_IDX = 6;
     public final int SIDE_BYTE_IDX = 7;
-    public final int[] RESERVED_BYTE_IDX = new int[]{8, 9 ,10, 11};
+
+    public final int LENGTH_L_BYTE_IDX = 8;
+    public final int LENGTH_H_BYTE_IDX = 9;
+
+    public final int[] RESERVED_BYTE_IDX = new int[]{10, 11};
     //  |00 |01 |02 |03 |04 |05 |06 |07 |08 |09 |10 |11 | (12-bytes)
     //  |XL |XH |YL |YH |ZL |ZH |ID |MS |RS |RS |RS |RS |
     //  RS: stable reserved byte field; L: lower-byte; H: higher-byte; ID: association (vehicle) Id; MS: Master End Side
@@ -32,6 +36,7 @@ public class MasterInformativePosition {
         this.setZ(z);
         this.setAssocId(0); // if not set, set to 0
         this.setMasterSideByValue(SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE);
+        this.setVehicleLength(0);
         this.setReserved();
     }
 
@@ -39,6 +44,7 @@ public class MasterInformativePosition {
         this(x, y, z);
         this.setAssocId(associationId);
         this.setMasterSideByValue(SlaveMasterSide.Constants.UNKNOWN_SIDE_VALUE);
+        this.setVehicleLength(0);
         this.setReserved();
     }
 
@@ -46,6 +52,15 @@ public class MasterInformativePosition {
         this(x, y, z);
         this.setAssocId(associationId);
         this.setMasterSideByValue(masterSideValue);
+        this.setVehicleLength(0);
+        this.setReserved();
+    }
+
+    public MasterInformativePosition(int x, int y, int z, int associationId, int masterSideValue, int length) {
+        this(x, y, z);
+        this.setAssocId(associationId);
+        this.setMasterSideByValue(masterSideValue);
+        this.setVehicleLength(length);
         this.setReserved();
     }
 
@@ -54,6 +69,7 @@ public class MasterInformativePosition {
         this.setX(signedIntFromTwoBytes(this.masterInfoBytes[X_H_BYTE_IDX], this.masterInfoBytes[X_L_BYTE_IDX]));
         this.setY(signedIntFromTwoBytes(this.masterInfoBytes[Y_H_BYTE_IDX], this.masterInfoBytes[Y_L_BYTE_IDX]));
         this.setZ(unSignedIntFromTwoBytes(this.masterInfoBytes[Z_H_BYTE_IDX], this.masterInfoBytes[Z_L_BYTE_IDX]));
+        this.setVehicleLength(unSignedIntFromTwoBytes(this.masterInfoBytes[LENGTH_H_BYTE_IDX], this.masterInfoBytes[LENGTH_L_BYTE_IDX]));
         this.setAssocId(unsignedIntFromByte(this.masterInfoBytes[ASSOC_ID_BYTE_IDX]));
         this.setMasterSideByValue(unsignedIntFromByte(this.masterInfoBytes[SIDE_BYTE_IDX]));
     }
@@ -75,6 +91,7 @@ public class MasterInformativePosition {
         if (this.getY() != otherMasterInfoPosition.getY()) return false;
         if (this.getZ() != otherMasterInfoPosition.getZ()) return false;
         if (this.getMasterSide() != otherMasterInfoPosition.getMasterSide()) return false;
+        if (this.getVehicleLength() != otherMasterInfoPosition.getVehicleLength()) return false;
         return this.getAssocId() != null ? (this.getAssocId() == otherMasterInfoPosition.getAssocId()) : (otherMasterInfoPosition.getAssocId() == null);
 
     }
@@ -84,6 +101,7 @@ public class MasterInformativePosition {
         int result = this.getX();
         result = 31 * result + this.getY();
         result = 31 * result + this.getZ();
+        result = 31 * result + this.getVehicleLength();
         result = 31 * result + (this.getAssocId() != null ? this.getAssocId().hashCode() : 0);
         result = 31 * result + (this.getMasterSideValue() != null ? this.getMasterSideValue().hashCode() : 0);
         return result;
@@ -124,6 +142,14 @@ public class MasterInformativePosition {
         this.masterInfoBytes[Z_H_BYTE_IDX] = (byte) (z >>> 8);
     }
 
+    public void setVehicleLength(int length) {
+        if (length < 0 || length > 65535) {
+            throw new IllegalArgumentException("input length value out of range! (min 0 max 65535)");
+        }
+        this.masterInfoBytes[LENGTH_L_BYTE_IDX] = (byte) length;
+        this.masterInfoBytes[LENGTH_H_BYTE_IDX] = (byte) (length >>> 8);
+    }
+
     public void setAssocId(int assocId) {
         if (assocId < 0 || assocId > 255) {
             throw new IllegalArgumentException("association id range has to be limited from 0 to 255!");
@@ -156,6 +182,10 @@ public class MasterInformativePosition {
         return unSignedIntFromTwoBytes(masterInfoBytes[Z_H_BYTE_IDX], masterInfoBytes[Z_L_BYTE_IDX]);
     }
 
+    public int getVehicleLength() {
+        return unSignedIntFromTwoBytes(masterInfoBytes[LENGTH_H_BYTE_IDX], masterInfoBytes[LENGTH_L_BYTE_IDX]);
+    }
+
     public Integer getAssocId() {
         return unsignedIntFromByte(masterInfoBytes[ASSOC_ID_BYTE_IDX]);
     }
@@ -183,6 +213,7 @@ public class MasterInformativePosition {
                 ", y=" + this.getY() +
                 ", z=" + this.getZ() +
                 ", association=" + this.getAssocId() +
+                ", vehicle length=" + this.getVehicleLength() +
                 ", side=" + this.getMasterSide() +
                 '}';
     }

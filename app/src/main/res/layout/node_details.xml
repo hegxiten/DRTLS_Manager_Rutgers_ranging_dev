@@ -449,6 +449,56 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvSlaveVehicleLengthTitle"
+            style="@style/NodeDetailPropertyTitle"
+            android:text="@string/slave_master_vehicle_length_title" />
+
+        <LinearLayout
+            android:id="@+id/tvSlaveVehicleLengthContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/node_value_left_padding"
+            android:layout_marginEnd="@dimen/node_value_left_padding"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_vehicle_length_input_hint">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/slave_detail_vehicle_length"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvMasterVehicleLengthTitle"
+            style="@style/NodeDetailPropertyTitle"
+            android:text="@string/slave_master_vehicle_length_title" />
+
+        <LinearLayout
+            android:id="@+id/tvMasterVehicleLengthContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/node_value_left_padding"
+            android:layout_marginEnd="@dimen/node_value_left_padding"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+            <android.support.design.widget.TextInputLayout
+                style="@style/NodeDetailPositionCompound"
+                android:hint="@string/slave_master_vehicle_length_input_hint">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/master_detail_vehicle_length"
+                    style="@style/editText.coordinate" />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <TextView
             android:id="@+id/tvSlaveMasterAssocTitle"
             style="@style/NodeDetailPropertyTitle"
             android:text="@string/slave_master_assoc_config" />
@@ -554,15 +604,6 @@
                 style="@style/NodeDetailReadOnlyPayload"
                 android:text="@string/slave_master_field_y_detail_sign" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="0dp"
-                android:id="@+id/tvSlaveMasterFieldExplainYError"
-                style="@style/NodeDetailReadOnlyPayload"
-                android:text="@string/slave_master_field_y_error_sign" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -589,6 +630,14 @@
                 android:id="@+id/tvSlaveMasterFieldExplainZSign"
                 style="@style/NodeDetailReadOnlyPayload"
                 android:text="@string/slave_master_field_z_detail_sign" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:id="@+id/tvSlaveMasterFieldExplainYError"
+                style="@style/NodeDetailReadOnlyPayload"
+                android:text="@string/slave_master_field_error_explanation" />
         </LinearLayout>
     </LinearLayout>
 
