@@ -41,7 +41,7 @@ android {
     compileSdkVersion Integer.parseInt(project.SDK_VERSION_TARGET)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
     defaultConfig {
-        applicationId "com.decawave.argomanager"
+        applicationId "com.decawave.rutgersrail"
         minSdkVersion Integer.parseInt(project.SDK_VERSION_MIN)
         targetSdkVersion Integer.parseInt(project.SDK_VERSION_TARGET)
         versionCode Integer.parseInt(project.APP_VERSION_CODE)

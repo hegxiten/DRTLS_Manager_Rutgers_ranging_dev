@@ -29,7 +29,7 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="25dp"
-        android:text="Decawave DRTLS Manager"
+        android:text="DRTLS Manager RU Rail Lab"
         android:textColor="#AD0E0E"
         android:textSize="@dimen/activity_horizontal_margin" />
 

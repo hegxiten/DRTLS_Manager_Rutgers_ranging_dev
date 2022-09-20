@@ -53,7 +53,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.decawave.argomanager"
+            android:authorities="com.decawave.rutgersrail"
             android:exported="false"
             android:grantUriPermissions="true"
             >
